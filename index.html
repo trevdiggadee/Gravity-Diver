@@ -488,8 +488,9 @@
 
   .toast{
     position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%) translateY(20px);
-    background: var(--neon); color: #171d02; padding: 14px 22px; border-radius: 100px; font-weight:700;
-    font-size: 14px; opacity:0; pointer-events:none; transition: all .3s ease; z-index: 130; box-shadow: 0 10px 30px rgba(0,0,0,.5), 0 0 22px rgba(var(--neon-rgb),0.4);
+    background: var(--neon); color: #171d02; padding: 14px 22px; border-radius: 20px; font-weight:700;
+    font-size: 13px; line-height:1.4; max-width: min(92vw, 420px); text-align:center;
+    opacity:0; pointer-events:none; transition: all .3s ease; z-index: 130; box-shadow: 0 10px 30px rgba(0,0,0,.5), 0 0 22px rgba(var(--neon-rgb),0.4);
   }
   .toast.show{ opacity:1; transform: translateX(-50%) translateY(0); }
 
@@ -743,8 +744,12 @@ function normalizeDaysLength(parsed){
   return parsed;
 }
 
+/* ---- Dev bypass: add ?dev=1 to the URL to skip login entirely while testing ---- */
+const DEV_BYPASS = new URLSearchParams(window.location.search).has('dev');
+
 /* ---- Cloud persistence (Supabase) ---- */
 async function loadDaysFromCloud(){
+  if(DEV_BYPASS) return freshDays();
   if(!currentUserId) return freshDays();
   try{
     const { data, error } = await supabaseClient
@@ -758,13 +763,14 @@ async function loadDaysFromCloud(){
   return freshDays();
 }
 async function saveDaysToCloud(){
+  if(DEV_BYPASS) return;
   if(!currentUserId) return;
   try{
     const { error } = await supabaseClient
       .from('program_state')
       .upsert({ user_id: currentUserId, days, updated_at: new Date().toISOString() }, { onConflict: 'user_id' });
     if(error) throw error;
-  }catch(e){ console.error('saveDaysToCloud failed', e); showToast("Couldn't sync to cloud — check your connection."); }
+  }catch(e){ console.error('saveDaysToCloud failed', e); showToast("Sync error: " + (e && (e.message || e.details || JSON.stringify(e))), 8000); }
 }
 let saveDaysTimer = null;
 function saveDays(){
@@ -777,6 +783,7 @@ function flushSaveDays(){
 }
 
 async function loadHistoryFromCloud(){
+  if(DEV_BYPASS) return [];
   if(!currentUserId) return [];
   try{
     const { data, error } = await supabaseClient
@@ -789,6 +796,7 @@ async function loadHistoryFromCloud(){
   }catch(e){ console.error('loadHistoryFromCloud failed', e); return []; }
 }
 async function insertHistoryEntryToCloud(entry){
+  if(DEV_BYPASS) return `dev-${Date.now()}`;
   try{
     const { data, error } = await supabaseClient
       .from('workout_history')
@@ -797,9 +805,10 @@ async function insertHistoryEntryToCloud(entry){
       .single();
     if(error) throw error;
     return data.id;
-  }catch(e){ console.error('insertHistoryEntryToCloud failed', e); showToast("Couldn't save workout to cloud."); return null; }
+  }catch(e){ console.error('insertHistoryEntryToCloud failed', e); showToast("Save error: " + (e && (e.message || e.details || JSON.stringify(e))), 8000); return null; }
 }
 async function deleteHistoryEntryFromCloud(id){
+  if(DEV_BYPASS) return;
   try{
     const { error } = await supabaseClient
       .from('workout_history')
@@ -807,7 +816,7 @@ async function deleteHistoryEntryFromCloud(id){
       .eq('id', id)
       .eq('user_id', currentUserId);
     if(error) throw error;
-  }catch(e){ console.error('deleteHistoryEntryFromCloud failed', e); showToast("Couldn't delete from cloud."); }
+  }catch(e){ console.error('deleteHistoryEntryFromCloud failed', e); showToast("Delete error: " + (e && (e.message || e.details || JSON.stringify(e))), 8000); }
 }
 
 let days = freshDays();
@@ -871,12 +880,12 @@ function escapeHtml(str){
   div.textContent = str;
   return div.innerHTML;
 }
-function showToast(msg){
+function showToast(msg, duration){
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('show');
   clearTimeout(showToast._timeout);
-  showToast._timeout = setTimeout(() => t.classList.remove('show'), 3200);
+  showToast._timeout = setTimeout(() => t.classList.remove('show'), duration || 3200);
 }
 function spawnConfetti(container, opts){
   const { count = 20, mode = 'pop' } = opts || {};
@@ -1719,22 +1728,27 @@ function showSplash(){
   authError.textContent = '';
 }
 
-supabaseClient.auth.onAuthStateChange((event, session) => {
-  if(event === 'TOKEN_REFRESHED') return;
-  if(session && session.user){
-    if(session.user.id !== currentUserId) showApp(session.user.id);
-  } else {
-    showSplash();
-  }
-});
+if(DEV_BYPASS){
+  logoutBtn.style.display = 'none';
+  showApp('dev-local');
+} else {
+  supabaseClient.auth.onAuthStateChange((event, session) => {
+    if(event === 'TOKEN_REFRESHED') return;
+    if(session && session.user){
+      if(session.user.id !== currentUserId) showApp(session.user.id);
+    } else {
+      showSplash();
+    }
+  });
 
-supabaseClient.auth.getSession().then(({ data }) => {
-  if(data && data.session && data.session.user){
-    showApp(data.session.user.id);
-  } else {
-    showSplash();
-  }
-});
+  supabaseClient.auth.getSession().then(({ data }) => {
+    if(data && data.session && data.session.user){
+      showApp(data.session.user.id);
+    } else {
+      showSplash();
+    }
+  });
+}
 
 </script>
 </body>
