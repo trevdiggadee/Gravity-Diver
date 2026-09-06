@@ -744,12 +744,8 @@ function normalizeDaysLength(parsed){
   return parsed;
 }
 
-/* ---- Dev bypass: add ?dev=1 to the URL to skip login entirely while testing ---- */
-const DEV_BYPASS = new URLSearchParams(window.location.search).has('dev');
-
 /* ---- Cloud persistence (Supabase) ---- */
 async function loadDaysFromCloud(){
-  if(DEV_BYPASS) return freshDays();
   if(!currentUserId) return freshDays();
   try{
     const { data, error } = await supabaseClient
@@ -763,7 +759,6 @@ async function loadDaysFromCloud(){
   return freshDays();
 }
 async function saveDaysToCloud(){
-  if(DEV_BYPASS) return;
   if(!currentUserId) return;
   try{
     const { error } = await supabaseClient
@@ -783,7 +778,6 @@ function flushSaveDays(){
 }
 
 async function loadHistoryFromCloud(){
-  if(DEV_BYPASS) return [];
   if(!currentUserId) return [];
   try{
     const { data, error } = await supabaseClient
@@ -796,7 +790,6 @@ async function loadHistoryFromCloud(){
   }catch(e){ console.error('loadHistoryFromCloud failed', e); return []; }
 }
 async function insertHistoryEntryToCloud(entry){
-  if(DEV_BYPASS) return `dev-${Date.now()}`;
   try{
     const { data, error } = await supabaseClient
       .from('workout_history')
@@ -808,7 +801,6 @@ async function insertHistoryEntryToCloud(entry){
   }catch(e){ console.error('insertHistoryEntryToCloud failed', e); showToast("Save error: " + (e && (e.message || e.details || JSON.stringify(e))), 8000); return null; }
 }
 async function deleteHistoryEntryFromCloud(id){
-  if(DEV_BYPASS) return;
   try{
     const { error } = await supabaseClient
       .from('workout_history')
@@ -1728,27 +1720,22 @@ function showSplash(){
   authError.textContent = '';
 }
 
-if(DEV_BYPASS){
-  logoutBtn.style.display = 'none';
-  showApp('dev-local');
-} else {
-  supabaseClient.auth.onAuthStateChange((event, session) => {
-    if(event === 'TOKEN_REFRESHED') return;
-    if(session && session.user){
-      if(session.user.id !== currentUserId) showApp(session.user.id);
-    } else {
-      showSplash();
-    }
-  });
+supabaseClient.auth.onAuthStateChange((event, session) => {
+  if(event === 'TOKEN_REFRESHED') return;
+  if(session && session.user){
+    if(session.user.id !== currentUserId) showApp(session.user.id);
+  } else {
+    showSplash();
+  }
+});
 
-  supabaseClient.auth.getSession().then(({ data }) => {
-    if(data && data.session && data.session.user){
-      showApp(data.session.user.id);
-    } else {
-      showSplash();
-    }
-  });
-}
+supabaseClient.auth.getSession().then(({ data }) => {
+  if(data && data.session && data.session.user){
+    showApp(data.session.user.id);
+  } else {
+    showSplash();
+  }
+});
 
 </script>
 </body>
