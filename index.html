@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RepLog — Workout Logbook</title>
+<link rel="icon" type="image/png" href="REPLOG-ICON.png">
+<link rel="apple-touch-icon" href="REPLOG-ICON.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="RepLog">
+<meta name="theme-color" content="#08090a">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
@@ -62,7 +68,7 @@
   }
   .nav-block button{
     background: transparent; border:none; border-right: 1px solid var(--line); color: var(--chalk-dim);
-    padding: 10px 22px; font: inherit; font-size: 14px; font-weight:600; cursor:pointer; white-space:nowrap;
+    padding: 8px 16px; font: inherit; font-size: 13px; font-weight:600; cursor:pointer; white-space:nowrap;
     transition: all .15s ease;
   }
   .nav-block button:last-child{ border-right:none; }
@@ -76,8 +82,8 @@
     display:inline-flex; align-items:center; justify-content:center;
     background: linear-gradient(135deg, #1c1e22, #0e0f11);
     border:none; color: var(--neon-strong);
-    font: inherit; font-family:'Oswald',sans-serif; font-size: 14px; font-weight:600; letter-spacing:0.05em;
-    padding: 9px 26px; cursor:pointer; transition: all .2s ease;
+    font: inherit; font-family:'Oswald',sans-serif; font-size: 13px; font-weight:600; letter-spacing:0.05em;
+    padding: 8px 18px; cursor:pointer; transition: all .2s ease;
   }
   .start-btn:hover{ background: linear-gradient(135deg, #24272c, #17181b); }
 
@@ -128,7 +134,7 @@
   .auth-note button:hover{ color: var(--chalk); }
   .auth-submit[disabled]{ opacity:0.6; cursor:not-allowed; }
 
-  .wrap{ max-width: 1180px; margin: 0 auto; padding: 26px 32px 90px; }
+  .wrap{ max-width: 1180px; margin: 0 auto; padding: 26px 32px 154px; }
   .view{ display:none; }
   .view.active{ display:block; animation: rise .35s ease; }
   @keyframes rise{ from{ opacity:0; transform: translateY(8px);} to{opacity:1; transform:none;} }
@@ -256,7 +262,7 @@
 
   /* ---- Finish bar ---- */
   .finish-bar{
-    position: sticky; bottom: 0; margin-top: 15px; padding: 10px 20px; background: var(--panel);
+    position: sticky; bottom: 64px; margin-top: 15px; padding: 10px 20px; background: var(--panel);
     border: 1px solid var(--line); border-radius: var(--radius); display:flex; flex-direction:column; align-items:center; justify-content:center;
     box-shadow: 0 -10px 30px rgba(0,0,0,0.45); gap:8px;
   }
@@ -584,7 +590,7 @@
       <span class="session-total">Total time <span class="clock-sm mono" id="finishClock">00:00:00</span></span>
       <div class="finish-actions">
         <button class="btn-primary" id="startBtnBottom">Start</button>
-        <button class="mode-btn" id="modeBtn"><span class="mode-dot" id="modeDot"></span>Mode</button>
+        <button class="mode-btn" id="modeBtn"><span class="mode-dot" id="modeDot"></span>Vibe</button>
         <button class="btn-primary" id="finishBtn">Finish workout</button>
       </div>
     </div>
@@ -649,7 +655,7 @@
   <div class="theme-modal">
     <button type="button" class="ex-modal-close" id="themeModalClose" title="Close">×</button>
     <div class="eyebrow">Choose Your Vibe</div>
-    <div class="theme-modal-title">Neon Mode</div>
+    <div class="theme-modal-title">Neon Vibe</div>
     <div class="color-wheel-wrap">
       <div class="color-wheel-ring"></div>
       <div class="color-wheel" id="colorWheel"></div>
@@ -1360,7 +1366,7 @@ function applyTheme(color, opts){
   modeDot.style.background = color.hex;
   modeDot.style.boxShadow = `0 0 8px ${color.hex}`;
   try{ localStorage.setItem(STORAGE_THEME, JSON.stringify(color)); }catch(e){}
-  if(!opts.silent) showToast(`Neon Mode: ${color.name}`);
+  if(!opts.silent) showToast(`Vibe set: ${color.name}`);
 }
 
 function buildColorWheel(){
