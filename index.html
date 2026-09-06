@@ -703,6 +703,268 @@
   @media (prefers-reduced-motion: reduce){
     *,*::before,*::after{ animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
   }
+
+  /* =========================================================
+     COMPACT ONE-SCREEN WORKOUT LAYOUT
+     ========================================================= */
+  body{ padding-bottom:88px; }
+
+  .topbar{
+    gap:5px;
+    padding:6px 10px 7px;
+    min-height:0;
+  }
+  .logo-img{
+    width:min(46vw,220px);
+    max-width:220px;
+    filter:drop-shadow(0 0 10px rgba(var(--neon-rgb),.28));
+  }
+  .tagline{ display:none; }
+  .nav{ gap:5px; margin-top:0; flex-wrap:nowrap; width:100%; justify-content:center; }
+  .nav-block{ border-radius:8px; max-width:100%; }
+  .nav-block button{ padding:5px 8px; font-size:10px; }
+  .nav #startBtn{ display:none !important; }
+  .session-active{
+    padding:4px 6px 4px 9px; gap:7px;
+    position:absolute; right:8px; top:7px;
+    border-radius:9px;
+  }
+  .session-active .label{ font-size:9px; }
+  .session-active .clock{ font-size:11px; }
+  .session-active .cancel-link{ padding:3px 6px; font-size:9px; }
+
+  .wrap{
+    max-width:1180px;
+    margin:0 auto;
+    padding:8px 10px 96px;
+  }
+
+  .day-rail,.week-rail{
+    gap:4px;
+    margin-bottom:6px;
+  }
+  .day-tab,.week-tab{
+    padding:5px 3px;
+    font-size:10px;
+    min-height:27px;
+  }
+  .day-tab .dot{ top:3px; right:6px; width:4px; height:4px; }
+
+  .day-header{
+    grid-template-columns:minmax(0,1.35fr) minmax(0,.9fr) minmax(0,1fr) !important;
+    gap:5px;
+    margin-bottom:7px;
+  }
+  .day-header .field{
+    min-height:43px;
+    padding:6px 25px 5px 9px;
+    border-radius:9px;
+  }
+  .day-header .field::before{ top:7px; bottom:7px; }
+  .day-header .field label{
+    margin-bottom:2px;
+    font-size:7px;
+    letter-spacing:.08em;
+  }
+  .meta-display{
+    font-size:12px;
+    line-height:1.05;
+  }
+  .meta-display.placeholder{ font-size:10px; }
+  .meta-edit-icon{ right:8px; font-size:11px; }
+  .day-header .field input,.day-header .field select{
+    font-size:11px;
+    line-height:1.15;
+  }
+  @media(max-width:700px){
+    .day-header{
+      grid-template-columns:minmax(0,1.32fr) minmax(0,.9fr) minmax(0,1.05fr) !important;
+    }
+    .day-header .field:first-child{ grid-column:auto !important; }
+    .meta-display{ font-size:10.5px; }
+    .day-header .field{ padding-right:20px; }
+    .meta-edit-icon{ right:6px; font-size:10px; }
+  }
+
+  .columns{
+    grid-template-columns:1fr 1fr !important;
+    gap:8px !important;
+  }
+  .columns.single{ grid-template-columns:1fr !important; }
+  .col-head{
+    gap:5px;
+    margin-bottom:5px;
+    min-height:20px;
+  }
+  .col-head .bar{ width:3px; height:15px; }
+  .col-head h2{ font-size:13px; }
+  .col-head .count{ font-size:9px; }
+
+  .slot{
+    padding:8px;
+    margin-bottom:5px;
+    border-radius:8px;
+  }
+  .slot-top{ gap:5px; margin-bottom:5px; }
+  .slot-grid{ gap:5px; }
+  .slot-grid .field label{ font-size:8px; }
+  .log-sets-btn{ padding:6px; font-size:9px; }
+  .sets-summary,.prev-reps{ font-size:8px; }
+
+  .slot-compact{
+    gap:6px;
+    padding:7px 8px;
+    margin-bottom:4px;
+    border-radius:8px;
+    min-height:31px;
+  }
+  .slot-compact .sc-dot{ width:6px; height:6px; }
+  .slot-compact .sc-name{ font-size:10.5px; }
+  .slot-compact .sc-summary{ font-size:8px; max-width:34%; }
+  .slot-compact .sc-chev{ font-size:12px; }
+
+  /* Global bottom dock. Logout sits above; workout controls are bottom-most. */
+  .finish-bar{
+    position:fixed;
+    left:50%;
+    bottom:0;
+    transform:translateX(-50%);
+    width:min(100%,1180px);
+    margin:0;
+    padding:5px 9px calc(6px + env(safe-area-inset-bottom));
+    border-radius:12px 12px 0 0;
+    border:1px solid var(--line);
+    border-bottom:none;
+    background:rgba(12,13,15,.96);
+    backdrop-filter:blur(16px) saturate(1.15);
+    box-shadow:0 -10px 30px rgba(0,0,0,.48),0 -1px 18px rgba(var(--neon-rgb),.08);
+    z-index:120;
+    gap:4px;
+  }
+  .bottom-utility-row{
+    width:100%;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    min-height:17px;
+    padding:0 2px;
+  }
+  .finish-bar .session-total{ font-size:9px; gap:4px; }
+  .finish-bar .session-total .clock-sm{ font-size:10px; }
+  .finish-bar .logout-btn{
+    padding:1px 5px;
+    border:none;
+    font-size:8px;
+    opacity:.62;
+  }
+  .finish-actions{
+    display:grid;
+    grid-template-columns:1fr .72fr 1.25fr;
+    gap:5px;
+    width:100%;
+    flex-wrap:nowrap;
+  }
+  .finish-actions .btn-primary,
+  .finish-actions .mode-btn{
+    width:100%;
+    max-width:none;
+    min-height:35px;
+    padding:6px 7px;
+    font-size:11px;
+    border-radius:8px;
+  }
+  .mode-btn{ gap:5px; }
+  .mode-dot{ width:7px; height:7px; }
+
+  @media(max-width:520px){
+    body{ padding-bottom:82px; }
+    .topbar{ padding-left:5px; padding-right:5px; }
+    .logo-img{ width:160px; }
+    .nav-block button{ padding:4px 6px; font-size:9px; }
+    .wrap{ padding:6px 6px 90px; }
+    .day-rail,.week-rail{ gap:3px; margin-bottom:4px; }
+    .day-tab,.week-tab{ padding:4px 2px; font-size:9px; min-height:24px; }
+    .day-header{ gap:3px; margin-bottom:5px; }
+    .day-header .field{ min-height:39px; padding:5px 18px 4px 7px; }
+    .day-header .field label{ font-size:6.5px; }
+    .meta-display{ font-size:9.5px; }
+    .columns{ gap:5px !important; }
+    .col-head{ margin-bottom:3px; }
+    .col-head h2{ font-size:11px; }
+    .col-head .count{ font-size:7.5px; }
+    .slot-compact{ padding:6px 6px; min-height:28px; margin-bottom:3px; }
+    .slot-compact .sc-name{ font-size:9.5px; }
+    .slot-compact .sc-summary{ display:none; }
+    .finish-bar{ padding-left:6px; padding-right:6px; }
+  }
+
+  /* =========================================================
+     STRONGER VIBE OUTER GLOW + ELECTRICITY
+     ========================================================= */
+  .color-wheel-wrap{
+    filter:
+      drop-shadow(0 0 15px rgba(var(--neon-rgb),.70))
+      drop-shadow(0 0 36px rgba(var(--neon-rgb),.48))
+      drop-shadow(0 0 72px rgba(var(--neon-rgb),.30));
+  }
+  .color-wheel-wrap::after{
+    inset:-10px !important;
+    border:2px solid rgba(var(--neon-rgb),.35) !important;
+    box-shadow:
+      0 0 8px rgba(var(--neon-rgb),.85),
+      0 0 22px rgba(var(--neon-rgb),.72),
+      0 0 55px rgba(var(--neon-rgb),.52),
+      0 0 95px rgba(var(--neon-rgb),.30),
+      inset 0 0 24px rgba(var(--neon-rgb),.18) !important;
+    animation:outerNeonSurge 1.15s ease-in-out infinite !important;
+  }
+  @keyframes outerNeonSurge{
+    0%,100%{ opacity:.70; transform:scale(.975); filter:brightness(.95); }
+    45%{ opacity:1; transform:scale(1.035); filter:brightness(1.35); }
+    70%{ opacity:.82; transform:scale(1.005); filter:brightness(1.08); }
+  }
+
+  .vibe-electric{
+    position:absolute;
+    inset:-24px;
+    border-radius:50%;
+    pointer-events:none;
+    z-index:4;
+    background:
+      repeating-conic-gradient(
+        from 3deg,
+        transparent 0deg 8deg,
+        rgba(var(--neon-rgb),.96) 8.7deg 9.5deg,
+        transparent 10deg 17deg,
+        rgba(255,255,255,.95) 17.4deg 17.8deg,
+        transparent 18deg 27deg
+      );
+    -webkit-mask:radial-gradient(circle,transparent 0 63%,#000 64% 67%,transparent 68% 100%);
+    mask:radial-gradient(circle,transparent 0 63%,#000 64% 67%,transparent 68% 100%);
+    filter:
+      drop-shadow(0 0 3px rgb(var(--neon-rgb)))
+      drop-shadow(0 0 9px rgba(var(--neon-rgb),.90))
+      drop-shadow(0 0 19px rgba(var(--neon-rgb),.62));
+    animation:electricOrbit 2.7s linear infinite,electricFlicker .34s steps(2,end) infinite;
+  }
+  .vibe-electric-two{
+    inset:-15px;
+    opacity:.72;
+    transform:rotate(19deg);
+    animation:electricOrbitReverse 1.9s linear infinite,electricFlicker .22s steps(2,end) infinite reverse;
+    -webkit-mask:radial-gradient(circle,transparent 0 66%,#000 67% 69%,transparent 70% 100%);
+    mask:radial-gradient(circle,transparent 0 66%,#000 67% 69%,transparent 70% 100%);
+  }
+  @keyframes electricOrbit{ to{ transform:rotate(360deg); } }
+  @keyframes electricOrbitReverse{ to{ transform:rotate(-341deg); } }
+  @keyframes electricFlicker{
+    0%{ opacity:.28; filter:drop-shadow(0 0 2px rgb(var(--neon-rgb))) drop-shadow(0 0 7px rgba(var(--neon-rgb),.65)); }
+    28%{ opacity:1; }
+    47%{ opacity:.48; }
+    65%{ opacity:.92; }
+    100%{ opacity:.62; filter:drop-shadow(0 0 4px rgb(var(--neon-rgb))) drop-shadow(0 0 16px rgba(var(--neon-rgb),1)); }
+  }
+
 </style>
 </head>
 <body>
@@ -746,7 +1008,6 @@
       <div class="clock mono" id="liveClock">00:00:00</div>
       <button class="cancel-link" id="cancelSession">Reset</button>
     </div>
-    <button class="logout-btn" id="logoutBtn">Log out</button>
   </div>
 </div>
 
@@ -799,14 +1060,6 @@
       </div>
     </div>
 
-    <div class="finish-bar">
-      <span class="session-total">Total time <span class="clock-sm mono" id="finishClock">00:00:00</span></span>
-      <div class="finish-actions">
-        <button class="btn-primary" id="startBtnBottom">Start</button>
-        <button class="mode-btn" id="modeBtn"><span class="mode-dot" id="modeDot"></span>Vibe</button>
-        <button class="btn-primary" id="finishBtn">Finish workout</button>
-      </div>
-    </div>
   </div>
 
   <!-- LOGBOOK VIEW -->
@@ -814,6 +1067,18 @@
     <div id="logList"></div>
   </div>
 
+</div>
+
+<div class="finish-bar" id="bottomDock" style="display:none;">
+  <div class="bottom-utility-row">
+    <span class="session-total">Total <span class="clock-sm mono" id="finishClock">00:00:00</span></span>
+    <button class="logout-btn" id="logoutBtn">Log out</button>
+  </div>
+  <div class="finish-actions" id="bottomWorkoutActions">
+    <button class="btn-primary" id="startBtnBottom">Start</button>
+    <button class="mode-btn" id="modeBtn"><span class="mode-dot" id="modeDot"></span>Vibe</button>
+    <button class="btn-primary" id="finishBtn">Finish workout</button>
+  </div>
 </div>
 
 <!-- UNIFIED EXERCISE POPUP: set check-off + rest timer -->
@@ -889,6 +1154,8 @@
     <div class="color-wheel-wrap">
       <div class="vibe-fire"></div>
       <div class="vibe-sparks"></div>
+      <div class="vibe-electric"></div>
+      <div class="vibe-electric vibe-electric-two"></div>
       <div class="color-wheel-ring"></div>
       <div class="color-wheel" id="colorWheel"></div>
     </div>
@@ -1961,6 +2228,8 @@ const navBuild = document.getElementById('navBuild');
 const navLog = document.getElementById('navLog');
 const viewBuild = document.getElementById('viewBuild');
 const viewLog = document.getElementById('viewLog');
+const bottomDock = document.getElementById('bottomDock');
+const bottomWorkoutActions = document.getElementById('bottomWorkoutActions');
 navBuild.addEventListener('click', () => switchView('build'));
 navLog.addEventListener('click', () => switchView('log'));
 function switchView(v){
@@ -1968,6 +2237,9 @@ function switchView(v){
   navLog.classList.toggle('active', v==='log');
   viewBuild.classList.toggle('active', v==='build');
   viewLog.classList.toggle('active', v==='log');
+  if(bottomWorkoutActions) bottomWorkoutActions.style.display = v==='build' ? '' : 'none';
+  const dockTimer = bottomDock && bottomDock.querySelector('.session-total');
+  if(dockTimer) dockTimer.style.display = v==='build' ? '' : 'none';
   if(v==='log') renderLog();
 }
 
@@ -2076,12 +2348,14 @@ async function showApp(userId){
   history = loadedHistory;
   appTopbar.style.display = '';
   appWrap.style.display = '';
+  if(bottomDock) bottomDock.style.display = '';
   renderAll();
 }
 function showSplash(){
   currentUserId = null;
   appTopbar.style.display = 'none';
   appWrap.style.display = 'none';
+  if(bottomDock) bottomDock.style.display = 'none';
   splashView.classList.remove('hide');
   authForm.reset();
   authError.textContent = '';
