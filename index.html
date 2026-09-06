@@ -337,19 +337,66 @@
   #exAddSetBtn{ width:100%; margin-bottom: 12px; padding: 8px 18px; }
 
   .ex-rest-zone{ border-top:1px solid var(--line); padding-top:12px; text-align:center; }
-  .ex-timer-popup{ display:none; }
+  .ex-timer-popup{ display:none; position:relative; }
   .ex-timer-popup.show{ display:block; animation: popIn .18s ease; }
   #exFinishBtn{ width:100%; margin-top:12px; }
   .ex-rest-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
   .ex-rest-label{ font-size:11px; letter-spacing:.1em; text-transform:uppercase; color: var(--chalk-faint); }
   .ex-rest-input-row{ display:flex; align-items:center; gap:6px; }
-  .ex-rest-input-row input{ width:64px; padding:7px 8px; text-align:center; font-size:13px; }
+  .ex-rest-input-row input{ width:52px; padding:7px 4px; text-align:center; font-size:13px; }
   .ex-rest-suffix{ font-size:11px; color: var(--chalk-faint); }
+  .rest-step{
+    width:26px; height:26px; border-radius:50%; border:1px solid var(--line); background: var(--panel-3);
+    color: var(--chalk); font-size:15px; line-height:1; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center;
+    transition: all .15s ease;
+  }
+  .rest-step:hover{ border-color: var(--neon); color: var(--neon); }
+  .rest-presets{ display:flex; gap:6px; justify-content:center; flex-wrap:wrap; margin: 8px 0 2px; }
+  .rest-chip{
+    background: var(--panel-3); border:1px solid var(--line); color: var(--chalk-dim); font:inherit; font-size:11px;
+    padding:5px 10px; border-radius:100px; cursor:pointer; transition: all .15s ease;
+  }
+  .rest-chip:hover{ border-color: var(--chalk-dim); color: var(--chalk); }
+  .rest-chip.active{ background: rgba(var(--neon-rgb),0.15); border-color: var(--neon); color: var(--neon); font-weight:700; }
 
+  .timer-stage{ display:flex; align-items:center; justify-content:center; gap:12px; }
+  .rest-nudge{
+    background: var(--panel-3); border:1px solid var(--line); color: var(--chalk-dim); font:inherit; font-size:11px; font-weight:700;
+    width:38px; height:38px; border-radius:50%; cursor:pointer; transition: all .15s ease; flex-shrink:0;
+  }
+  .rest-nudge:hover{ border-color: var(--neon); color: var(--neon); background: rgba(var(--neon-rgb),0.08); }
   .analog-clock{
-    width:108px; height:108px; border-radius:50%; margin: 0 auto 8px; position:relative;
+    width:124px; height:124px; border-radius:50%; margin: 0 auto 8px; position:relative; flex-shrink:0;
     border: 3px solid var(--neon); box-shadow: 0 0 28px rgba(var(--neon-rgb),0.28), inset 0 0 20px rgba(var(--neon-rgb),0.08);
     background: radial-gradient(circle, rgba(var(--neon-rgb),0.05), transparent 70%);
+  }
+  .tick-ring{ position:absolute; inset:0; z-index:0; }
+  .tick-ring span{
+    position:absolute; top:3px; left:50%; width:2px; height:7px; margin-left:-1px; border-radius:1px;
+    background: rgba(var(--neon-rgb),0.35); transform-origin: 50% 59px;
+  }
+  .tick-ring span:nth-child(1){ transform: rotate(0deg); }
+  .tick-ring span:nth-child(2){ transform: rotate(30deg); }
+  .tick-ring span:nth-child(3){ transform: rotate(60deg); }
+  .tick-ring span:nth-child(4){ transform: rotate(90deg); }
+  .tick-ring span:nth-child(5){ transform: rotate(120deg); }
+  .tick-ring span:nth-child(6){ transform: rotate(150deg); }
+  .tick-ring span:nth-child(7){ transform: rotate(180deg); }
+  .tick-ring span:nth-child(8){ transform: rotate(210deg); }
+  .tick-ring span:nth-child(9){ transform: rotate(240deg); }
+  .tick-ring span:nth-child(10){ transform: rotate(270deg); }
+  .tick-ring span:nth-child(11){ transform: rotate(300deg); }
+  .tick-ring span:nth-child(12){ transform: rotate(330deg); }
+  .analog-clock.running{ animation: clockBreathe 2.2s ease-in-out infinite; }
+  @keyframes clockBreathe{
+    0%,100%{ box-shadow: 0 0 28px rgba(var(--neon-rgb),0.28), inset 0 0 20px rgba(var(--neon-rgb),0.08); }
+    50%{ box-shadow: 0 0 44px rgba(var(--neon-rgb),0.5), inset 0 0 28px rgba(var(--neon-rgb),0.16); }
+  }
+  .analog-clock.done-flash{ animation: clockDoneFlash .7s ease; }
+  @keyframes clockDoneFlash{
+    0%{ box-shadow: 0 0 28px rgba(var(--neon-rgb),0.28); }
+    35%{ box-shadow: 0 0 90px 22px rgba(var(--neon-strong-rgb),0.9); }
+    100%{ box-shadow: 0 0 28px rgba(var(--neon-rgb),0.28); }
   }
   .analog-clock.urgent{ animation: urgentBlink 0.6s ease infinite; }
   @keyframes urgentBlink{
@@ -361,8 +408,17 @@
     background: conic-gradient(var(--neon) 0deg, transparent 0deg);
     transition: background 1s linear;
   }
+  .ring-comet{
+    position:absolute; bottom:50%; left:50%; width:2px; height:56px; transform-origin: bottom center;
+    transform: translateX(-50%) rotate(0deg); z-index:1; pointer-events:none; transition: transform 1s linear;
+  }
+  .ring-comet::after{
+    content:''; position:absolute; top:-4px; left:50%; transform:translateX(-50%);
+    width:9px; height:9px; border-radius:50%; background: var(--neon-strong);
+    box-shadow: 0 0 14px 3px var(--neon), 0 0 5px var(--neon-strong);
+  }
   .analog-clock .hand{
-    position:absolute; bottom:50%; left:50%; width:3px; height:42px; background: var(--neon-strong);
+    position:absolute; bottom:50%; left:50%; width:3px; height:46px; background: var(--neon-strong);
     transform-origin: bottom center; transform: translateX(-50%) rotate(0deg); border-radius:2px;
     box-shadow: 0 0 10px var(--neon); transition: transform 1s linear; z-index:1;
   }
@@ -370,7 +426,13 @@
     position:absolute; top:50%; left:50%; width:10px; height:10px; background: var(--neon-strong);
     border-radius:50%; transform:translate(-50%,-50%); box-shadow: 0 0 10px var(--neon); z-index:2;
   }
-  .ex-rest-zone .digital-readout{ font-size: 22px; color: var(--neon-strong); letter-spacing: 0.04em; text-shadow: 0 0 16px rgba(var(--neon-rgb),0.4); margin-bottom: 2px; }
+  .ex-rest-zone .digital-readout{
+    font-size: 28px; font-weight:800; color: var(--neon-strong); letter-spacing: 0.04em;
+    text-shadow: 0 0 16px rgba(var(--neon-rgb),0.4); margin: 8px 0 2px; transition: color .3s ease; display:inline-block;
+  }
+  .digital-readout.tick{ animation: digitPulse .3s ease; }
+  @keyframes digitPulse{ 0%{ transform:scale(1.18); } 100%{ transform:scale(1); } }
+  .digital-readout.low{ color:#ff6a4d; text-shadow: 0 0 18px rgba(255,106,77,0.55); }
 
   .timer-btn-wide{
     margin-top:8px; width:100%; display:flex; align-items:center; justify-content:center; gap:8px;
@@ -618,15 +680,33 @@
       <div class="ex-rest-head">
         <span class="ex-rest-label">Rest Timer</span>
         <div class="ex-rest-input-row">
-          <input type="number" min="0" id="exRestSeconds" placeholder="90">
+          <button type="button" class="rest-step" id="restStepDown" title="Minus 5 seconds">−</button>
+          <input type="number" min="5" step="5" id="exRestSeconds" placeholder="90">
+          <button type="button" class="rest-step" id="restStepUp" title="Plus 5 seconds">+</button>
           <span class="ex-rest-suffix">sec</span>
         </div>
       </div>
+      <div class="rest-presets" id="restPresets">
+        <button type="button" class="rest-chip" data-secs="30">30s</button>
+        <button type="button" class="rest-chip" data-secs="60">60s</button>
+        <button type="button" class="rest-chip" data-secs="90">90s</button>
+        <button type="button" class="rest-chip" data-secs="120">2m</button>
+        <button type="button" class="rest-chip" data-secs="180">3m</button>
+      </div>
       <div class="ex-timer-popup" id="exTimerPopup">
-        <div class="analog-clock" id="analogClock">
-          <div class="ring-progress" id="ringProgress"></div>
-          <div class="hand" id="restHand"></div>
-          <div class="center-dot"></div>
+        <div class="timer-stage">
+          <button type="button" class="rest-nudge" id="restNudgeDown" title="Subtract 15 seconds">−15</button>
+          <div class="analog-clock" id="analogClock">
+            <div class="tick-ring">
+              <span></span><span></span><span></span><span></span><span></span><span></span>
+              <span></span><span></span><span></span><span></span><span></span><span></span>
+            </div>
+            <div class="ring-progress" id="ringProgress"></div>
+            <div class="ring-comet" id="ringComet"></div>
+            <div class="hand" id="restHand"></div>
+            <div class="center-dot"></div>
+          </div>
+          <button type="button" class="rest-nudge" id="restNudgeUp" title="Add 15 seconds">+15</button>
         </div>
         <div class="digital-readout mono" id="restDigital">00:00</div>
       </div>
@@ -1114,15 +1194,22 @@ const exSetRowsEl = document.getElementById('exSetRows');
 const exAddSetBtn = document.getElementById('exAddSetBtn');
 const exModalClose = document.getElementById('exModalClose');
 const exRestSeconds = document.getElementById('exRestSeconds');
+const restStepDown = document.getElementById('restStepDown');
+const restStepUp = document.getElementById('restStepUp');
+const restPresets = document.getElementById('restPresets');
+const restNudgeDown = document.getElementById('restNudgeDown');
+const restNudgeUp = document.getElementById('restNudgeUp');
 const exTimerBtn = document.getElementById('exTimerBtn');
 const exTimerPopup = document.getElementById('exTimerPopup');
 const analogClock = document.getElementById('analogClock');
 const ringProgress = document.getElementById('ringProgress');
+const ringComet = document.getElementById('ringComet');
 const restHand = document.getElementById('restHand');
 const restDigital = document.getElementById('restDigital');
 
 let exModalSide = null, exModalIndex = null, exModalRowsData = [], exModalCelebrated = false;
 let exRestInterval = null;
+let restRemaining = 0, restTotal = 0;
 
 function setTimerLabel(text){
   exTimerBtn.innerHTML = CLOCK_ICON_SVG + `<span class="tb-label">${text}</span>`;
@@ -1132,21 +1219,54 @@ setTimerLabel('Start Rest');
 function resetTimerVisual(){
   if(exRestInterval){ clearInterval(exRestInterval); exRestInterval = null; }
   exTimerBtn.classList.remove('running');
+  analogClock.classList.remove('running');
+  analogClock.classList.remove('urgent');
+  analogClock.classList.remove('done-flash');
   setTimerLabel('Start Rest');
   restDigital.textContent = '00:00';
+  restDigital.classList.remove('low');
   ringProgress.style.background = 'conic-gradient(var(--neon) 0deg, transparent 0deg)';
   restHand.style.transform = 'translateX(-50%) rotate(0deg)';
-  analogClock.classList.remove('urgent');
+  ringComet.style.transform = 'translateX(-50%) rotate(0deg)';
   exTimerPopup.classList.remove('show');
+  restRemaining = 0; restTotal = 0;
 }
 
 function updateClockVisual(remaining, total){
   restDigital.textContent = formatMMSS(Math.max(remaining,0));
+  restDigital.classList.remove('tick'); void restDigital.offsetWidth; restDigital.classList.add('tick');
+  restDigital.classList.toggle('low', remaining <= 10 && remaining > 0);
   const progress = Math.min(1, (total-remaining)/total);
   const deg = progress*360;
   restHand.style.transform = `translateX(-50%) rotate(${deg}deg)`;
-  ringProgress.style.background = `conic-gradient(var(--neon) ${deg}deg, transparent ${deg}deg)`;
+  ringComet.style.transform = `translateX(-50%) rotate(${deg}deg)`;
+  ringProgress.style.background = `conic-gradient(var(--neon) 0deg, var(--neon-strong) ${deg/2}deg, var(--neon) ${deg}deg, transparent ${deg}deg)`;
   analogClock.classList.toggle('urgent', remaining <= 5 && remaining > 0);
+}
+
+function tickRestTimer(){
+  restRemaining--;
+  updateClockVisual(restRemaining, restTotal);
+  if(restRemaining <= 0){
+    clearInterval(exRestInterval); exRestInterval = null;
+    exTimerBtn.classList.remove('running');
+    analogClock.classList.remove('running');
+    setTimerLabel('Start Rest');
+    analogClock.classList.remove('urgent');
+    playBeep();
+    restDigital.textContent = 'Done';
+    restDigital.classList.remove('low');
+    analogClock.classList.add('done-flash');
+    spawnConfetti(exTimerPopup, { count: 18, mode: 'pop' });
+    setTimeout(() => {
+      restDigital.textContent = '00:00';
+      ringProgress.style.background = 'conic-gradient(var(--neon) 0deg, transparent 0deg)';
+      restHand.style.transform = 'translateX(-50%) rotate(0deg)';
+      ringComet.style.transform = 'translateX(-50%) rotate(0deg)';
+      analogClock.classList.remove('done-flash');
+      exTimerPopup.classList.remove('show');
+    }, 1800);
+  }
 }
 
 exTimerBtn.addEventListener('click', () => {
@@ -1160,31 +1280,56 @@ exTimerBtn.addEventListener('click', () => {
   d[exModalSide][exModalIndex].rest = exRestSeconds.value;
   saveDays();
 
-  const total = seconds;
-  let remaining = seconds;
+  restTotal = seconds;
+  restRemaining = seconds;
   exTimerBtn.classList.add('running');
+  analogClock.classList.add('running');
   exTimerPopup.classList.add('show');
   setTimerLabel('Stop');
-  updateClockVisual(remaining, total);
+  updateClockVisual(restRemaining, restTotal);
 
-  exRestInterval = setInterval(() => {
-    remaining--;
-    updateClockVisual(remaining, total);
-    if(remaining <= 0){
-      clearInterval(exRestInterval); exRestInterval = null;
-      exTimerBtn.classList.remove('running');
-      setTimerLabel('Start Rest');
-      analogClock.classList.remove('urgent');
-      playBeep();
-      restDigital.textContent = 'Done';
-      setTimeout(() => {
-        restDigital.textContent = '00:00';
-        ringProgress.style.background = 'conic-gradient(var(--neon) 0deg, transparent 0deg)';
-        restHand.style.transform = 'translateX(-50%) rotate(0deg)';
-        exTimerPopup.classList.remove('show');
-      }, 1800);
-    }
-  }, 1000);
+  exRestInterval = setInterval(tickRestTimer, 1000);
+});
+
+function nudgeRestTimer(deltaSeconds){
+  if(!exRestInterval) return;
+  restRemaining = Math.max(1, restRemaining + deltaSeconds);
+  if(restRemaining > restTotal) restTotal = restRemaining;
+  updateClockVisual(restRemaining, restTotal);
+}
+restNudgeDown.addEventListener('click', () => nudgeRestTimer(-15));
+restNudgeUp.addEventListener('click', () => nudgeRestTimer(15));
+
+function persistRestValue(){
+  if(exModalSide != null && exModalIndex != null){
+    const d = days[activeDay];
+    d[exModalSide][exModalIndex].rest = exRestSeconds.value;
+    saveDays();
+  }
+  highlightRestPreset();
+}
+function highlightRestPreset(){
+  const val = String(parseInt(exRestSeconds.value, 10) || '');
+  restPresets.querySelectorAll('.rest-chip').forEach(chip => {
+    chip.classList.toggle('active', chip.dataset.secs === val);
+  });
+}
+exRestSeconds.addEventListener('input', persistRestValue);
+restPresets.addEventListener('click', (e) => {
+  const chip = e.target.closest('.rest-chip');
+  if(!chip) return;
+  exRestSeconds.value = chip.dataset.secs;
+  persistRestValue();
+});
+restStepDown.addEventListener('click', () => {
+  const v = Math.max(5, (parseInt(exRestSeconds.value, 10) || 90) - 5);
+  exRestSeconds.value = v;
+  persistRestValue();
+});
+restStepUp.addEventListener('click', () => {
+  const v = (parseInt(exRestSeconds.value, 10) || 90) + 5;
+  exRestSeconds.value = v;
+  persistRestValue();
 });
 
 function openExerciseModal(side, index){
@@ -1198,6 +1343,7 @@ function openExerciseModal(side, index){
   exModal.classList.remove('all-done');
   resetTimerVisual();
   exRestSeconds.value = slot.rest || '';
+  highlightRestPreset();
 
   const rowCount = Math.max(existing.length, planned, 1);
   exModalRowsData = [];
