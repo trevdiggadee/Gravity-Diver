@@ -169,15 +169,15 @@
 
   /* ---- Workout identity : polished tap-to-edit metadata ---- */
   .day-header{
-    display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; margin-bottom:18px;
+    display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap:10px; margin-bottom:18px;
   }
   .field{ display:flex; flex-direction:column; gap:1px; }
   .field label{ font-size: 9px; color: var(--chalk-dim); letter-spacing:.05em; text-transform:uppercase; line-height:1.2; }
   .day-header .field{
     min-width:0; position:relative; display:block; cursor:pointer;
     background: linear-gradient(145deg, rgba(255,255,255,.035), rgba(255,255,255,.012));
-    border:1px solid var(--line); border-radius:14px; padding:11px 38px 10px 13px;
-    min-height:62px; overflow:hidden;
+    border:1px solid var(--line); border-radius:14px; padding:11px 34px 10px 13px;
+    min-height:68px; overflow:hidden;
     transition: border-color .18s ease, transform .18s ease, box-shadow .18s ease, background .18s ease;
   }
   .day-header .field::before{
@@ -187,9 +187,9 @@
   .day-header .field:hover{ border-color:rgba(var(--neon-rgb),.5); transform:translateY(-1px); box-shadow:0 9px 24px rgba(0,0,0,.22); }
   .day-header .field.editing{ border-color:var(--neon); background:rgba(var(--neon-rgb),.045); box-shadow:0 0 0 3px rgba(var(--neon-rgb),.08), 0 10px 26px rgba(0,0,0,.28); }
   .day-header .field label{ display:block; margin:0 0 5px; color:var(--chalk-faint); font-size:9px; font-weight:700; letter-spacing:.12em; }
-  .meta-display{ color:#fff; font-family:'Oswald',sans-serif; font-size:15px; font-weight:600; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .meta-display{ color:#fff; font-family:'Oswald',sans-serif; font-size:13px; font-weight:600; line-height:1.28; white-space:normal; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; word-break:break-word; }
   .meta-display.placeholder{ color:var(--chalk-faint); font-family:'Inter',sans-serif; font-size:12px; font-weight:500; }
-  .meta-edit-icon{ position:absolute; right:12px; top:50%; transform:translateY(-50%); color:var(--chalk-faint); font-size:14px; transition:.18s ease; }
+  .meta-edit-icon{ position:absolute; right:11px; top:13px; color:var(--chalk-faint); font-size:13px; transition:.18s ease; }
   .day-header .field:hover .meta-edit-icon, .day-header .field.editing .meta-edit-icon{ color:var(--neon-strong); text-shadow:0 0 10px rgba(var(--neon-rgb),.6); }
   .day-header .field input, .day-header .field select{
     display:none; width:100%; background:transparent; border:none; border-radius:0; padding:0; color:#fff;
@@ -220,9 +220,9 @@
   select:disabled, input:disabled{ opacity:0.5; cursor:not-allowed; }
 
   /* ---- Columns ---- */
-  .columns{ display:grid; grid-template-columns: 1fr 1fr; gap: 22px; }
-  .columns.single{ grid-template-columns: 1fr; }
-  @media (max-width: 880px){ .columns{ grid-template-columns: 1fr; } }
+  .columns{ display:grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 22px; }
+  .columns.single{ grid-template-columns: minmax(0,1fr); }
+  @media (max-width: 880px){ .columns{ grid-template-columns: minmax(0,1fr); } }
 
   .col-head{ display:flex; align-items:center; gap:10px; margin-bottom: 14px; }
   .col-head .bar{ width:4px; height: 22px; border-radius: 4px; }
@@ -254,7 +254,7 @@
   .slot-compact.lower{ border-left-color: var(--lower); }
   .slot-compact .sc-dot{ width:8px; height:8px; border-radius:50%; background: var(--panel-3); border:1px solid var(--line); flex-shrink:0; }
   .slot-compact.done .sc-dot{ background: var(--neon); border-color: var(--neon); box-shadow: 0 0 8px var(--neon); }
-  .slot-compact .sc-name{ flex:1; font-size:14px; font-weight:600; color: var(--chalk); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .slot-compact .sc-name{ flex:1; min-width:0; font-size:14px; font-weight:600; color: var(--chalk); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .slot-compact .sc-summary{ font-size:11px; color: var(--chalk-faint); font-family:'JetBrains Mono',monospace; flex-shrink:0; max-width:38%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .slot-compact .sc-chev{ color: var(--chalk-faint); font-size:16px; flex-shrink:0; }
   .slot-top{ display:flex; align-items:center; gap:10px; margin-bottom: 10px; }
@@ -520,6 +520,23 @@
   .export-menu-item svg{ flex-shrink:0; color: var(--neon-strong); width:20px; height:20px; }
   .emi-title{ font-size:13px; font-weight:600; color: var(--chalk); }
   .emi-sub{ font-size:11px; color: var(--chalk-faint); margin-top:1px; }
+
+  /* ---- Profile / username ---- */
+  .profile-card{
+    max-width: 380px; margin: 20px auto 0; background: var(--panel); border:1px solid var(--line);
+    border-radius: var(--radius); padding: 30px 26px; text-align:center;
+  }
+  .profile-avatar{
+    width:72px; height:72px; border-radius:50%; margin:0 auto 16px; display:flex; align-items:center; justify-content:center;
+    background: rgba(var(--neon-rgb),0.12); border:2px solid var(--neon); color: var(--neon-strong);
+    font-family:'Oswald',sans-serif; font-size:28px; font-weight:700; text-shadow:0 0 12px rgba(var(--neon-rgb),0.5);
+  }
+  .profile-username-row{ text-align:left; margin-bottom:16px; }
+  .profile-username-row label{ display:block; font-size:11px; color:var(--chalk-dim); letter-spacing:.05em; text-transform:uppercase; margin-bottom:6px; }
+  #saveUsernameBtn{ width:100%; margin-bottom:12px; }
+  .profile-msg{ font-size:12px; min-height:16px; margin-bottom:10px; color: var(--neon-strong); }
+  .profile-email{ font-size:12px; color: var(--chalk-dim); margin-bottom:20px; padding-bottom:20px; border-bottom:1px solid var(--line); }
+  #profileLogoutBtn{ width:100%; }
 
   /* ---- Logbook header / export ---- */
   .log-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
@@ -899,71 +916,9 @@
     .day-header .field label{ font-size:8px; margin-bottom:4px; }
     .meta-display{ font-size:14px; }
     .meta-display.placeholder{ font-size:11px; }
-    .columns{ grid-template-columns:1fr; gap:14px; }
+    .columns{ grid-template-columns:minmax(0,1fr); gap:14px; }
     .bottom-dock{ padding-left:12px; padding-right:12px; }
   }
-
-  /* ===== Profile + mobile fit update ===== */
-  .day-header{ grid-template-columns:repeat(3,minmax(0,1fr)) !important; }
-  .day-header .field{ width:100%; min-width:0; }
-  .day-header .meta-display{
-    white-space:normal; overflow:visible; text-overflow:clip; overflow-wrap:anywhere;
-    font-size:14px; line-height:1.15; padding-right:2px;
-  }
-  .day-header .field input, .day-header .field select{ min-width:0; width:100%; font-size:13px; }
-
-  .columns, .columns > div, #upperSlots, #lowerSlots{ min-width:0; max-width:100%; }
-  .slot, .slot-compact{ width:100%; max-width:100%; min-width:0; }
-  .slot-compact{ overflow:hidden; gap:8px; padding:12px 11px; }
-  .slot-compact .sc-name{ min-width:0; }
-  .slot-compact .sc-summary{ min-width:0; max-width:34%; }
-  .slot-top, .custom-ex-row, .slot-grid{ min-width:0; max-width:100%; }
-  .slot-top select, .custom-ex-row input, .slot-grid > *{ min-width:0; }
-
-  .profile-card{
-    width:100%; max-width:520px; margin:0 auto; background:var(--panel); border:1px solid var(--line);
-    border-radius:18px; padding:22px; box-shadow:0 16px 42px rgba(0,0,0,.22);
-  }
-  .profile-kicker{ font-size:10px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:var(--neon); margin-bottom:5px; }
-  .profile-title{ margin:0 0 4px; font-size:26px; }
-  .profile-sub{ color:var(--chalk-dim); font-size:12px; margin-bottom:20px; }
-  .profile-avatar{
-    width:72px; height:72px; border-radius:50%; display:flex; align-items:center; justify-content:center;
-    margin:0 0 18px; background:rgba(var(--neon-rgb),.10); border:1px solid rgba(var(--neon-rgb),.45);
-    color:var(--neon-strong); font-family:'Oswald',sans-serif; font-size:28px; font-weight:700;
-    box-shadow:0 0 24px rgba(var(--neon-rgb),.14);
-  }
-  .profile-field{ margin-bottom:14px; }
-  .profile-field label{ display:block; font-size:10px; font-weight:700; color:var(--chalk-faint); letter-spacing:.1em; text-transform:uppercase; margin-bottom:6px; }
-  .profile-field input{ padding:12px 13px; }
-  .profile-email{ color:var(--chalk-dim); background:var(--panel-3); border:1px solid var(--line); border-radius:var(--radius-sm); padding:12px 13px; font-size:13px; overflow-wrap:anywhere; }
-  .profile-save{ width:100%; margin-top:6px; }
-  .profile-status{ min-height:18px; margin-top:10px; font-size:12px; color:var(--chalk-dim); }
-
-  @media(max-width:700px){
-    .nav-block button{ padding:8px 11px; font-size:12px; }
-    .day-header{ gap:6px !important; }
-    .day-header .field{ padding:9px 25px 8px 9px !important; min-height:62px; }
-    .day-header .meta-display{ font-size:12px; line-height:1.12; }
-    .day-header .meta-display.placeholder{ font-size:10px; }
-    .meta-edit-icon{ right:8px; font-size:12px; }
-    .slot-compact .sc-name{ font-size:13px; }
-    .slot-compact .sc-summary{ max-width:30%; font-size:10px; }
-    .profile-card{ padding:18px 16px; }
-  }
-  @media(max-width:390px){
-    .wrap{ padding-left:10px; padding-right:10px; }
-    .nav-block button{ padding:8px 9px; font-size:11px; }
-    .day-header .field{ padding-left:8px !important; padding-right:21px !important; }
-    .day-header .meta-display{ font-size:11px; }
-    .slot-compact{ padding-left:9px; padding-right:9px; gap:6px; }
-    .slot-compact .sc-summary{ max-width:28%; }
-  }
-
-
-  .program-save-btn{ color:var(--neon-strong); border-color:var(--neon); background:rgba(var(--neon-rgb),.08); }
-  .program-save-btn.saving{ opacity:.65; pointer-events:none; }
-  @media(max-width:700px){ .program-save-btn{ font-size:11px; padding:8px 10px; } }
 </style>
 </head>
 <body>
@@ -1001,7 +956,6 @@
       <button id="navLog">Logbook</button>
       <button id="navProfile">Profile</button>
       <button id="setupBtn">Complete Day Setup</button>
-      <button id="saveProgramBtn" class="program-save-btn" type="button">Save 4-Week Program</button>
       <button class="start-btn" id="startBtn">Start</button>
     </div>
     <div class="session-active" id="sessionActive">
@@ -1078,22 +1032,15 @@
   <!-- PROFILE VIEW -->
   <div id="viewProfile" class="view">
     <div class="profile-card">
-      <div class="profile-kicker">Account</div>
-      <h2 class="profile-title">Your Profile</h2>
-      <div class="profile-sub">Choose the username shown in RepLog.</div>
-      <div class="profile-avatar" id="profileAvatar">R</div>
-      <form id="profileForm">
-        <div class="profile-field">
-          <label for="profileUsername">Username</label>
-          <input id="profileUsername" type="text" maxlength="24" autocomplete="nickname" placeholder="Choose a username">
-        </div>
-        <div class="profile-field">
-          <label>Email</label>
-          <div class="profile-email" id="profileEmail">—</div>
-        </div>
-        <button type="submit" class="btn-primary profile-save" id="profileSaveBtn">Save Username</button>
-        <div class="profile-status" id="profileStatus" aria-live="polite"></div>
-      </form>
+      <div class="profile-avatar" id="profileAvatar">?</div>
+      <div class="profile-username-row">
+        <label for="usernameInput">Username</label>
+        <input id="usernameInput" type="text" maxlength="24" placeholder="Choose a username" autocomplete="off">
+      </div>
+      <button type="button" class="btn-primary" id="saveUsernameBtn">Save Username</button>
+      <div class="profile-msg" id="profileMsg"></div>
+      <div class="profile-email">Signed in as <span id="profileEmail"></span></div>
+      <button type="button" class="btn-ghost" id="profileLogoutBtn">Log out</button>
     </div>
   </div>
 
@@ -1266,12 +1213,12 @@ const DAY_COUNT = 4;
 const SLOTS_PER_SIDE = 5;
 const WEEK_COUNT = 4;
 let currentUserId = null;
+let currentUser = null;
 
 function emptySlotDef(){ return { exercise:"", sets:"", rest:"", custom:false }; }
 function emptyWeek(){
   return {
     date:"",
-    completed:false,
     logs: {
       upper: Array.from({length:SLOTS_PER_SIDE}, () => []),
       lower: Array.from({length:SLOTS_PER_SIDE}, () => [])
@@ -1295,54 +1242,14 @@ function isValidDaysShape(parsed){
   return Array.isArray(parsed) && parsed.length && parsed[0].weeks && parsed[0].weeks[0] && parsed[0].weeks[0].logs;
 }
 function normalizeDaysLength(parsed){
-  const normalized = parsed.length > DAY_COUNT
-    ? parsed.slice(0, DAY_COUNT)
-    : parsed.length < DAY_COUNT
-      ? parsed.concat(Array.from({length: DAY_COUNT - parsed.length}, emptyDay))
-      : parsed;
-
-  // Backward-compatible migration: older saved programs had no explicit
-  // completion flag. If a week already contains logged sets, treat it as
-  // completed so the old progress is not lost.
-  normalized.forEach(day => {
-    if(!Array.isArray(day.weeks)) day.weeks = Array.from({length:WEEK_COUNT}, emptyWeek);
-    while(day.weeks.length < WEEK_COUNT) day.weeks.push(emptyWeek());
-    day.weeks = day.weeks.slice(0, WEEK_COUNT);
-    day.weeks.forEach(week => {
-      if(typeof week.completed !== 'boolean'){
-        const logs = week.logs || {upper:[], lower:[]};
-        week.completed = [...(logs.upper || []), ...(logs.lower || [])]
-          .some(arr => Array.isArray(arr) && arr.length > 0);
-      }
-    });
-  });
-  return normalized;
+  if(parsed.length > DAY_COUNT) return parsed.slice(0, DAY_COUNT);
+  if(parsed.length < DAY_COUNT) return parsed.concat(Array.from({length: DAY_COUNT - parsed.length}, emptyDay));
+  return parsed;
 }
 
 /* ---- Cloud persistence (Supabase) ---- */
-const PROGRAM_BACKUP_PREFIX = "replog_program_backup_v2:";
-let programLoadState = "not_loaded";
-let programSaveInFlight = Promise.resolve();
-
-function programBackupKey(){ return PROGRAM_BACKUP_PREFIX + String(currentUserId || ""); }
-function backupProgramLocally(snapshot){
-  if(!currentUserId || !Array.isArray(snapshot)) return;
-  try{ localStorage.setItem(programBackupKey(), JSON.stringify({savedAt:new Date().toISOString(), days:snapshot})); }
-  catch(e){ console.warn("Local program backup unavailable", e); }
-}
-function loadLocalProgramBackup(){
-  if(!currentUserId) return null;
-  try{
-    const raw = localStorage.getItem(programBackupKey());
-    if(!raw) return null;
-    const parsed = JSON.parse(raw);
-    return parsed && isValidDaysShape(parsed.days) ? normalizeDaysLength(parsed.days) : null;
-  }catch(e){ return null; }
-}
-
 async function loadDaysFromCloud(){
-  if(!currentUserId){ programLoadState="not_loaded"; return freshDays(); }
-  programLoadState="loading";
+  if(!currentUserId) return freshDays();
   try{
     const { data, error } = await supabaseClient
       .from('program_state')
@@ -1350,67 +1257,27 @@ async function loadDaysFromCloud(){
       .eq('user_id', currentUserId)
       .maybeSingle();
     if(error) throw error;
-
-    // A real row wins. Never replace it with a blank program.
-    if(data && data.days && isValidDaysShape(data.days)){
-      const loaded = normalizeDaysLength(data.days);
-      programLoadState="loaded";
-      backupProgramLocally(loaded);
-      return loaded;
-    }
-
-    // No row exists: this is the only case where a new blank program is created.
-    if(!data){
-      const local = loadLocalProgramBackup();
-      if(local){ programLoadState="loaded_local"; return local; }
-      const blank = freshDays();
-      programLoadState="new";
-      return blank;
-    }
-
-    // Row exists but contains unusable data. Protect the user instead of overwriting it.
-    const local = loadLocalProgramBackup();
-    if(local){ programLoadState="loaded_local"; return local; }
-    throw new Error("Saved program data exists but could not be read safely.");
-  }catch(e){
-    programLoadState="error";
-    console.error('loadDaysFromCloud failed', e);
-    const local = loadLocalProgramBackup();
-    if(local){
-      programLoadState="loaded_local";
-      return local;
-    }
-    throw e;
-  }
+    if(data && data.days && isValidDaysShape(data.days)) return normalizeDaysLength(data.days);
+  }catch(e){ console.error('loadDaysFromCloud failed', e); }
+  return freshDays();
 }
-
 async function saveDaysToCloud(){
-  if(!currentUserId || programLoadState === "loading" || programLoadState === "error" || programLoadState === "not_loaded") return false;
-  const snapshot = normalizeDaysLength(JSON.parse(JSON.stringify(days)));
-  programSaveInFlight = programSaveInFlight.then(async () => {
+  if(!currentUserId) return;
+  try{
     const { error } = await supabaseClient
       .from('program_state')
-      .upsert({ user_id: currentUserId, days: snapshot, updated_at: new Date().toISOString() }, { onConflict: 'user_id' });
+      .upsert({ user_id: currentUserId, days, updated_at: new Date().toISOString() }, { onConflict: 'user_id' });
     if(error) throw error;
-    backupProgramLocally(snapshot);
-    programLoadState="loaded";
-    return true;
-  }).catch(e => {
-    console.error('saveDaysToCloud failed', e);
-    showToast("Program not saved — your data was kept on this device. " + (e && (e.message || e.details || "")), 8000);
-    return false;
-  });
-  return programSaveInFlight;
+  }catch(e){ console.error('saveDaysToCloud failed', e); showToast("Sync error: " + (e && (e.message || e.details || JSON.stringify(e))), 8000); }
 }
 let saveDaysTimer = null;
 function saveDays(){
   clearTimeout(saveDaysTimer);
-  if(programLoadState === "loading" || programLoadState === "error" || programLoadState === "not_loaded") return;
-  saveDaysTimer = setTimeout(() => saveDaysToCloud(), 700);
+  saveDaysTimer = setTimeout(saveDaysToCloud, 700);
 }
 function flushSaveDays(){
   clearTimeout(saveDaysTimer);
-  return saveDaysToCloud();
+  saveDaysToCloud();
 }
 
 async function loadHistoryFromCloud(){
@@ -1553,12 +1420,9 @@ function dayHasContent(d){
 }
 function renderDayRail(){
   dayRail.innerHTML = "";
-  const selectedWeek = days[activeDay]?.currentWeek || 1;
   days.forEach((d, i) => {
-    const week = d.weeks && d.weeks[selectedWeek - 1];
-    const completed = !!(week && (week.completed === true || weekHasContent(d, selectedWeek - 1)));
     const btn = document.createElement('button');
-    btn.className = 'day-tab' + (i===activeDay ? ' active' : '') + (completed ? ' filled' : '');
+    btn.className = 'day-tab' + (i===activeDay ? ' active' : '') + (dayHasContent(d) ? ' filled' : '');
     btn.innerHTML = `Day ${i+1}<span class="dot"></span>`;
     btn.addEventListener('click', () => { activeDay = i; renderAll(); });
     dayRail.appendChild(btn);
@@ -1570,11 +1434,8 @@ function renderDayRail(){
 --------------------------------------------------------- */
 const weekRail = document.getElementById('weekRail');
 function weekHasContent(day, wi){
-  const week = day.weeks[wi];
-  if(!week) return false;
-  if(week.completed === true) return true;
-  const l = week.logs || {upper:[], lower:[]};
-  return [...(l.upper || []), ...(l.lower || [])].some(arr => arr && arr.length > 0);
+  const l = day.weeks[wi].logs;
+  return [...l.upper, ...l.lower].some(arr => arr && arr.length > 0);
 }
 function renderWeekRail(){
   const d = days[activeDay];
@@ -1659,21 +1520,6 @@ function renderSetupBar(){
     btn.classList.remove('setup-locked');
   }
 }
-const saveProgramBtn = document.getElementById('saveProgramBtn');
-if(saveProgramBtn){
-  saveProgramBtn.addEventListener('click', async () => {
-    if(programLoadState === "loading" || programLoadState === "error" || programLoadState === "not_loaded"){
-      showToast("Your saved program is still loading. Please try again in a moment."); return;
-    }
-    saveProgramBtn.classList.add('saving');
-    saveProgramBtn.textContent = 'Saving…';
-    const ok = await flushSaveDays();
-    saveProgramBtn.classList.remove('saving');
-    saveProgramBtn.textContent = 'Save 4-Week Program';
-    if(ok) showToast('4-week program saved.');
-  });
-}
-
 document.getElementById('setupBtn').addEventListener('click', () => {
   const d = days[activeDay];
   if(d.setupComplete){
@@ -2375,17 +2221,9 @@ document.getElementById('finishBtn').addEventListener('click', async () => {
   d.timerStart = null;
   d.timerElapsed = 0;
 
-  // Explicitly persist completion for this day in this week.
-  // This is separate from the workout log so a completed day survives
-  // navigation, reloads, and the next week.
-  weekData.completed = true;
-
   const blockComplete = cw === WEEK_COUNT;
   if(cw < WEEK_COUNT) d.currentWeek = cw + 1;
-
-  // Save immediately so completion cannot be lost if the user navigates
-  // away or closes the app right after finishing.
-  await flushSaveDays();
+  flushSaveDays();
   renderAll();
 
   openSummaryModal({
@@ -2755,52 +2593,6 @@ const authSubmitBtn = document.getElementById('authSubmitBtn');
 const authError = document.getElementById('authError');
 const authForgotBtn = document.getElementById('authForgotBtn');
 const logoutBtn = document.getElementById('logoutBtn');
-const profileForm = document.getElementById('profileForm');
-const profileUsername = document.getElementById('profileUsername');
-const profileEmail = document.getElementById('profileEmail');
-const profileAvatar = document.getElementById('profileAvatar');
-const profileStatus = document.getElementById('profileStatus');
-const profileSaveBtn = document.getElementById('profileSaveBtn');
-let currentAuthUser = null;
-
-function renderProfile(){
-  if(!currentAuthUser) return;
-  const username = (currentAuthUser.user_metadata && currentAuthUser.user_metadata.username) || '';
-  profileUsername.value = username;
-  profileEmail.textContent = currentAuthUser.email || '—';
-  const source = username || currentAuthUser.email || 'R';
-  profileAvatar.textContent = source.trim().charAt(0).toUpperCase() || 'R';
-  profileStatus.textContent = '';
-}
-
-profileForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const username = profileUsername.value.trim();
-  if(username.length < 2){
-    profileStatus.style.color = 'var(--danger)';
-    profileStatus.textContent = 'Username must be at least 2 characters.';
-    return;
-  }
-  profileSaveBtn.disabled = true;
-  profileSaveBtn.textContent = 'Saving…';
-  profileStatus.style.color = 'var(--chalk-dim)';
-  profileStatus.textContent = '';
-  try{
-    const { data, error } = await supabaseClient.auth.updateUser({ data: { username } });
-    if(error) throw error;
-    if(data && data.user) currentAuthUser = data.user;
-    renderProfile();
-    profileStatus.style.color = 'var(--neon-strong)';
-    profileStatus.textContent = 'Username saved.';
-    showToast('Username updated.');
-  }catch(err){
-    profileStatus.style.color = 'var(--danger)';
-    profileStatus.textContent = (err && err.message) || 'Could not save username.';
-  }finally{
-    profileSaveBtn.disabled = false;
-    profileSaveBtn.textContent = 'Save Username';
-  }
-});
 
 let authMode = 'login';
 function setAuthMode(mode){
@@ -2863,32 +2655,22 @@ logoutBtn.addEventListener('click', async () => {
 });
 
 async function showApp(user){
-  currentAuthUser = user;
   currentUserId = user.id;
+  currentUser = user;
   splashView.classList.add('hide');
   activeDay = 0;
-  try{
-    const [loadedDays, loadedHistory] = await Promise.all([loadDaysFromCloud(), loadHistoryFromCloud()]);
-    days = loadedDays;
-    history = loadedHistory;
-    appTopbar.style.display = '';
-    appWrap.style.display = '';
-    if(bottomDock) bottomDock.style.display = '';
-    renderAll();
-    // Persist a brand-new account program only after the read succeeded.
-    if(programLoadState === "new") await flushSaveDays();
-  }catch(e){
-    console.error('showApp failed', e);
-    appTopbar.style.display = 'none';
-    appWrap.style.display = 'none';
-    if(bottomDock) bottomDock.style.display = 'none';
-    splashView.classList.remove('hide');
-    authError.textContent = 'Your saved program could not be loaded. Nothing was overwritten. Please try again.';
-  }
+  const [loadedDays, loadedHistory] = await Promise.all([loadDaysFromCloud(), loadHistoryFromCloud()]);
+  days = loadedDays;
+  history = loadedHistory;
+  appTopbar.style.display = '';
+  appWrap.style.display = '';
+  if(bottomDock) bottomDock.style.display = '';
+  renderProfile();
+  renderAll();
 }
 function showSplash(){
   currentUserId = null;
-  currentAuthUser = null;
+  currentUser = null;
   appTopbar.style.display = 'none';
   appWrap.style.display = 'none';
   if(bottomDock) bottomDock.style.display = 'none';
@@ -2912,6 +2694,55 @@ supabaseClient.auth.getSession().then(({ data }) => {
   } else {
     showSplash();
   }
+});
+
+/* ---------------------------------------------------------
+   PROFILE / USERNAME
+--------------------------------------------------------- */
+const usernameInput = document.getElementById('usernameInput');
+const saveUsernameBtn = document.getElementById('saveUsernameBtn');
+const profileMsg = document.getElementById('profileMsg');
+const profileEmail = document.getElementById('profileEmail');
+const profileAvatar = document.getElementById('profileAvatar');
+const profileLogoutBtn = document.getElementById('profileLogoutBtn');
+
+function renderProfile(){
+  if(!currentUser) return;
+  const username = (currentUser.user_metadata && currentUser.user_metadata.username) || '';
+  usernameInput.value = username;
+  profileEmail.textContent = currentUser.email || '';
+  const initial = (username || currentUser.email || '?').trim().charAt(0).toUpperCase();
+  profileAvatar.textContent = initial || '?';
+  profileMsg.textContent = '';
+}
+
+saveUsernameBtn.addEventListener('click', async () => {
+  const username = usernameInput.value.trim();
+  if(!username){
+    profileMsg.style.color = 'var(--danger)';
+    profileMsg.textContent = 'Enter a username first.';
+    return;
+  }
+  saveUsernameBtn.disabled = true;
+  profileMsg.style.color = '';
+  profileMsg.textContent = 'Saving…';
+  try{
+    const { data, error } = await supabaseClient.auth.updateUser({ data: { username } });
+    if(error) throw error;
+    currentUser = data.user;
+    profileMsg.style.color = 'var(--neon-strong)';
+    profileMsg.textContent = 'Saved!';
+    profileAvatar.textContent = username.charAt(0).toUpperCase();
+  }catch(err){
+    profileMsg.style.color = 'var(--danger)';
+    profileMsg.textContent = (err && err.message) || 'Could not save username.';
+  }finally{
+    saveUsernameBtn.disabled = false;
+  }
+});
+usernameInput.addEventListener('keydown', (e) => { if(e.key === 'Enter'){ e.preventDefault(); saveUsernameBtn.click(); } });
+profileLogoutBtn.addEventListener('click', async () => {
+  await supabaseClient.auth.signOut();
 });
 
 </script>
