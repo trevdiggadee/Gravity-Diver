@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="color-scheme" content="dark">
 <title>RepLog — Workout Logbook</title>
 <link rel="icon" type="image/png" href="REPLOG-ICON.png">
 <link rel="apple-touch-icon" href="REPLOG-ICON.png">
@@ -168,7 +169,7 @@
 
   /* ---- Workout identity : polished tap-to-edit metadata ---- */
   .day-header{
-    display:grid; grid-template-columns: 1.35fr 1fr 1fr; gap:10px; margin-bottom:18px;
+    display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; margin-bottom:18px;
   }
   .field{ display:flex; flex-direction:column; gap:1px; }
   .field label{ font-size: 9px; color: var(--chalk-dim); letter-spacing:.05em; text-transform:uppercase; line-height:1.2; }
@@ -206,6 +207,7 @@
     width:100%; background: var(--panel-3); border:1px solid var(--line); color: var(--chalk);
     padding: 3px 10px; border-radius: var(--radius-sm); font: inherit; font-size: 13px; line-height:1.4;
     transition: border-color .15s ease, box-shadow .15s ease;
+    color-scheme: dark; caret-color: var(--neon); accent-color: var(--neon);
   }
   select{
     appearance: none; -webkit-appearance:none;
@@ -1043,7 +1045,7 @@
         <span class="ex-rest-label">Rest Timer</span>
         <div class="ex-rest-input-row">
           <button type="button" class="rest-step" id="restStepDown" title="Minus 5 seconds">−</button>
-          <input type="number" min="5" step="5" id="exRestSeconds" placeholder="90">
+          <input type="number" min="5" step="5" inputmode="numeric" pattern="[0-9]*" id="exRestSeconds" placeholder="90">
           <button type="button" class="rest-step" id="restStepUp" title="Plus 5 seconds">+</button>
           <span class="ex-rest-suffix">sec</span>
         </div>
@@ -1856,8 +1858,8 @@ function renderExRows(){
     rowEl.className = 'ex-set-row' + (logged ? ' checked' : '');
     rowEl.innerHTML = `
       <button type="button" class="ex-check ${logged ? 'checked' : ''}" title="${logged ? 'Logged — tap to undo' : 'Tap to log this set'}">${logged ? '✓' : (i+1)}</button>
-      <input type="number" min="0" class="ex-reps" placeholder="Reps" value="${row.reps}">
-      <input type="number" min="0" step="0.5" class="ex-weight" placeholder="Weight (lb)" value="${row.weight}">
+      <input type="number" min="0" inputmode="numeric" pattern="[0-9]*" class="ex-reps" placeholder="Reps" value="${row.reps}">
+      <input type="number" min="0" step="0.5" inputmode="decimal" class="ex-weight" placeholder="Weight (lb)" value="${row.weight}">
       <button type="button" class="ex-row-remove" title="Remove set">×</button>
     `;
     const repsInput = rowEl.querySelector('.ex-reps');
