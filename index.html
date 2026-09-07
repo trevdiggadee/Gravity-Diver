@@ -960,6 +960,10 @@
     .slot-compact .sc-summary{ max-width:28%; }
   }
 
+
+  .program-save-btn{ color:var(--neon-strong); border-color:var(--neon); background:rgba(var(--neon-rgb),.08); }
+  .program-save-btn.saving{ opacity:.65; pointer-events:none; }
+  @media(max-width:700px){ .program-save-btn{ font-size:11px; padding:8px 10px; } }
 </style>
 </head>
 <body>
@@ -997,6 +1001,7 @@
       <button id="navLog">Logbook</button>
       <button id="navProfile">Profile</button>
       <button id="setupBtn">Complete Day Setup</button>
+      <button id="saveProgramBtn" class="program-save-btn" type="button">Save 4-Week Program</button>
       <button class="start-btn" id="startBtn">Start</button>
     </div>
     <div class="session-active" id="sessionActive">
@@ -1261,26 +1266,6 @@ const DAY_COUNT = 4;
 const SLOTS_PER_SIDE = 5;
 const WEEK_COUNT = 4;
 let currentUserId = null;
-let daysLoadedFromCloud = false;
-let daysLoadInProgress = false;
-const STORAGE_PROGRAM_PREFIX = 'replog_program_backup_v1:';
-function programBackupKey(userId){ return STORAGE_PROGRAM_PREFIX + String(userId || ''); }
-function isUsableDaysShape(parsed){
-  return Array.isArray(parsed) && parsed.length >= 1 && parsed.every(d => d && Array.isArray(d.weeks) && d.weeks.length >= WEEK_COUNT && d.weeks.every(w => w && w.logs && w.logs.upper && w.logs.lower));
-}
-function backupDaysLocally(){
-  if(!currentUserId || !isUsableDaysShape(days)) return;
-  try{ localStorage.setItem(programBackupKey(currentUserId), JSON.stringify(days)); }catch(e){}
-}
-function loadLocalProgramBackup(){
-  if(!currentUserId) return null;
-  try{
-    const raw = localStorage.getItem(programBackupKey(currentUserId));
-    if(!raw) return null;
-    const parsed = JSON.parse(raw);
-    return isUsableDaysShape(parsed) ? normalizeDaysLength(parsed) : null;
-  }catch(e){ return null; }
-}
 
 function emptySlotDef(){ return { exercise:"", sets:"", rest:"", custom:false }; }
 function emptyWeek(){
@@ -1315,10 +1300,29 @@ function normalizeDaysLength(parsed){
 }
 
 /* ---- Cloud persistence (Supabase) ---- */
+const PROGRAM_BACKUP_PREFIX = "replog_program_backup_v2:";
+let programLoadState = "not_loaded";
+let programSaveInFlight = Promise.resolve();
+
+function programBackupKey(){ return PROGRAM_BACKUP_PREFIX + String(currentUserId || ""); }
+function backupProgramLocally(snapshot){
+  if(!currentUserId || !Array.isArray(snapshot)) return;
+  try{ localStorage.setItem(programBackupKey(), JSON.stringify({savedAt:new Date().toISOString(), days:snapshot})); }
+  catch(e){ console.warn("Local program backup unavailable", e); }
+}
+function loadLocalProgramBackup(){
+  if(!currentUserId) return null;
+  try{
+    const raw = localStorage.getItem(programBackupKey());
+    if(!raw) return null;
+    const parsed = JSON.parse(raw);
+    return parsed && isValidDaysShape(parsed.days) ? normalizeDaysLength(parsed.days) : null;
+  }catch(e){ return null; }
+}
+
 async function loadDaysFromCloud(){
-  daysLoadInProgress = true;
-  daysLoadedFromCloud = false;
-  if(!currentUserId){ daysLoadInProgress = false; return freshDays(); }
+  if(!currentUserId){ programLoadState="not_loaded"; return freshDays(); }
+  programLoadState="loading";
   try{
     const { data, error } = await supabaseClient
       .from('program_state')
@@ -1326,55 +1330,67 @@ async function loadDaysFromCloud(){
       .eq('user_id', currentUserId)
       .maybeSingle();
     if(error) throw error;
+
+    // A real row wins. Never replace it with a blank program.
     if(data && data.days && isValidDaysShape(data.days)){
       const loaded = normalizeDaysLength(data.days);
-      daysLoadedFromCloud = true;
-      daysLoadInProgress = false;
-      try{ localStorage.setItem(programBackupKey(currentUserId), JSON.stringify(loaded)); }catch(e){}
+      programLoadState="loaded";
+      backupProgramLocally(loaded);
       return loaded;
     }
-    // No saved program exists yet. It is safe to create one after this point.
-    daysLoadedFromCloud = true;
-    daysLoadInProgress = false;
-    return freshDays();
-  }catch(e){
-    console.error('loadDaysFromCloud failed', e);
-    const backup = loadLocalProgramBackup();
-    daysLoadedFromCloud = !!backup;
-    daysLoadInProgress = false;
-    if(backup){
-      showToast('Cloud program could not be loaded. Restored your last local program backup.', 7000);
-      return backup;
+
+    // No row exists: this is the only case where a new blank program is created.
+    if(!data){
+      const local = loadLocalProgramBackup();
+      if(local){ programLoadState="loaded_local"; return local; }
+      const blank = freshDays();
+      programLoadState="new";
+      return blank;
     }
-    // IMPORTANT: never allow a failed load to overwrite a real cloud program with blank data.
-    return freshDays();
+
+    // Row exists but contains unusable data. Protect the user instead of overwriting it.
+    const local = loadLocalProgramBackup();
+    if(local){ programLoadState="loaded_local"; return local; }
+    throw new Error("Saved program data exists but could not be read safely.");
+  }catch(e){
+    programLoadState="error";
+    console.error('loadDaysFromCloud failed', e);
+    const local = loadLocalProgramBackup();
+    if(local){
+      programLoadState="loaded_local";
+      return local;
+    }
+    throw e;
   }
 }
+
 async function saveDaysToCloud(){
-  if(!currentUserId || daysLoadInProgress || !daysLoadedFromCloud) return;
-  backupDaysLocally();
-  try{
+  if(!currentUserId || programLoadState === "loading" || programLoadState === "error" || programLoadState === "not_loaded") return false;
+  const snapshot = normalizeDaysLength(JSON.parse(JSON.stringify(days)));
+  programSaveInFlight = programSaveInFlight.then(async () => {
     const { error } = await supabaseClient
       .from('program_state')
-      .upsert({ user_id: currentUserId, days, updated_at: new Date().toISOString() }, { onConflict: 'user_id' });
+      .upsert({ user_id: currentUserId, days: snapshot, updated_at: new Date().toISOString() }, { onConflict: 'user_id' });
     if(error) throw error;
-    backupDaysLocally();
-  }catch(e){
+    backupProgramLocally(snapshot);
+    programLoadState="loaded";
+    return true;
+  }).catch(e => {
     console.error('saveDaysToCloud failed', e);
-    showToast("Sync error: " + (e && (e.message || e.details || JSON.stringify(e))), 8000);
-  }
+    showToast("Program not saved — your data was kept on this device. " + (e && (e.message || e.details || "")), 8000);
+    return false;
+  });
+  return programSaveInFlight;
 }
 let saveDaysTimer = null;
 function saveDays(){
   clearTimeout(saveDaysTimer);
-  if(daysLoadInProgress || !daysLoadedFromCloud) return;
-  backupDaysLocally();
-  saveDaysTimer = setTimeout(saveDaysToCloud, 700);
+  if(programLoadState === "loading" || programLoadState === "error" || programLoadState === "not_loaded") return;
+  saveDaysTimer = setTimeout(() => saveDaysToCloud(), 700);
 }
 function flushSaveDays(){
   clearTimeout(saveDaysTimer);
-  if(daysLoadInProgress || !daysLoadedFromCloud) return;
-  saveDaysToCloud();
+  return saveDaysToCloud();
 }
 
 async function loadHistoryFromCloud(){
@@ -1617,6 +1633,21 @@ function renderSetupBar(){
     btn.classList.remove('setup-locked');
   }
 }
+const saveProgramBtn = document.getElementById('saveProgramBtn');
+if(saveProgramBtn){
+  saveProgramBtn.addEventListener('click', async () => {
+    if(programLoadState === "loading" || programLoadState === "error" || programLoadState === "not_loaded"){
+      showToast("Your saved program is still loading. Please try again in a moment."); return;
+    }
+    saveProgramBtn.classList.add('saving');
+    saveProgramBtn.textContent = 'Saving…';
+    const ok = await flushSaveDays();
+    saveProgramBtn.classList.remove('saving');
+    saveProgramBtn.textContent = 'Save 4-Week Program';
+    if(ok) showToast('4-week program saved.');
+  });
+}
+
 document.getElementById('setupBtn').addEventListener('click', () => {
   const d = days[activeDay];
   if(d.setupComplete){
@@ -2797,21 +2828,29 @@ logoutBtn.addEventListener('click', async () => {
   await supabaseClient.auth.signOut();
 });
 
-let appLoadToken = 0;
 async function showApp(user){
-  const token = ++appLoadToken;
   currentAuthUser = user;
   currentUserId = user.id;
   splashView.classList.add('hide');
   activeDay = 0;
-  const [loadedDays, loadedHistory] = await Promise.all([loadDaysFromCloud(), loadHistoryFromCloud()]);
-  if(token !== appLoadToken) return;
-  days = loadedDays;
-  history = loadedHistory;
-  appTopbar.style.display = '';
-  appWrap.style.display = '';
-  if(bottomDock) bottomDock.style.display = '';
-  renderAll();
+  try{
+    const [loadedDays, loadedHistory] = await Promise.all([loadDaysFromCloud(), loadHistoryFromCloud()]);
+    days = loadedDays;
+    history = loadedHistory;
+    appTopbar.style.display = '';
+    appWrap.style.display = '';
+    if(bottomDock) bottomDock.style.display = '';
+    renderAll();
+    // Persist a brand-new account program only after the read succeeded.
+    if(programLoadState === "new") await flushSaveDays();
+  }catch(e){
+    console.error('showApp failed', e);
+    appTopbar.style.display = 'none';
+    appWrap.style.display = 'none';
+    if(bottomDock) bottomDock.style.display = 'none';
+    splashView.classList.remove('hide');
+    authError.textContent = 'Your saved program could not be loaded. Nothing was overwritten. Please try again.';
+  }
 }
 function showSplash(){
   currentUserId = null;
