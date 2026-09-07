@@ -1439,23 +1439,42 @@ function playCountdownBeep(){
     o.start(t0); o.stop(t0 + 0.16);
   }catch(e){}
 }
+let restAlarmInterval = null;
+let restAlarmAudio = null;
+
+function stopRestAlarm(){
+  if(restAlarmInterval){ clearInterval(restAlarmInterval); restAlarmInterval = null; }
+  if(restAlarmAudio){
+    try{ restAlarmAudio.close(); }catch(e){}
+    restAlarmAudio = null;
+  }
+}
+
 function playBuzzer(){
+  // Repeating rest alarm: sounds for a full 10 seconds after the timer reaches zero.
+  stopRestAlarm();
   try{
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const t0 = ctx.currentTime;
-    [0, 0.3].forEach((offset) => {
-      const start = t0 + offset;
-      const o = ctx.createOscillator();
-      const g = ctx.createGain();
-      o.type = 'sawtooth';
-      o.frequency.setValueAtTime(220, start);
-      o.frequency.exponentialRampToValueAtTime(160, start + 0.26);
-      o.connect(g); g.connect(ctx.destination);
-      g.gain.setValueAtTime(0.0001, start);
-      g.gain.exponentialRampToValueAtTime(0.32, start + 0.02);
-      g.gain.exponentialRampToValueAtTime(0.0001, start + 0.26);
-      o.start(start); o.stop(start + 0.28);
-    });
+    restAlarmAudio = ctx;
+    const playAlarmBurst = () => {
+      const t0 = ctx.currentTime;
+      [0, 0.28, 0.56].forEach((offset) => {
+        const start = t0 + offset;
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = 'sawtooth';
+        o.frequency.setValueAtTime(240, start);
+        o.frequency.exponentialRampToValueAtTime(170, start + 0.22);
+        o.connect(g); g.connect(ctx.destination);
+        g.gain.setValueAtTime(0.0001, start);
+        g.gain.exponentialRampToValueAtTime(0.28, start + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, start + 0.22);
+        o.start(start); o.stop(start + 0.24);
+      });
+    };
+    playAlarmBurst();
+    restAlarmInterval = setInterval(playAlarmBurst, 1000);
+    setTimeout(() => stopRestAlarm(), 10000);
   }catch(e){}
 }
 function playBeep(){
@@ -1797,6 +1816,7 @@ setTimerLabel('Start Rest');
 
 function resetTimerVisual(){
   if(exRestInterval){ clearInterval(exRestInterval); exRestInterval = null; }
+  stopRestAlarm();
   exTimerBtn.classList.remove('running');
   analogClock.classList.remove('running');
   analogClock.classList.remove('urgent');
