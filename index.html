@@ -1164,12 +1164,18 @@
         </div>
       </div>
       <div class="rest-sound-row">
-        <label for="restSoundSelect">Alert sound</label>
+        <label for="restSoundSelect">Alarm sound</label>
         <select id="restSoundSelect" class="rest-sound-select">
-          <option value="classic">Classic Beep</option>
-          <option value="bell">Bell</option>
-          <option value="digital">Digital</option>
-          <option value="pulse">Pulse</option>
+          <option value="oga_alarm">Digital Alarm</option>
+          <option value="bell">Classic Bell</option>
+          <option value="point_bell">Point Bell</option>
+          <option value="chime_1">Chime 1</option>
+          <option value="chime_2">Chime 2</option>
+          <option value="chime_3">Chime 3</option>
+          <option value="chime_4">Chime 4</option>
+          <option value="pleasing">Pleasing Bell</option>
+          <option value="doorbell">Doorbell</option>
+          <option value="vocal">Vocal Alarm</option>
           <option value="silent">Silent</option>
         </select>
       </div>
@@ -1304,6 +1310,8 @@ const SLOTS_PER_SIDE = 5;
 const WEEK_COUNT = 4;
 let currentUserId = null;
 let currentUser = null;
+let cloudDaysLoaded = false;
+let cloudHistoryLoaded = false;
 
 function emptySlotDef(){ return { exercise:"", sets:"", rest:"", custom:false }; }
 function emptyWeek(){
@@ -1339,20 +1347,43 @@ function normalizeDaysLength(parsed){
 
 /* ---- Cloud persistence (Supabase) ---- */
 async function loadDaysFromCloud(){
+  cloudDaysLoaded = false;
   if(!currentUserId) return freshDays();
   try{
     const { data, error } = await supabaseClient
       .from('program_state')
-      .select('days')
+      .select('days, updated_at')
       .eq('user_id', currentUserId)
-      .maybeSingle();
+      .order('updated_at', { ascending:false })
+      .limit(1);
     if(error) throw error;
-    if(data && data.days && isValidDaysShape(data.days)) return normalizeDaysLength(data.days);
-  }catch(e){ console.error('loadDaysFromCloud failed', e); }
-  return freshDays();
+    if(Array.isArray(data) && data.length){
+      const cloudDays = data[0].days;
+      if(!cloudDays || !isValidDaysShape(cloudDays)){
+        throw new Error('Saved program data has an unexpected format.');
+      }
+      const normalized = normalizeDaysLength(cloudDays);
+      cloudDaysLoaded = true;
+      try{ localStorage.setItem('REPLOG_CLOUD_DAYS_BACKUP_' + currentUserId, JSON.stringify(normalized)); }catch(_){}
+      return normalized;
+    }
+    cloudDaysLoaded = true;
+    return freshDays();
+  }catch(e){
+    console.error('loadDaysFromCloud failed', e);
+    try{
+      const backup = JSON.parse(localStorage.getItem('REPLOG_CLOUD_DAYS_BACKUP_' + currentUserId) || 'null');
+      if(isValidDaysShape(backup)){
+        showToast('Cloud sync could not be read. Showing your last saved copy; nothing was overwritten.', 9000);
+        return normalizeDaysLength(backup);
+      }
+    }catch(_){}
+    showToast('Could not load your saved workout program. Your cloud data was NOT overwritten.', 10000);
+    return null;
+  }
 }
 async function saveDaysToCloud(){
-  if(!currentUserId) return;
+  if(!currentUserId || !cloudDaysLoaded) return;
   try{
     const { error } = await supabaseClient
       .from('program_state')
@@ -1371,6 +1402,7 @@ function flushSaveDays(){
 }
 
 async function loadHistoryFromCloud(){
+  cloudHistoryLoaded = false;
   if(!currentUserId) return [];
   try{
     const { data, error } = await supabaseClient
@@ -1379,8 +1411,13 @@ async function loadHistoryFromCloud(){
       .eq('user_id', currentUserId)
       .order('created_at', { ascending: false });
     if(error) throw error;
+    cloudHistoryLoaded = true;
     return (data || []).map(row => Object.assign({}, row.entry, { id: row.id }));
-  }catch(e){ console.error('loadHistoryFromCloud failed', e); return []; }
+  }catch(e){
+    console.error('loadHistoryFromCloud failed', e);
+    showToast('Could not load workout history. Your cloud data was NOT overwritten.', 9000);
+    return [];
+  }
 }
 async function insertHistoryEntryToCloud(entry){
   try{
@@ -1441,7 +1478,24 @@ function formatHMS(totalSeconds){
 let restAudioCtx = null;
 let restAlarmTimeouts = [];
 let restCountdownPlayed = new Set();
-let restSoundChoice = 'classic';
+let restSoundChoice = 'oga_alarm';
+let restAlarmAudio = null;
+
+const REST_ALARM_SOURCES = {
+  // CC0 / public-domain sources from OpenGameArt. These are used only for
+  // the 10-second end-of-rest alarm; the 5-second countdown beep stays native
+  // Web Audio so it remains exactly the same regardless of alarm selection.
+  oga_alarm: 'https://opengameart.org/sites/default/files/alarm_2.wav',
+  bell: 'https://opengameart.org/sites/default/files/bell.wav',
+  point_bell: 'https://opengameart.org/sites/default/files/sd_0.wav',
+  chime_1: 'https://opengameart.org/sites/default/files/bell_ding1.wav',
+  chime_2: 'https://opengameart.org/sites/default/files/bell_ding2.wav',
+  chime_3: 'https://opengameart.org/sites/default/files/bell_ding3.wav',
+  chime_4: 'https://opengameart.org/sites/default/files/bell_ding4.wav',
+  pleasing: 'https://opengameart.org/sites/default/files/pleasing-bell.wav',
+  doorbell: 'https://opengameart.org/sites/default/files/doorbell.wav',
+  vocal: 'https://opengameart.org/sites/default/files/alarme_0.ogg'
+};
 
 function getRestAudioContext(){
   try{
@@ -1455,7 +1509,7 @@ function clearRestAudioTimers(){
   restAlarmTimeouts = [];
 }
 function scheduleTone(freq, start, duration, type='sine', volume=.18, endFreq=null){
-  const ctx=getRestAudioContext(); if(!ctx || restSoundChoice==='silent') return;
+  const ctx=getRestAudioContext(); if(!ctx) return;
   const o=ctx.createOscillator(), g=ctx.createGain();
   o.type=type; o.frequency.setValueAtTime(freq,start);
   if(endFreq) o.frequency.exponentialRampToValueAtTime(endFreq,start+duration*.85);
@@ -1466,46 +1520,55 @@ function scheduleTone(freq, start, duration, type='sine', volume=.18, endFreq=nu
   o.start(start); o.stop(start+duration+.02);
 }
 function playCountdownBeep(){
-  const ctx=getRestAudioContext(); if(!ctx || restSoundChoice==='silent') return;
+  // Keep the 5-second countdown sound identical no matter which alarm is selected.
+  const ctx=getRestAudioContext(); if(!ctx) return;
   const t=ctx.currentTime+.01;
-  if(restSoundChoice==='bell') scheduleTone(880,t,.32,'sine',.18,660);
-  else if(restSoundChoice==='digital') scheduleTone(1200,t,.09,'square',.16,900);
-  else if(restSoundChoice==='pulse') scheduleTone(520,t,.18,'triangle',.18,520);
-  else scheduleTone(880,t,.13,'square',.18,880);
+  scheduleTone(880,t,.13,'square',.18,880);
 }
-let restAlarmInterval = null;
-let restAlarmAudio = null;
 function stopRestAlarm(){
-  if(restAlarmInterval){ clearInterval(restAlarmInterval); restAlarmInterval=null; }
   clearRestAudioTimers();
-  if(restAlarmAudio){ try{restAlarmAudio.close();}catch(e){} restAlarmAudio=null; restAudioCtx=null; }
+  if(restAlarmAudio){
+    try{
+      restAlarmAudio.pause();
+      restAlarmAudio.currentTime = 0;
+      restAlarmAudio.removeAttribute('src');
+      restAlarmAudio.load();
+    }catch(e){}
+    restAlarmAudio=null;
+  }
 }
 function playBuzzer(){
+  // Play exactly ONE selected alarm. Do not layer a synthesized fallback on top;
+  // that could make iOS sound like two alarms at once.
   stopRestAlarm();
   if(restSoundChoice==='silent') return;
-  const ctx=getRestAudioContext(); if(!ctx) return;
-  restAlarmAudio=ctx;
-  const start=ctx.currentTime+.01;
-  // Schedule the entire 10-second alarm immediately. This avoids the delayed
-  // sound caused by creating a new AudioContext every second.
-  for(let i=0;i<10;i++){
-    const t=start+i*.9;
-    if(restSoundChoice==='bell'){
-      scheduleTone(784,t,.65,'sine',.22,392);
-      scheduleTone(1175,t+.08,.55,'sine',.14,587);
-    }else if(restSoundChoice==='digital'){
-      scheduleTone(440,t,.16,'square',.20,330);
-      scheduleTone(660,t+.19,.16,'square',.20,440);
-    }else if(restSoundChoice==='pulse'){
-      scheduleTone(300,t,.28,'sawtooth',.20,190);
-      scheduleTone(300,t+.35,.28,'sawtooth',.20,190);
-    }else{
-      scheduleTone(240,t,.24,'sawtooth',.25,170);
-      scheduleTone(240,t+.28,.24,'sawtooth',.25,170);
-      scheduleTone(240,t+.56,.24,'sawtooth',.25,170);
-    }
+
+  const src = REST_ALARM_SOURCES[restSoundChoice];
+  if(!src) return;
+
+  const audio = new Audio();
+  restAlarmAudio = audio;
+  audio.preload = 'auto';
+  audio.volume = .82;
+  audio.loop = true;
+  audio.playsInline = true;
+  audio.src = src;
+
+  const endAlarm = () => {
+    if(restAlarmAudio !== audio) return;
+    stopRestAlarm();
+  };
+
+  // A single source is allowed to play for the full 10-second alarm window.
+  const playPromise = audio.play();
+  if(playPromise && typeof playPromise.catch === 'function'){
+    playPromise.catch((err) => {
+      // Never add another sound on failure. This prevents a hidden second
+      // alarm from being heard alongside the selected open-source sound.
+      console.warn('RepLog alarm could not play:', err);
+    });
   }
-  restAlarmTimeouts.push(setTimeout(()=>{ stopRestAlarm(); },10150));
+  restAlarmTimeouts.push(setTimeout(endAlarm, 10000));
 }
 function playBeep(){
   try{
@@ -1954,8 +2017,8 @@ function persistRestValue(){
   highlightRestPreset();
 }
 const restSoundSelect = document.getElementById('restSoundSelect');
-try{ restSoundSelect.value = localStorage.getItem('REPLOG_REST_SOUND') || 'classic'; }catch(e){}
-restSoundChoice = restSoundSelect.value || 'classic';
+try{ restSoundSelect.value = localStorage.getItem('REPLOG_REST_SOUND') || 'oga_alarm'; }catch(e){}
+restSoundChoice = restSoundSelect.value || 'oga_alarm';
 restSoundSelect.addEventListener('change', () => {
   restSoundChoice = restSoundSelect.value;
   try{ localStorage.setItem('REPLOG_REST_SOUND', restSoundChoice); }catch(e){}
@@ -2873,6 +2936,14 @@ async function showApp(user){
   splashView.classList.add('hide');
   activeDay = 0;
   const [loadedDays, loadedHistory] = await Promise.all([loadDaysFromCloud(), loadHistoryFromCloud()]);
+  if(!loadedDays){
+    appTopbar.style.display = 'none';
+    appWrap.style.display = 'none';
+    if(bottomDock) bottomDock.style.display = 'none';
+    splashView.classList.remove('hide');
+    authError.textContent = 'Your saved program could not be loaded. Please do not create a new program yet.';
+    return;
+  }
   days = loadedDays;
   history = loadedHistory;
   appTopbar.style.display = '';
