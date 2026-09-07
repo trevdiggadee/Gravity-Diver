@@ -1271,6 +1271,7 @@ function emptySlotDef(){ return { exercise:"", sets:"", rest:"", custom:false };
 function emptyWeek(){
   return {
     date:"",
+    completed:false,
     logs: {
       upper: Array.from({length:SLOTS_PER_SIDE}, () => []),
       lower: Array.from({length:SLOTS_PER_SIDE}, () => [])
@@ -1294,9 +1295,28 @@ function isValidDaysShape(parsed){
   return Array.isArray(parsed) && parsed.length && parsed[0].weeks && parsed[0].weeks[0] && parsed[0].weeks[0].logs;
 }
 function normalizeDaysLength(parsed){
-  if(parsed.length > DAY_COUNT) return parsed.slice(0, DAY_COUNT);
-  if(parsed.length < DAY_COUNT) return parsed.concat(Array.from({length: DAY_COUNT - parsed.length}, emptyDay));
-  return parsed;
+  const normalized = parsed.length > DAY_COUNT
+    ? parsed.slice(0, DAY_COUNT)
+    : parsed.length < DAY_COUNT
+      ? parsed.concat(Array.from({length: DAY_COUNT - parsed.length}, emptyDay))
+      : parsed;
+
+  // Backward-compatible migration: older saved programs had no explicit
+  // completion flag. If a week already contains logged sets, treat it as
+  // completed so the old progress is not lost.
+  normalized.forEach(day => {
+    if(!Array.isArray(day.weeks)) day.weeks = Array.from({length:WEEK_COUNT}, emptyWeek);
+    while(day.weeks.length < WEEK_COUNT) day.weeks.push(emptyWeek());
+    day.weeks = day.weeks.slice(0, WEEK_COUNT);
+    day.weeks.forEach(week => {
+      if(typeof week.completed !== 'boolean'){
+        const logs = week.logs || {upper:[], lower:[]};
+        week.completed = [...(logs.upper || []), ...(logs.lower || [])]
+          .some(arr => Array.isArray(arr) && arr.length > 0);
+      }
+    });
+  });
+  return normalized;
 }
 
 /* ---- Cloud persistence (Supabase) ---- */
@@ -1533,9 +1553,12 @@ function dayHasContent(d){
 }
 function renderDayRail(){
   dayRail.innerHTML = "";
+  const selectedWeek = days[activeDay]?.currentWeek || 1;
   days.forEach((d, i) => {
+    const week = d.weeks && d.weeks[selectedWeek - 1];
+    const completed = !!(week && (week.completed === true || weekHasContent(d, selectedWeek - 1)));
     const btn = document.createElement('button');
-    btn.className = 'day-tab' + (i===activeDay ? ' active' : '') + (dayHasContent(d) ? ' filled' : '');
+    btn.className = 'day-tab' + (i===activeDay ? ' active' : '') + (completed ? ' filled' : '');
     btn.innerHTML = `Day ${i+1}<span class="dot"></span>`;
     btn.addEventListener('click', () => { activeDay = i; renderAll(); });
     dayRail.appendChild(btn);
@@ -1547,8 +1570,11 @@ function renderDayRail(){
 --------------------------------------------------------- */
 const weekRail = document.getElementById('weekRail');
 function weekHasContent(day, wi){
-  const l = day.weeks[wi].logs;
-  return [...l.upper, ...l.lower].some(arr => arr && arr.length > 0);
+  const week = day.weeks[wi];
+  if(!week) return false;
+  if(week.completed === true) return true;
+  const l = week.logs || {upper:[], lower:[]};
+  return [...(l.upper || []), ...(l.lower || [])].some(arr => arr && arr.length > 0);
 }
 function renderWeekRail(){
   const d = days[activeDay];
@@ -2349,9 +2375,17 @@ document.getElementById('finishBtn').addEventListener('click', async () => {
   d.timerStart = null;
   d.timerElapsed = 0;
 
+  // Explicitly persist completion for this day in this week.
+  // This is separate from the workout log so a completed day survives
+  // navigation, reloads, and the next week.
+  weekData.completed = true;
+
   const blockComplete = cw === WEEK_COUNT;
   if(cw < WEEK_COUNT) d.currentWeek = cw + 1;
-  flushSaveDays();
+
+  // Save immediately so completion cannot be lost if the user navigates
+  // away or closes the app right after finishing.
+  await flushSaveDays();
   renderAll();
 
   openSummaryModal({
