@@ -1261,6 +1261,26 @@ const DAY_COUNT = 4;
 const SLOTS_PER_SIDE = 5;
 const WEEK_COUNT = 4;
 let currentUserId = null;
+let daysLoadedFromCloud = false;
+let daysLoadInProgress = false;
+const STORAGE_PROGRAM_PREFIX = 'replog_program_backup_v1:';
+function programBackupKey(userId){ return STORAGE_PROGRAM_PREFIX + String(userId || ''); }
+function isUsableDaysShape(parsed){
+  return Array.isArray(parsed) && parsed.length >= 1 && parsed.every(d => d && Array.isArray(d.weeks) && d.weeks.length >= WEEK_COUNT && d.weeks.every(w => w && w.logs && w.logs.upper && w.logs.lower));
+}
+function backupDaysLocally(){
+  if(!currentUserId || !isUsableDaysShape(days)) return;
+  try{ localStorage.setItem(programBackupKey(currentUserId), JSON.stringify(days)); }catch(e){}
+}
+function loadLocalProgramBackup(){
+  if(!currentUserId) return null;
+  try{
+    const raw = localStorage.getItem(programBackupKey(currentUserId));
+    if(!raw) return null;
+    const parsed = JSON.parse(raw);
+    return isUsableDaysShape(parsed) ? normalizeDaysLength(parsed) : null;
+  }catch(e){ return null; }
+}
 
 function emptySlotDef(){ return { exercise:"", sets:"", rest:"", custom:false }; }
 function emptyWeek(){
@@ -1296,7 +1316,9 @@ function normalizeDaysLength(parsed){
 
 /* ---- Cloud persistence (Supabase) ---- */
 async function loadDaysFromCloud(){
-  if(!currentUserId) return freshDays();
+  daysLoadInProgress = true;
+  daysLoadedFromCloud = false;
+  if(!currentUserId){ daysLoadInProgress = false; return freshDays(); }
   try{
     const { data, error } = await supabaseClient
       .from('program_state')
@@ -1304,26 +1326,54 @@ async function loadDaysFromCloud(){
       .eq('user_id', currentUserId)
       .maybeSingle();
     if(error) throw error;
-    if(data && data.days && isValidDaysShape(data.days)) return normalizeDaysLength(data.days);
-  }catch(e){ console.error('loadDaysFromCloud failed', e); }
-  return freshDays();
+    if(data && data.days && isValidDaysShape(data.days)){
+      const loaded = normalizeDaysLength(data.days);
+      daysLoadedFromCloud = true;
+      daysLoadInProgress = false;
+      try{ localStorage.setItem(programBackupKey(currentUserId), JSON.stringify(loaded)); }catch(e){}
+      return loaded;
+    }
+    // No saved program exists yet. It is safe to create one after this point.
+    daysLoadedFromCloud = true;
+    daysLoadInProgress = false;
+    return freshDays();
+  }catch(e){
+    console.error('loadDaysFromCloud failed', e);
+    const backup = loadLocalProgramBackup();
+    daysLoadedFromCloud = !!backup;
+    daysLoadInProgress = false;
+    if(backup){
+      showToast('Cloud program could not be loaded. Restored your last local program backup.', 7000);
+      return backup;
+    }
+    // IMPORTANT: never allow a failed load to overwrite a real cloud program with blank data.
+    return freshDays();
+  }
 }
 async function saveDaysToCloud(){
-  if(!currentUserId) return;
+  if(!currentUserId || daysLoadInProgress || !daysLoadedFromCloud) return;
+  backupDaysLocally();
   try{
     const { error } = await supabaseClient
       .from('program_state')
       .upsert({ user_id: currentUserId, days, updated_at: new Date().toISOString() }, { onConflict: 'user_id' });
     if(error) throw error;
-  }catch(e){ console.error('saveDaysToCloud failed', e); showToast("Sync error: " + (e && (e.message || e.details || JSON.stringify(e))), 8000); }
+    backupDaysLocally();
+  }catch(e){
+    console.error('saveDaysToCloud failed', e);
+    showToast("Sync error: " + (e && (e.message || e.details || JSON.stringify(e))), 8000);
+  }
 }
 let saveDaysTimer = null;
 function saveDays(){
   clearTimeout(saveDaysTimer);
+  if(daysLoadInProgress || !daysLoadedFromCloud) return;
+  backupDaysLocally();
   saveDaysTimer = setTimeout(saveDaysToCloud, 700);
 }
 function flushSaveDays(){
   clearTimeout(saveDaysTimer);
+  if(daysLoadInProgress || !daysLoadedFromCloud) return;
   saveDaysToCloud();
 }
 
@@ -2747,12 +2797,15 @@ logoutBtn.addEventListener('click', async () => {
   await supabaseClient.auth.signOut();
 });
 
+let appLoadToken = 0;
 async function showApp(user){
+  const token = ++appLoadToken;
   currentAuthUser = user;
   currentUserId = user.id;
   splashView.classList.add('hide');
   activeDay = 0;
   const [loadedDays, loadedHistory] = await Promise.all([loadDaysFromCloud(), loadHistoryFromCloud()]);
+  if(token !== appLoadToken) return;
   days = loadedDays;
   history = loadedHistory;
   appTopbar.style.display = '';
