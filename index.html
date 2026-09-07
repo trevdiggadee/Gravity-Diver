@@ -401,6 +401,10 @@
   }
   .rest-chip:hover{ border-color: var(--chalk-dim); color: var(--chalk); }
   .rest-chip.active{ background: rgba(var(--neon-rgb),0.15); border-color: var(--neon); color: var(--neon); font-weight:700; }
+  .rest-sound-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:9px 0 3px;padding:7px 9px;border:1px solid rgba(255,255,255,.055);border-radius:9px;background:rgba(255,255,255,.018);}
+  .rest-sound-row label{font-size:9px;color:var(--chalk-dim);text-transform:uppercase;letter-spacing:.05em;}
+  .rest-sound-select{min-width:142px;padding:7px 26px 7px 9px;border-radius:8px;border:1px solid var(--line);background:var(--panel-3);color:var(--chalk);font:inherit;font-size:11px;color-scheme:dark;}
+  .rest-sound-select:focus{border-color:var(--neon);}
 
   .timer-stage{ display:flex; align-items:center; justify-content:center; gap:12px; }
   .rest-nudge{
@@ -1159,6 +1163,16 @@
           <span class="ex-rest-suffix">sec</span>
         </div>
       </div>
+      <div class="rest-sound-row">
+        <label for="restSoundSelect">Alert sound</label>
+        <select id="restSoundSelect" class="rest-sound-select">
+          <option value="classic">Classic Beep</option>
+          <option value="bell">Bell</option>
+          <option value="digital">Digital</option>
+          <option value="pulse">Pulse</option>
+          <option value="silent">Silent</option>
+        </select>
+      </div>
       <div class="rest-presets" id="restPresets">
         <button type="button" class="rest-chip" data-secs="30">30s</button>
         <button type="button" class="rest-chip" data-secs="60">60s</button>
@@ -1424,58 +1438,74 @@ function formatHMS(totalSeconds){
   const s = Math.floor(totalSeconds%60).toString().padStart(2,'0');
   return `${h}:${m}:${s}`;
 }
-function playCountdownBeep(){
+let restAudioCtx = null;
+let restAlarmTimeouts = [];
+let restCountdownPlayed = new Set();
+let restSoundChoice = 'classic';
+
+function getRestAudioContext(){
   try{
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const t0 = ctx.currentTime;
-    const o = ctx.createOscillator();
-    const g = ctx.createGain();
-    o.type = 'square';
-    o.frequency.setValueAtTime(880, t0);
-    o.connect(g); g.connect(ctx.destination);
-    g.gain.setValueAtTime(0.0001, t0);
-    g.gain.exponentialRampToValueAtTime(0.2, t0 + 0.01);
-    g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.14);
-    o.start(t0); o.stop(t0 + 0.16);
-  }catch(e){}
+    if(!restAudioCtx) restAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if(restAudioCtx.state === 'suspended') restAudioCtx.resume();
+    return restAudioCtx;
+  }catch(e){ return null; }
+}
+function clearRestAudioTimers(){
+  restAlarmTimeouts.forEach(id => clearTimeout(id));
+  restAlarmTimeouts = [];
+}
+function scheduleTone(freq, start, duration, type='sine', volume=.18, endFreq=null){
+  const ctx=getRestAudioContext(); if(!ctx || restSoundChoice==='silent') return;
+  const o=ctx.createOscillator(), g=ctx.createGain();
+  o.type=type; o.frequency.setValueAtTime(freq,start);
+  if(endFreq) o.frequency.exponentialRampToValueAtTime(endFreq,start+duration*.85);
+  o.connect(g); g.connect(ctx.destination);
+  g.gain.setValueAtTime(.0001,start);
+  g.gain.exponentialRampToValueAtTime(volume,start+.008);
+  g.gain.exponentialRampToValueAtTime(.0001,start+duration);
+  o.start(start); o.stop(start+duration+.02);
+}
+function playCountdownBeep(){
+  const ctx=getRestAudioContext(); if(!ctx || restSoundChoice==='silent') return;
+  const t=ctx.currentTime+.01;
+  if(restSoundChoice==='bell') scheduleTone(880,t,.32,'sine',.18,660);
+  else if(restSoundChoice==='digital') scheduleTone(1200,t,.09,'square',.16,900);
+  else if(restSoundChoice==='pulse') scheduleTone(520,t,.18,'triangle',.18,520);
+  else scheduleTone(880,t,.13,'square',.18,880);
 }
 let restAlarmInterval = null;
 let restAlarmAudio = null;
-
 function stopRestAlarm(){
-  if(restAlarmInterval){ clearInterval(restAlarmInterval); restAlarmInterval = null; }
-  if(restAlarmAudio){
-    try{ restAlarmAudio.close(); }catch(e){}
-    restAlarmAudio = null;
-  }
+  if(restAlarmInterval){ clearInterval(restAlarmInterval); restAlarmInterval=null; }
+  clearRestAudioTimers();
+  if(restAlarmAudio){ try{restAlarmAudio.close();}catch(e){} restAlarmAudio=null; restAudioCtx=null; }
 }
-
 function playBuzzer(){
-  // Repeating rest alarm: sounds for a full 10 seconds after the timer reaches zero.
   stopRestAlarm();
-  try{
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    restAlarmAudio = ctx;
-    const playAlarmBurst = () => {
-      const t0 = ctx.currentTime;
-      [0, 0.28, 0.56].forEach((offset) => {
-        const start = t0 + offset;
-        const o = ctx.createOscillator();
-        const g = ctx.createGain();
-        o.type = 'sawtooth';
-        o.frequency.setValueAtTime(240, start);
-        o.frequency.exponentialRampToValueAtTime(170, start + 0.22);
-        o.connect(g); g.connect(ctx.destination);
-        g.gain.setValueAtTime(0.0001, start);
-        g.gain.exponentialRampToValueAtTime(0.28, start + 0.02);
-        g.gain.exponentialRampToValueAtTime(0.0001, start + 0.22);
-        o.start(start); o.stop(start + 0.24);
-      });
-    };
-    playAlarmBurst();
-    restAlarmInterval = setInterval(playAlarmBurst, 1000);
-    setTimeout(() => stopRestAlarm(), 10000);
-  }catch(e){}
+  if(restSoundChoice==='silent') return;
+  const ctx=getRestAudioContext(); if(!ctx) return;
+  restAlarmAudio=ctx;
+  const start=ctx.currentTime+.01;
+  // Schedule the entire 10-second alarm immediately. This avoids the delayed
+  // sound caused by creating a new AudioContext every second.
+  for(let i=0;i<10;i++){
+    const t=start+i*.9;
+    if(restSoundChoice==='bell'){
+      scheduleTone(784,t,.65,'sine',.22,392);
+      scheduleTone(1175,t+.08,.55,'sine',.14,587);
+    }else if(restSoundChoice==='digital'){
+      scheduleTone(440,t,.16,'square',.20,330);
+      scheduleTone(660,t+.19,.16,'square',.20,440);
+    }else if(restSoundChoice==='pulse'){
+      scheduleTone(300,t,.28,'sawtooth',.20,190);
+      scheduleTone(300,t+.35,.28,'sawtooth',.20,190);
+    }else{
+      scheduleTone(240,t,.24,'sawtooth',.25,170);
+      scheduleTone(240,t+.28,.24,'sawtooth',.25,170);
+      scheduleTone(240,t+.56,.24,'sawtooth',.25,170);
+    }
+  }
+  restAlarmTimeouts.push(setTimeout(()=>{ stopRestAlarm(); },10150));
 }
 function playBeep(){
   try{
@@ -1807,6 +1837,7 @@ const restDigital = document.getElementById('restDigital');
 let exModalSide = null, exModalIndex = null, exModalRowsData = [], exModalCelebrated = false;
 let exModalPrevLog = [];
 let exRestInterval = null;
+let restDeadline = 0;
 let restRemaining = 0, restTotal = 0;
 
 function setTimerLabel(text){
@@ -1844,32 +1875,39 @@ function updateClockVisual(remaining, total){
 }
 
 function tickRestTimer(){
-  restRemaining--;
-  updateClockVisual(restRemaining, restTotal);
-  if(restRemaining > 0 && restRemaining <= 5){
-    playCountdownBeep();
+  const nextRemaining = Math.max(0, Math.ceil((restDeadline - Date.now())/1000));
+  if(nextRemaining !== restRemaining){
+    restRemaining = nextRemaining;
+    updateClockVisual(restRemaining, restTotal);
+    if(restRemaining > 0 && restRemaining <= 5 && !restCountdownPlayed.has(restRemaining)){
+      restCountdownPlayed.add(restRemaining);
+      playCountdownBeep();
+    }
   }
-  if(restRemaining <= 0){
-    clearInterval(exRestInterval); exRestInterval = null;
+  if(Date.now() >= restDeadline){
+    clearInterval(exRestInterval); exRestInterval=null;
+    restRemaining=0;
+    updateClockVisual(0,restTotal);
     exTimerBtn.classList.remove('running');
     analogClock.classList.remove('running');
     setTimerLabel('Start Rest');
     analogClock.classList.remove('urgent');
     playBuzzer();
-    restDigital.textContent = 'Done';
+    restDigital.textContent='Done';
     restDigital.classList.remove('low');
     analogClock.classList.add('done-flash');
-    spawnConfetti(exTimerPopup, { count: 18, mode: 'pop' });
-    setTimeout(() => {
-      restDigital.textContent = '00:00';
-      ringProgress.style.background = 'conic-gradient(var(--neon) 0deg, transparent 0deg)';
-      restHand.style.transform = 'translateX(-50%) rotate(0deg)';
-      ringComet.style.transform = 'translateX(-50%) rotate(0deg)';
+    spawnConfetti(exTimerPopup,{count:18,mode:'pop'});
+    setTimeout(()=>{
+      restDigital.textContent='00:00';
+      ringProgress.style.background='conic-gradient(var(--neon) 0deg, transparent 0deg)';
+      restHand.style.transform='translateX(-50%) rotate(0deg)';
+      ringComet.style.transform='translateX(-50%) rotate(0deg)';
       analogClock.classList.remove('done-flash');
       exTimerPopup.classList.remove('show');
-    }, 1800);
+    },1800);
   }
 }
+
 
 exTimerBtn.addEventListener('click', () => {
   if(exRestInterval){
@@ -1882,15 +1920,20 @@ exTimerBtn.addEventListener('click', () => {
   d[exModalSide][exModalIndex].rest = exRestSeconds.value;
   saveDays();
 
+  restSoundChoice = document.getElementById('restSoundSelect')?.value || 'classic';
+  getRestAudioContext();
+  clearRestAudioTimers();
+  restCountdownPlayed = new Set();
   restTotal = seconds;
   restRemaining = seconds;
+  restDeadline = Date.now() + seconds*1000;
   exTimerBtn.classList.add('running');
   analogClock.classList.add('running');
   exTimerPopup.classList.add('show');
   setTimerLabel('Stop');
   updateClockVisual(restRemaining, restTotal);
 
-  exRestInterval = setInterval(tickRestTimer, 1000);
+  exRestInterval = setInterval(tickRestTimer, 100);
 });
 
 function nudgeRestTimer(deltaSeconds){
@@ -1910,6 +1953,15 @@ function persistRestValue(){
   }
   highlightRestPreset();
 }
+const restSoundSelect = document.getElementById('restSoundSelect');
+try{ restSoundSelect.value = localStorage.getItem('REPLOG_REST_SOUND') || 'classic'; }catch(e){}
+restSoundChoice = restSoundSelect.value || 'classic';
+restSoundSelect.addEventListener('change', () => {
+  restSoundChoice = restSoundSelect.value;
+  try{ localStorage.setItem('REPLOG_REST_SOUND', restSoundChoice); }catch(e){}
+  getRestAudioContext();
+});
+
 function highlightRestPreset(){
   const val = String(parseInt(exRestSeconds.value, 10) || '');
   restPresets.querySelectorAll('.rest-chip').forEach(chip => {
@@ -2720,9 +2772,20 @@ const topbarLogo = document.getElementById('topbarLogo');
 // Color the logo itself (not its background) with the active RepLog accent.
 function syncLogoColor(){
   const flood = document.getElementById('replogLogoFlood');
-  if(!flood) return;
   const neon = getComputedStyle(document.documentElement).getPropertyValue('--neon').trim();
-  if(neon) flood.setAttribute('flood-color', neon);
+  if(!neon) return;
+  if(flood){
+    flood.setAttribute('flood-color', neon);
+    flood.style.setProperty('flood-color', neon);
+  }
+  // Force Safari/iOS to repaint the SVG filter immediately after a Vibe change.
+  [splashLogo, topbarLogo].forEach(img => {
+    if(!img) return;
+    const f=img.style.filter || getComputedStyle(img).filter;
+    img.style.filter='none';
+    void img.offsetWidth;
+    img.style.filter='url(#replogLogoColor) drop-shadow(0 0 16px rgba(var(--neon-rgb),0.3))';
+  });
 }
 syncLogoColor();
 splashLogo.src = topbarLogo.src;
