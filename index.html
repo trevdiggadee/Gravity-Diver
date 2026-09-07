@@ -343,7 +343,26 @@
   }
   .ex-modal-close:hover{ color: var(--danger); }
   .ex-modal .eyebrow{ font-size:11px; letter-spacing:.14em; color: var(--chalk-faint); text-transform:uppercase; text-align:center; margin-bottom:6px; }
-  .ex-modal-title{ text-align:center; font-family:'Oswald',sans-serif; font-size:19px; color: var(--chalk); margin-bottom: 12px; }
+  .ex-modal-title{ text-align:center; font-family:'Oswald',sans-serif; font-size:19px; color: var(--chalk); margin-bottom: 10px; }
+
+  .ex-pr-badge{
+    display:none; align-items:center; justify-content:center; gap:6px; align-self:center; margin-bottom:10px; width:max-content;
+    background: rgba(var(--neon-rgb),0.15); border:1px solid var(--neon); color: var(--neon-strong);
+    font-family:'Oswald',sans-serif; font-size:12px; font-weight:700; letter-spacing:.04em;
+    padding:6px 16px; border-radius:100px; text-shadow:0 0 10px rgba(var(--neon-rgb),0.5);
+    box-shadow:0 0 18px rgba(var(--neon-rgb),0.3);
+  }
+  .ex-pr-badge.show{ display:inline-flex; animation: prPop .4s cubic-bezier(.34,1.56,.64,1); }
+  @keyframes prPop{ 0%{ transform:scale(.6); opacity:0; } 60%{ transform:scale(1.08); opacity:1; } 100%{ transform:scale(1); } }
+
+  .ex-prev-row{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    background: var(--panel-3); border:1px solid var(--line); border-radius: var(--radius-sm);
+    padding: 8px 12px; margin-bottom: 10px;
+  }
+  .ex-prev-row.empty .ex-prev-data{ color: var(--chalk-faint); }
+  .ex-prev-label{ color: var(--chalk-faint); font-size:10px; letter-spacing:.06em; text-transform:uppercase; flex-shrink:0; }
+  .ex-prev-data{ color: var(--chalk); font-size:12px; text-align:right; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
   .ex-set-rows{ display:flex; flex-direction:column; gap:6px; max-height: 34vh; overflow-y:auto; margin-bottom: 8px; padding-right:2px; }
   .ex-set-row{ display:grid; grid-template-columns: 30px 1fr 1fr 24px; gap:8px; align-items:center; padding:5px; border-radius:8px; border:1px solid transparent; transition: all .2s ease; }
@@ -478,6 +497,50 @@
     box-shadow: 0 0 70px rgba(var(--neon-rgb),0.28); animation: popIn .3s ease;
   }
   .confetti-layer{ position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:1; }
+  .summary-export-btn{
+    position:absolute; top:14px; right:14px; z-index:4; background: var(--panel-3); border:1px solid var(--line);
+    color: var(--chalk-dim); width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    cursor:pointer; transition: all .15s ease;
+  }
+  .summary-export-btn:hover{ color: var(--neon); border-color: var(--neon); background: rgba(var(--neon-rgb),0.08); }
+  .summary-export-btn svg{ width:17px; height:17px; }
+  .export-menu{
+    position:absolute; top:52px; right:14px; z-index:5; background: var(--panel-2); border:1px solid var(--line);
+    border-radius: 14px; padding:6px; width:232px; box-shadow: 0 14px 40px rgba(0,0,0,0.5);
+    display:none; flex-direction:column; gap:2px;
+  }
+  .export-menu.show{ display:flex; animation: popIn .18s ease; }
+  .export-menu-item{
+    display:flex; align-items:center; gap:10px; background:none; border:none; text-align:left; color: var(--chalk);
+    padding:9px 10px; border-radius:10px; cursor:pointer; transition: background .15s ease; font:inherit; width:100%;
+  }
+  .export-menu-item:hover{ background: rgba(var(--neon-rgb),0.1); }
+  .export-menu-item svg{ flex-shrink:0; color: var(--neon-strong); width:20px; height:20px; }
+  .emi-title{ font-size:13px; font-weight:600; color: var(--chalk); }
+  .emi-sub{ font-size:11px; color: var(--chalk-faint); margin-top:1px; }
+
+  /* ---- Logbook header / export ---- */
+  .log-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+  .log-header-title{ font-family:'Oswald',sans-serif; font-size:15px; color: var(--chalk); letter-spacing:.02em; }
+  .log-export-btn{ display:flex; align-items:center; gap:6px; }
+  .log-export-btn svg{ width:15px; height:15px; }
+
+  /* ---- Printable training log (hidden on screen) ---- */
+  @media screen{ .print-log-area{ display:none; } }
+  @media print{
+    body *{ visibility:hidden; }
+    .print-log-area, .print-log-area *{ visibility:visible; }
+    .print-log-area{ position:absolute; top:0; left:0; width:100%; padding:24px; display:block !important; }
+  }
+  .print-log-area{ color:#111; background:#fff; font-family: Arial, sans-serif; }
+  .print-log-area h1{ font-size:22px; margin:0 0 4px; }
+  .print-log-area .pl-sub{ color:#555; font-size:12px; margin-bottom:18px; }
+  .print-log-area .pl-entry{ border:1px solid #ddd; border-radius:8px; padding:14px 16px; margin-bottom:14px; page-break-inside: avoid; }
+  .print-log-area .pl-entry h3{ font-size:15px; margin:0 0 2px; }
+  .print-log-area .pl-entry .pl-meta{ font-size:11px; color:#666; margin-bottom:8px; }
+  .print-log-area .pl-cols{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .print-log-area .pl-cols h4{ font-size:11px; color:#888; margin:0 0 4px; text-transform:uppercase; letter-spacing:.05em; }
+  .print-log-area .pl-ex{ font-size:12px; display:flex; justify-content:space-between; gap:10px; padding:3px 0; border-bottom:1px solid #eee; }
   .summary-header{ position:relative; z-index:2; text-align:center; margin-bottom: 22px; }
   .summary-emoji{ font-size:42px; margin-bottom:4px; }
   .summary-header h2{ margin:0 0 6px; font-size:26px; color: var(--neon-strong); text-shadow: 0 0 20px rgba(var(--neon-rgb),0.4); }
@@ -501,6 +564,14 @@
   .cmp-up{ color: var(--neon-strong); }
   .cmp-down{ color: var(--lower); }
   .cmp-flat, .cmp-new{ color: var(--chalk-faint); }
+  .summary-block-complete{
+    position:relative; z-index:2;
+    background: linear-gradient(135deg, rgba(var(--neon-rgb),0.18), rgba(var(--neon-rgb),0.04));
+    border:1px solid var(--neon); border-radius: var(--radius-sm); padding: 14px 16px; margin-bottom: 18px; text-align:center;
+  }
+  .sbc-title{ font-family:'Oswald',sans-serif; font-size:16px; color: var(--neon-strong); text-shadow:0 0 14px rgba(var(--neon-rgb),0.4); margin-bottom:4px; }
+  .sbc-sub{ font-size:12px; color: var(--chalk-dim); }
+  #newProgramBtn{ position:relative; z-index:2; width:100%; margin-bottom:10px; }
   #summaryCloseBtn{ position:relative; z-index:2; width:100%; }
 
   /* ---- Vibe picker : floating wheel, no box ---- */
@@ -928,6 +999,13 @@
 
   <!-- LOGBOOK VIEW -->
   <div id="viewLog" class="view">
+    <div class="log-header" id="logHeader" style="display:none;">
+      <div class="log-header-title">Training Log</div>
+      <button type="button" class="btn-ghost log-export-btn" id="logExportBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path><path d="M9 15h6M9 11h6M9 19h3"></path></svg>
+        Export / Print
+      </button>
+    </div>
     <div id="logList"></div>
   </div>
 
@@ -951,6 +1029,11 @@
     <button type="button" class="ex-modal-close" id="exModalClose" title="Close">×</button>
     <div class="eyebrow">Logging Sets</div>
     <div class="ex-modal-title" id="exModalTitle">Exercise</div>
+    <div class="ex-pr-badge" id="exPrBadge"></div>
+    <div class="ex-prev-row" id="exPrevRow">
+      <span class="ex-prev-label">Last week</span>
+      <span class="ex-prev-data mono" id="exPrevData">—</span>
+    </div>
 
     <div class="ex-set-rows" id="exSetRows"></div>
     <button type="button" class="btn-ghost" id="exAddSetBtn">+ Add extra set</button>
@@ -999,13 +1082,31 @@
 <div class="summary-modal-overlay" id="summaryModalOverlay">
   <div class="summary-modal">
     <div class="confetti-layer" id="confettiLayer"></div>
+    <button type="button" class="summary-export-btn" id="summaryExportBtn" title="Export">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"></path><path d="M7 8l5-5 5 5"></path><path d="M5 21h14"></path></svg>
+    </button>
+    <div class="export-menu" id="exportMenu">
+      <button type="button" class="export-menu-item" id="exportImageBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"></rect><circle cx="8.5" cy="9" r="1.5"></circle><path d="M21 15l-5-5-9 9"></path></svg>
+        <div><div class="emi-title">Save as Image</div><div class="emi-sub">Styled PNG for Instagram/Stories</div></div>
+      </button>
+      <button type="button" class="export-menu-item" id="exportPdfBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path><path d="M9 15h6M9 11h6M9 19h3"></path></svg>
+        <div><div class="emi-title">Print / Save PDF</div><div class="emi-sub">Formatted training log for printing</div></div>
+      </button>
+    </div>
     <div class="summary-header">
       <div class="summary-emoji">🎉</div>
       <h2>Workout Complete</h2>
       <div class="summary-sub" id="summarySub">Week 1</div>
     </div>
+    <div class="summary-block-complete" id="summaryBlockComplete" style="display:none;">
+      <div class="sbc-title">🏁 4-Week Program Complete!</div>
+      <div class="sbc-sub">Ready to keep progressing? Start a fresh 4-week block.</div>
+    </div>
     <div class="summary-stats" id="summaryStats"></div>
     <div class="summary-exercises" id="summaryExercises"></div>
+    <button type="button" class="btn-primary" id="newProgramBtn" style="display:none;">Start New 4-Week Program</button>
     <button class="btn-primary" id="summaryCloseBtn">Done</button>
   </div>
 </div>
@@ -1029,6 +1130,8 @@
 </div>
 
 <div class="toast" id="toast"></div>
+
+<div id="printLogArea" class="print-log-area"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
@@ -1182,6 +1285,7 @@ async function deleteHistoryEntryFromCloud(id){
 let days = freshDays();
 let history = [];
 let activeDay = 0;
+let lastFinishedEntry = null;
 
 /* ---------------------------------------------------------
    HELPERS: sets/reps/volume formatting
@@ -1536,6 +1640,7 @@ const restHand = document.getElementById('restHand');
 const restDigital = document.getElementById('restDigital');
 
 let exModalSide = null, exModalIndex = null, exModalRowsData = [], exModalCelebrated = false;
+let exModalPrevLog = [];
 let exRestInterval = null;
 let restRemaining = 0, restTotal = 0;
 
@@ -1679,10 +1784,68 @@ function openExerciseModal(side, index){
     exModalRowsData.push({ reps: existing[i] ? existing[i].reps : "", weight: existing[i] ? existing[i].weight : "", logged: !!existing[i] });
   }
   exModalCelebrated = false;
+  exModalPrevLog = cw > 1 ? (d.weeks[cw-2].logs[side][index] || []) : [];
+  renderExPrevRow(cw, exModalPrevLog);
 
   exModalTitle.textContent = slot.exercise || 'Exercise';
   renderExRows();
+  updatePRBadge();
   exModalOverlay.classList.add('show');
+}
+
+function renderExPrevRow(cw, prevLog){
+  const prevRowEl = document.getElementById('exPrevRow');
+  const prevDataEl = document.getElementById('exPrevData');
+  if(cw <= 1){
+    prevRowEl.style.display = 'none';
+    return;
+  }
+  prevRowEl.style.display = 'flex';
+  if(!prevLog || prevLog.length === 0){
+    prevDataEl.textContent = 'Not logged yet';
+    prevRowEl.classList.add('empty');
+  } else {
+    prevDataEl.textContent = formatLogSummary(prevLog);
+    prevRowEl.classList.remove('empty');
+  }
+}
+
+function updatePRBadge(){
+  const badge = document.getElementById('exPrBadge');
+  const prevLog = exModalPrevLog;
+  if(!prevLog || prevLog.length === 0){
+    badge.classList.remove('show');
+    return;
+  }
+  const prevVolume = calcVolume(prevLog);
+  const currentVolume = calcVolume(exModalRowsData);
+  const volumePR = prevVolume > 0 && currentVolume > prevVolume;
+
+  let strengthPR = false;
+  for(let i=0; i<exModalRowsData.length; i++){
+    const row = exModalRowsData[i];
+    const prev = prevLog[i];
+    if(!prev || row.reps === "" || row.weight === "") continue;
+    const reps = parseFloat(row.reps), weight = parseFloat(row.weight);
+    const prevReps = parseFloat(prev.reps), prevWeight = parseFloat(prev.weight);
+    if(!isNaN(reps) && !isNaN(weight) && !isNaN(prevReps) && !isNaN(prevWeight)){
+      if(reps >= prevReps && weight > prevWeight){ strengthPR = true; break; }
+    }
+  }
+
+  let label = null;
+  if(volumePR) label = '🏆 Volume PR!';
+  else if(strengthPR) label = '🔥 Strength PR!';
+
+  if(label){
+    const isNewLabel = badge.textContent !== label || !badge.classList.contains('show');
+    badge.textContent = label;
+    if(isNewLabel){
+      badge.classList.remove('show'); void badge.offsetWidth; badge.classList.add('show');
+    }
+  } else {
+    badge.classList.remove('show');
+  }
 }
 
 function renderExRows(){
@@ -1730,6 +1893,7 @@ function persistExRows(){
   const cleaned = exModalRowsData.filter(r => r.reps !== "" || r.weight !== "");
   d.weeks[cw-1].logs[exModalSide][exModalIndex] = cleaned;
   saveDays();
+  updatePRBadge();
 }
 
 const exFinishBtn = document.getElementById('exFinishBtn');
@@ -1935,6 +2099,7 @@ function exSummaryItem(e, side){
     </div>
   `;
 }
+let summaryBlockCompleteDayIndex = null;
 function openSummaryModal(data){
   summarySub.textContent = `Week ${data.week} · ${data.title}${data.blockComplete ? ' · 4-week block complete!' : ''}`;
   summaryStats.innerHTML = `
@@ -1945,12 +2110,28 @@ function openSummaryModal(data){
   summaryExercises.innerHTML =
     (data.upperSummary.length ? `<h4>UPPER BODY</h4>` + data.upperSummary.map(e => exSummaryItem(e,'upper')).join('') : '') +
     (data.lowerSummary.length ? `<h4>LOWER BODY</h4>` + data.lowerSummary.map(e => exSummaryItem(e,'lower')).join('') : '');
+  document.getElementById('summaryBlockComplete').style.display = data.blockComplete ? 'block' : 'none';
+  const newProgramBtn = document.getElementById('newProgramBtn');
+  newProgramBtn.style.display = data.blockComplete ? 'flex' : 'none';
+  summaryBlockCompleteDayIndex = data.blockComplete ? data.dayIndex : null;
   confettiLayer.innerHTML = '';
   summaryModalOverlay.classList.add('show');
   spawnConfetti(confettiLayer, { count: 46, mode: 'rain' });
   setTimeout(() => spawnConfetti(confettiLayer, { count: 30, mode: 'rain' }), 400);
 }
-summaryCloseBtn.addEventListener('click', () => { summaryModalOverlay.classList.remove('show'); confettiLayer.innerHTML = ''; });
+document.getElementById('newProgramBtn').addEventListener('click', () => {
+  if(summaryBlockCompleteDayIndex == null) return;
+  const d = days[summaryBlockCompleteDayIndex];
+  d.weeks = Array.from({length:WEEK_COUNT}, emptyWeek);
+  d.currentWeek = 1;
+  d.setupComplete = false;
+  flushSaveDays();
+  summaryModalOverlay.classList.remove('show');
+  confettiLayer.innerHTML = '';
+  if(activeDay === summaryBlockCompleteDayIndex) renderAll();
+  showToast("New 4-week program started — update your exercises when ready!");
+});
+summaryCloseBtn.addEventListener('click', () => { summaryModalOverlay.classList.remove('show'); confettiLayer.innerHTML = ''; exportMenu.classList.remove('show'); });
 summaryModalOverlay.addEventListener('click', (e) => {
   if(e.target === summaryModalOverlay){ summaryModalOverlay.classList.remove('show'); confettiLayer.innerHTML = ''; }
 });
@@ -1999,6 +2180,7 @@ document.getElementById('finishBtn').addEventListener('click', async () => {
   };
   const newId = await insertHistoryEntryToCloud(entry);
   history.unshift(Object.assign({}, entry, { id: newId || `local-${Date.now()}` }));
+  lastFinishedEntry = entry;
 
   d.timerStart = null;
   d.timerElapsed = 0;
@@ -2010,7 +2192,7 @@ document.getElementById('finishBtn').addEventListener('click', async () => {
 
   openSummaryModal({
     title: entry.title, week: cw, duration: totalSeconds, calories, totalVolume,
-    upperSummary, lowerSummary, blockComplete
+    upperSummary, lowerSummary, blockComplete, dayIndex: activeDay
   });
 });
 
@@ -2019,10 +2201,13 @@ document.getElementById('finishBtn').addEventListener('click', async () => {
 --------------------------------------------------------- */
 const logList = document.getElementById('logList');
 function renderLog(){
+  const logHeaderEl = document.getElementById('logHeader');
   if(history.length === 0){
+    logHeaderEl.style.display = 'none';
     logList.innerHTML = `<div class="log-empty"><div class="display">No workouts logged yet</div>Finish a workout on the Build tab to start your history.</div>`;
     return;
   }
+  logHeaderEl.style.display = 'flex';
   logList.innerHTML = "";
   history.forEach(entry => {
     const dt = entry.date ? new Date(entry.date + 'T00:00:00') : null;
@@ -2086,6 +2271,230 @@ function exRow(s){
   const vol = calcVolume(s.log);
   return `<div class="log-ex"><span class="name">${escapeHtml(s.exercise)}</span><span class="stat">${escapeHtml(summary)}${vol ? ' · ' + Math.round(vol) + 'lb' : ''}</span></div>`;
 }
+
+/* ---------------------------------------------------------
+   EXPORT — styled PNG (Instagram/Stories) + printable PDF log
+--------------------------------------------------------- */
+function readCssVar(name, fallback){
+  const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  return v || fallback;
+}
+function roundRectPath(ctx, x, y, w, h, r){
+  ctx.beginPath();
+  ctx.moveTo(x+r, y);
+  ctx.arcTo(x+w, y, x+w, y+h, r);
+  ctx.arcTo(x+w, y+h, x, y+h, r);
+  ctx.arcTo(x, y+h, x, y, r);
+  ctx.arcTo(x, y, x+w, y, r);
+  ctx.closePath();
+}
+function wrapCanvasText(ctx, text, cx, cy, maxWidth, lineHeight, maxLines){
+  const words = String(text || '').split(' ');
+  let lines = [], line = '';
+  for(let n=0; n<words.length; n++){
+    const test = line ? line + ' ' + words[n] : words[n];
+    if(ctx.measureText(test).width > maxWidth && line){
+      lines.push(line); line = words[n];
+    } else { line = test; }
+  }
+  if(line) lines.push(line);
+  if(maxLines && lines.length > maxLines){
+    lines = lines.slice(0, maxLines);
+    lines[maxLines-1] = lines[maxLines-1].replace(/\s+\S*$/, '') + '…';
+  }
+  const totalH = lines.length * lineHeight;
+  const startY = cy - totalH/2 + lineHeight*0.8;
+  lines.forEach((ln,i) => ctx.fillText(ln, cx, startY + i*lineHeight));
+}
+function truncateCanvasText(ctx, text, maxWidth){
+  let t = String(text || '');
+  if(ctx.measureText(t).width <= maxWidth) return t;
+  while(t.length > 1 && ctx.measureText(t+'…').width > maxWidth){ t = t.slice(0,-1); }
+  return t + '…';
+}
+
+function buildWorkoutStoryImage(entry){
+  const W = 1080, H = 1920;
+  const canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  const neon = readCssVar('--neon', '#b6ff00');
+  const neonStrong = readCssVar('--neon-strong', '#d9ff66');
+  const neonRgb = readCssVar('--neon-rgb', '182,255,0');
+  const lower = readCssVar('--lower', neon);
+
+  const bgGrad = ctx.createLinearGradient(0,0,0,H);
+  bgGrad.addColorStop(0, '#15171b');
+  bgGrad.addColorStop(1, '#08090a');
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0,0,W,H);
+
+  const glow = ctx.createRadialGradient(W/2, 240, 40, W/2, 240, 640);
+  glow.addColorStop(0, `rgba(${neonRgb},0.30)`);
+  glow.addColorStop(1, `rgba(${neonRgb},0)`);
+  ctx.fillStyle = glow;
+  ctx.fillRect(0,0,W,H);
+
+  ctx.textAlign = 'center';
+  ctx.shadowColor = neon; ctx.shadowBlur = 26;
+  ctx.fillStyle = neon;
+  ctx.font = '700 42px Oswald, sans-serif';
+  ctx.fillText('REPLØG', W/2, 128);
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.font = '600 19px Inter, sans-serif';
+  ctx.fillText('TRAINING LOG', W/2, 162);
+
+  const pillText = `WEEK ${entry.week || 1}${entry.type ? '  ·  ' + entry.type.toUpperCase() : ''}`;
+  ctx.font = '700 22px Inter, sans-serif';
+  const pillW = ctx.measureText(pillText).width + 56;
+  ctx.fillStyle = `rgba(${neonRgb},0.14)`;
+  roundRectPath(ctx, W/2 - pillW/2, 200, pillW, 46, 23); ctx.fill();
+  ctx.strokeStyle = neon; ctx.lineWidth = 2;
+  roundRectPath(ctx, W/2 - pillW/2, 200, pillW, 46, 23); ctx.stroke();
+  ctx.fillStyle = neonStrong;
+  ctx.fillText(pillText, W/2, 230);
+
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '700 60px Oswald, sans-serif';
+  wrapCanvasText(ctx, entry.title || 'Workout', W/2, 350, W-160, 68, 2);
+
+  const stats = [
+    { val: Math.round(entry.totalVolume||0), lbl: 'LB VOLUME' },
+    { val: entry.calories||0, lbl: 'CALORIES' },
+    { val: formatHMS(entry.duration||0), lbl: 'TOTAL TIME' }
+  ];
+  const cardW = 280, cardH = 130, gap = 30, startX = (W - (cardW*3+gap*2))/2, statsY = 470;
+  stats.forEach((s,i) => {
+    const x = startX + i*(cardW+gap);
+    ctx.fillStyle = 'rgba(255,255,255,0.045)';
+    roundRectPath(ctx, x, statsY, cardW, cardH, 20); ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.09)'; ctx.lineWidth = 2;
+    roundRectPath(ctx, x, statsY, cardW, cardH, 20); ctx.stroke();
+    ctx.fillStyle = neonStrong;
+    ctx.font = '700 42px JetBrains Mono, monospace';
+    ctx.fillText(String(s.val), x+cardW/2, statsY+64);
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    ctx.font = '600 16px Inter, sans-serif';
+    ctx.fillText(s.lbl, x+cardW/2, statsY+98);
+  });
+
+  let y = 662;
+  ctx.textAlign = 'left';
+  const allEx = [
+    ...(entry.upper||[]).map(e => Object.assign({}, e, { side:'upper' })),
+    ...(entry.lower||[]).map(e => Object.assign({}, e, { side:'lower' }))
+  ];
+  const maxRows = 10;
+  const shown = allEx.slice(0, maxRows);
+  shown.forEach((ex) => {
+    ctx.fillStyle = 'rgba(255,255,255,0.035)';
+    roundRectPath(ctx, 90, y, W-180, 92, 18); ctx.fill();
+    ctx.fillStyle = ex.side === 'upper' ? neon : lower;
+    ctx.shadowColor = ctx.fillStyle; ctx.shadowBlur = 10;
+    ctx.beginPath(); ctx.arc(126, y+30, 7, 0, Math.PI*2); ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = '#ffffff'; ctx.font = '600 29px Oswald, sans-serif';
+    ctx.fillText(truncateCanvasText(ctx, ex.exercise, W-360), 150, y+42);
+    ctx.fillStyle = 'rgba(255,255,255,0.55)'; ctx.font = '400 21px JetBrains Mono, monospace';
+    ctx.fillText(truncateCanvasText(ctx, formatLogSummary(ex.log), W-360), 150, y+76);
+    const vol = calcVolume(ex.log);
+    if(vol){
+      ctx.textAlign = 'right'; ctx.fillStyle = neonStrong; ctx.font = '700 25px JetBrains Mono, monospace';
+      ctx.fillText(Math.round(vol)+' lb', W-120, y+54);
+      ctx.textAlign = 'left';
+    }
+    y += 108;
+  });
+  if(allEx.length > maxRows){
+    ctx.textAlign = 'center';
+    ctx.fillStyle = 'rgba(255,255,255,0.4)'; ctx.font = '500 21px Inter, sans-serif';
+    ctx.fillText(`+ ${allEx.length - maxRows} more exercises`, W/2, y+18);
+    ctx.textAlign = 'left';
+  }
+
+  ctx.textAlign = 'center';
+  ctx.fillStyle = 'rgba(255,255,255,0.32)'; ctx.font = '500 20px Inter, sans-serif';
+  ctx.fillText('Tracked with RepLog', W/2, H-56);
+
+  return canvas;
+}
+
+function exportWorkoutImage(entry){
+  if(!entry){ showToast("Nothing to export yet."); return; }
+  showToast("Generating image…");
+  setTimeout(() => {
+    try{
+      const canvas = buildWorkoutStoryImage(entry);
+      canvas.toBlob((blob) => {
+        if(!blob){ showToast("Could not generate image."); return; }
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        const safeTitle = (entry.title||'workout').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'') || 'workout';
+        a.href = url;
+        a.download = `replog-${safeTitle}-week${entry.week||1}.png`;
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 4000);
+        showToast("Image saved! Check your downloads.");
+      }, 'image/png');
+    }catch(e){
+      console.error('exportWorkoutImage failed', e);
+      showToast("Could not generate image.");
+    }
+  }, 30);
+}
+
+const printLogArea = document.getElementById('printLogArea');
+function renderPrintEntry(entry){
+  const dateStr = entry.date ? new Date(entry.date+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '';
+  const exList = (arr) => (arr && arr.length)
+    ? arr.map(s => `<div class="pl-ex"><span>${escapeHtml(s.exercise)}</span><span>${escapeHtml(formatLogSummary(s.log))}</span></div>`).join('')
+    : '<div class="pl-ex" style="color:#999;">None logged</div>';
+  return `
+    <div class="pl-entry">
+      <h3>${escapeHtml(entry.title || 'Workout')}${entry.week ? ' — Week ' + entry.week : ''}</h3>
+      <div class="pl-meta">${dateStr}${entry.type ? ' · ' + escapeHtml(entry.type) : ''}${entry.duration ? ' · ' + formatHMS(entry.duration) : ''}${entry.totalVolume ? ' · ' + Math.round(entry.totalVolume) + ' lb volume' : ''}</div>
+      <div class="pl-cols">
+        <div><h4>Upper Body</h4>${exList(entry.upper)}</div>
+        <div><h4>Lower Body</h4>${exList(entry.lower)}</div>
+      </div>
+    </div>
+  `;
+}
+function printTrainingLog(entries, heading){
+  if(!entries || entries.length === 0){ showToast("Nothing to print yet."); return; }
+  printLogArea.innerHTML = `
+    <h1>${escapeHtml(heading || 'RepLog Training Log')}</h1>
+    <div class="pl-sub">Exported ${new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})} · ${entries.length} workout${entries.length===1?'':'s'}</div>
+    ${entries.map(renderPrintEntry).join('')}
+  `;
+  window.print();
+}
+
+const summaryExportBtn = document.getElementById('summaryExportBtn');
+const exportMenu = document.getElementById('exportMenu');
+summaryExportBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  exportMenu.classList.toggle('show');
+});
+document.addEventListener('click', (e) => {
+  if(exportMenu.classList.contains('show') && !exportMenu.contains(e.target) && e.target !== summaryExportBtn){
+    exportMenu.classList.remove('show');
+  }
+});
+document.getElementById('exportImageBtn').addEventListener('click', () => {
+  exportMenu.classList.remove('show');
+  exportWorkoutImage(lastFinishedEntry);
+});
+document.getElementById('exportPdfBtn').addEventListener('click', () => {
+  exportMenu.classList.remove('show');
+  if(!lastFinishedEntry){ showToast("Nothing to print yet."); return; }
+  printTrainingLog([lastFinishedEntry], lastFinishedEntry.title || 'Workout Log');
+});
+document.getElementById('logExportBtn').addEventListener('click', () => {
+  printTrainingLog(history, 'RepLog — Full Training Log');
+});
 
 /* ---------------------------------------------------------
    NAV
