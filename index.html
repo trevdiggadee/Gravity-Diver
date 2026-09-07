@@ -586,14 +586,6 @@
     50%{ transform:rotate(180deg) scale(1.04); opacity:1; }
     100%{ transform:rotate(360deg) scale(.9); opacity:.35; }
   }
-  .color-wheel-ring{
-    position:absolute; inset:8px; border-radius:50%;
-    background:conic-gradient(from 0deg,#ff005c,#ff9a00,#f9f002,#7bff00,#00ff85,#00fff7,#00aaff,#7b2bff,#ff00e6,#ff005c);
-    filter:blur(11px) saturate(1.45);
-    animation:wheelSpin 16s linear infinite;
-    opacity:.27; z-index:-2;
-  }
-  @keyframes wheelSpin{ to{ transform:rotate(360deg); } }
   .color-wheel{ position:absolute; inset:0; }
   .color-swatch{
     position:absolute; width:46px; height:46px; border-radius:50%;
@@ -754,21 +746,46 @@
       inset 0 0 18px rgba(var(--neon-rgb),.30);
     animation: vibeRingSurge 2.4s ease-in-out infinite;
   }
-  .vibe-electric{
-    position:absolute; inset:-16px; border-radius:50%; pointer-events:none; z-index:5;
-    background:
-      repeating-conic-gradient(from 7deg, transparent 0 8deg, rgba(255,255,255,.95) 8.6deg 9.2deg, transparent 9.8deg 17deg),
-      repeating-conic-gradient(from 183deg, transparent 0 13deg, rgba(var(--neon-rgb),.95) 13.5deg 14.2deg, transparent 14.8deg 24deg);
-    -webkit-mask:radial-gradient(circle, transparent 0 49%, #000 50% 55%, transparent 56% 100%);
-    mask:radial-gradient(circle, transparent 0 49%, #000 50% 55%, transparent 56% 100%);
-    filter:drop-shadow(0 0 5px var(--neon)) drop-shadow(0 0 12px rgba(var(--neon-rgb),.8));
-    animation:electricSpin 5s linear infinite, electricFlicker .55s steps(2,end) infinite;
-    mix-blend-mode:screen;
-  }
-  .vibe-electric-two{ inset:-28px; opacity:.72; transform:rotate(18deg); animation-duration:8s,.8s; }
   @keyframes vibeRingSurge{0%,100%{opacity:.72;transform:scale(.985)}50%{opacity:1;transform:scale(1.018)}}
-  @keyframes electricSpin{to{transform:rotate(360deg)}}
-  @keyframes electricFlicker{0%,100%{opacity:.35}20%{opacity:.9}35%{opacity:.45}55%{opacity:1}70%{opacity:.5}}
+
+  .vibe-flame-tongue{
+    position:absolute; left:50%; bottom:6%; width:64px; height:118px; margin-left:-32px;
+    background: linear-gradient(to top,
+      rgba(var(--neon-rgb),.98) 0%,
+      rgba(var(--neon-rgb),.68) 30%,
+      rgba(var(--neon-strong-rgb),.34) 58%,
+      transparent 88%);
+    border-radius: 50% 50% 50% 50% / 68% 68% 32% 32%;
+    filter: blur(7px) saturate(1.7) brightness(1.15);
+    mix-blend-mode: screen;
+    transform-origin: bottom center;
+    opacity:.88; z-index:-1; pointer-events:none;
+    animation: flameLick1 1.05s ease-in-out infinite;
+  }
+  .ft2{
+    width:42px; height:86px; margin-left:-54px; opacity:.7; filter: blur(6px) saturate(1.6) brightness(1.1);
+    animation: flameLick2 .85s ease-in-out infinite .12s;
+  }
+  .ft3{
+    width:42px; height:86px; margin-left:10px; opacity:.7; filter: blur(6px) saturate(1.6) brightness(1.1);
+    animation: flameLick3 1.25s ease-in-out infinite .28s;
+  }
+  @keyframes flameLick1{
+    0%,100%{ transform: scaleY(1) scaleX(1) skewX(0deg) translateY(0); }
+    22%{ transform: scaleY(1.16) scaleX(.92) skewX(-4deg) translateY(-6px); }
+    50%{ transform: scaleY(.9) scaleX(1.07) skewX(3deg) translateY(3px); }
+    78%{ transform: scaleY(1.1) scaleX(.95) skewX(-2deg) translateY(-3px); }
+  }
+  @keyframes flameLick2{
+    0%,100%{ transform: scaleY(1) skewX(0deg) translateY(0); }
+    35%{ transform: scaleY(1.22) skewX(5deg) translateY(-7px); }
+    65%{ transform: scaleY(.85) skewX(-4deg) translateY(4px); }
+  }
+  @keyframes flameLick3{
+    0%,100%{ transform: scaleY(1) skewX(0deg) translateY(0); }
+    40%{ transform: scaleY(1.18) skewX(-5deg) translateY(-6px); }
+    72%{ transform: scaleY(.88) skewX(4deg) translateY(3px); }
+  }
 
   @media (max-width:700px){
     .topbar{ padding:8px 14px; }
@@ -969,11 +986,11 @@
     <button type="button" class="ex-modal-close" id="themeModalClose" title="Close" aria-label="Close vibe picker">×</button>
     <div class="theme-vibe-title">Choose Your Vibe</div>
     <div class="color-wheel-wrap">
-      <div class="vibe-electric"></div>
-      <div class="vibe-electric vibe-electric-two"></div>
       <div class="vibe-fire"></div>
+      <div class="vibe-flame-tongue ft1"></div>
+      <div class="vibe-flame-tongue ft2"></div>
+      <div class="vibe-flame-tongue ft3"></div>
       <div class="vibe-sparks"></div>
-      <div class="color-wheel-ring"></div>
       <div class="color-wheel" id="colorWheel"></div>
     </div>
   </div>
