@@ -902,6 +902,64 @@
     .columns{ grid-template-columns:1fr; gap:14px; }
     .bottom-dock{ padding-left:12px; padding-right:12px; }
   }
+
+  /* ===== Profile + mobile fit update ===== */
+  .day-header{ grid-template-columns:repeat(3,minmax(0,1fr)) !important; }
+  .day-header .field{ width:100%; min-width:0; }
+  .day-header .meta-display{
+    white-space:normal; overflow:visible; text-overflow:clip; overflow-wrap:anywhere;
+    font-size:14px; line-height:1.15; padding-right:2px;
+  }
+  .day-header .field input, .day-header .field select{ min-width:0; width:100%; font-size:13px; }
+
+  .columns, .columns > div, #upperSlots, #lowerSlots{ min-width:0; max-width:100%; }
+  .slot, .slot-compact{ width:100%; max-width:100%; min-width:0; }
+  .slot-compact{ overflow:hidden; gap:8px; padding:12px 11px; }
+  .slot-compact .sc-name{ min-width:0; }
+  .slot-compact .sc-summary{ min-width:0; max-width:34%; }
+  .slot-top, .custom-ex-row, .slot-grid{ min-width:0; max-width:100%; }
+  .slot-top select, .custom-ex-row input, .slot-grid > *{ min-width:0; }
+
+  .profile-card{
+    width:100%; max-width:520px; margin:0 auto; background:var(--panel); border:1px solid var(--line);
+    border-radius:18px; padding:22px; box-shadow:0 16px 42px rgba(0,0,0,.22);
+  }
+  .profile-kicker{ font-size:10px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:var(--neon); margin-bottom:5px; }
+  .profile-title{ margin:0 0 4px; font-size:26px; }
+  .profile-sub{ color:var(--chalk-dim); font-size:12px; margin-bottom:20px; }
+  .profile-avatar{
+    width:72px; height:72px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    margin:0 0 18px; background:rgba(var(--neon-rgb),.10); border:1px solid rgba(var(--neon-rgb),.45);
+    color:var(--neon-strong); font-family:'Oswald',sans-serif; font-size:28px; font-weight:700;
+    box-shadow:0 0 24px rgba(var(--neon-rgb),.14);
+  }
+  .profile-field{ margin-bottom:14px; }
+  .profile-field label{ display:block; font-size:10px; font-weight:700; color:var(--chalk-faint); letter-spacing:.1em; text-transform:uppercase; margin-bottom:6px; }
+  .profile-field input{ padding:12px 13px; }
+  .profile-email{ color:var(--chalk-dim); background:var(--panel-3); border:1px solid var(--line); border-radius:var(--radius-sm); padding:12px 13px; font-size:13px; overflow-wrap:anywhere; }
+  .profile-save{ width:100%; margin-top:6px; }
+  .profile-status{ min-height:18px; margin-top:10px; font-size:12px; color:var(--chalk-dim); }
+
+  @media(max-width:700px){
+    .nav-block button{ padding:8px 11px; font-size:12px; }
+    .day-header{ gap:6px !important; }
+    .day-header .field{ padding:9px 25px 8px 9px !important; min-height:62px; }
+    .day-header .meta-display{ font-size:12px; line-height:1.12; }
+    .day-header .meta-display.placeholder{ font-size:10px; }
+    .meta-edit-icon{ right:8px; font-size:12px; }
+    .slot-compact .sc-name{ font-size:13px; }
+    .slot-compact .sc-summary{ max-width:30%; font-size:10px; }
+    .profile-card{ padding:18px 16px; }
+  }
+  @media(max-width:390px){
+    .wrap{ padding-left:10px; padding-right:10px; }
+    .nav-block button{ padding:8px 9px; font-size:11px; }
+    .day-header .field{ padding-left:8px !important; padding-right:21px !important; }
+    .day-header .meta-display{ font-size:11px; }
+    .slot-compact{ padding-left:9px; padding-right:9px; gap:6px; }
+    .slot-compact .sc-summary{ max-width:28%; }
+  }
+
 </style>
 </head>
 <body>
@@ -937,6 +995,7 @@
     <div class="nav-block">
       <button id="navBuild" class="active">Build</button>
       <button id="navLog">Logbook</button>
+      <button id="navProfile">Profile</button>
       <button id="setupBtn">Complete Day Setup</button>
       <button class="start-btn" id="startBtn">Start</button>
     </div>
@@ -1009,6 +1068,28 @@
       </button>
     </div>
     <div id="logList"></div>
+  </div>
+
+  <!-- PROFILE VIEW -->
+  <div id="viewProfile" class="view">
+    <div class="profile-card">
+      <div class="profile-kicker">Account</div>
+      <h2 class="profile-title">Your Profile</h2>
+      <div class="profile-sub">Choose the username shown in RepLog.</div>
+      <div class="profile-avatar" id="profileAvatar">R</div>
+      <form id="profileForm">
+        <div class="profile-field">
+          <label for="profileUsername">Username</label>
+          <input id="profileUsername" type="text" maxlength="24" autocomplete="nickname" placeholder="Choose a username">
+        </div>
+        <div class="profile-field">
+          <label>Email</label>
+          <div class="profile-email" id="profileEmail">—</div>
+        </div>
+        <button type="submit" class="btn-primary profile-save" id="profileSaveBtn">Save Username</button>
+        <div class="profile-status" id="profileStatus" aria-live="polite"></div>
+      </form>
+    </div>
   </div>
 
 </div>
@@ -2503,19 +2584,25 @@ document.getElementById('logExportBtn').addEventListener('click', () => {
 --------------------------------------------------------- */
 const navBuild = document.getElementById('navBuild');
 const navLog = document.getElementById('navLog');
+const navProfile = document.getElementById('navProfile');
 const viewBuild = document.getElementById('viewBuild');
 const viewLog = document.getElementById('viewLog');
+const viewProfile = document.getElementById('viewProfile');
 const bottomDock = document.getElementById('bottomDock');
 const bottomWorkoutActions = document.getElementById('bottomWorkoutActions');
 navBuild.addEventListener('click', () => switchView('build'));
 navLog.addEventListener('click', () => switchView('log'));
+navProfile.addEventListener('click', () => switchView('profile'));
 function switchView(v){
   navBuild.classList.toggle('active', v==='build');
   navLog.classList.toggle('active', v==='log');
+  navProfile.classList.toggle('active', v==='profile');
   viewBuild.classList.toggle('active', v==='build');
   viewLog.classList.toggle('active', v==='log');
+  viewProfile.classList.toggle('active', v==='profile');
   if(bottomWorkoutActions) bottomWorkoutActions.style.display = v==='build' ? 'grid' : 'none';
   if(v==='log') renderLog();
+  if(v==='profile') renderProfile();
 }
 
 /* ---------------------------------------------------------
@@ -2553,6 +2640,52 @@ const authSubmitBtn = document.getElementById('authSubmitBtn');
 const authError = document.getElementById('authError');
 const authForgotBtn = document.getElementById('authForgotBtn');
 const logoutBtn = document.getElementById('logoutBtn');
+const profileForm = document.getElementById('profileForm');
+const profileUsername = document.getElementById('profileUsername');
+const profileEmail = document.getElementById('profileEmail');
+const profileAvatar = document.getElementById('profileAvatar');
+const profileStatus = document.getElementById('profileStatus');
+const profileSaveBtn = document.getElementById('profileSaveBtn');
+let currentAuthUser = null;
+
+function renderProfile(){
+  if(!currentAuthUser) return;
+  const username = (currentAuthUser.user_metadata && currentAuthUser.user_metadata.username) || '';
+  profileUsername.value = username;
+  profileEmail.textContent = currentAuthUser.email || '—';
+  const source = username || currentAuthUser.email || 'R';
+  profileAvatar.textContent = source.trim().charAt(0).toUpperCase() || 'R';
+  profileStatus.textContent = '';
+}
+
+profileForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const username = profileUsername.value.trim();
+  if(username.length < 2){
+    profileStatus.style.color = 'var(--danger)';
+    profileStatus.textContent = 'Username must be at least 2 characters.';
+    return;
+  }
+  profileSaveBtn.disabled = true;
+  profileSaveBtn.textContent = 'Saving…';
+  profileStatus.style.color = 'var(--chalk-dim)';
+  profileStatus.textContent = '';
+  try{
+    const { data, error } = await supabaseClient.auth.updateUser({ data: { username } });
+    if(error) throw error;
+    if(data && data.user) currentAuthUser = data.user;
+    renderProfile();
+    profileStatus.style.color = 'var(--neon-strong)';
+    profileStatus.textContent = 'Username saved.';
+    showToast('Username updated.');
+  }catch(err){
+    profileStatus.style.color = 'var(--danger)';
+    profileStatus.textContent = (err && err.message) || 'Could not save username.';
+  }finally{
+    profileSaveBtn.disabled = false;
+    profileSaveBtn.textContent = 'Save Username';
+  }
+});
 
 let authMode = 'login';
 function setAuthMode(mode){
@@ -2614,8 +2747,9 @@ logoutBtn.addEventListener('click', async () => {
   await supabaseClient.auth.signOut();
 });
 
-async function showApp(userId){
-  currentUserId = userId;
+async function showApp(user){
+  currentAuthUser = user;
+  currentUserId = user.id;
   splashView.classList.add('hide');
   activeDay = 0;
   const [loadedDays, loadedHistory] = await Promise.all([loadDaysFromCloud(), loadHistoryFromCloud()]);
@@ -2628,6 +2762,7 @@ async function showApp(userId){
 }
 function showSplash(){
   currentUserId = null;
+  currentAuthUser = null;
   appTopbar.style.display = 'none';
   appWrap.style.display = 'none';
   if(bottomDock) bottomDock.style.display = 'none';
@@ -2639,7 +2774,7 @@ function showSplash(){
 supabaseClient.auth.onAuthStateChange((event, session) => {
   if(event === 'TOKEN_REFRESHED') return;
   if(session && session.user){
-    if(session.user.id !== currentUserId) showApp(session.user.id);
+    if(session.user.id !== currentUserId) showApp(session.user);
   } else {
     showSplash();
   }
@@ -2647,7 +2782,7 @@ supabaseClient.auth.onAuthStateChange((event, session) => {
 
 supabaseClient.auth.getSession().then(({ data }) => {
   if(data && data.session && data.session.user){
-    showApp(data.session.user.id);
+    showApp(data.session.user);
   } else {
     showSplash();
   }
