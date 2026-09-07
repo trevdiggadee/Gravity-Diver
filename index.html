@@ -1348,6 +1348,40 @@ function formatHMS(totalSeconds){
   const s = Math.floor(totalSeconds%60).toString().padStart(2,'0');
   return `${h}:${m}:${s}`;
 }
+function playCountdownBeep(){
+  try{
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const t0 = ctx.currentTime;
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = 'square';
+    o.frequency.setValueAtTime(880, t0);
+    o.connect(g); g.connect(ctx.destination);
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(0.2, t0 + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.14);
+    o.start(t0); o.stop(t0 + 0.16);
+  }catch(e){}
+}
+function playBuzzer(){
+  try{
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const t0 = ctx.currentTime;
+    [0, 0.3].forEach((offset) => {
+      const start = t0 + offset;
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = 'sawtooth';
+      o.frequency.setValueAtTime(220, start);
+      o.frequency.exponentialRampToValueAtTime(160, start + 0.26);
+      o.connect(g); g.connect(ctx.destination);
+      g.gain.setValueAtTime(0.0001, start);
+      g.gain.exponentialRampToValueAtTime(0.32, start + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, start + 0.26);
+      o.start(start); o.stop(start + 0.28);
+    });
+  }catch(e){}
+}
 function playBeep(){
   try{
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -1716,13 +1750,16 @@ function updateClockVisual(remaining, total){
 function tickRestTimer(){
   restRemaining--;
   updateClockVisual(restRemaining, restTotal);
+  if(restRemaining > 0 && restRemaining <= 5){
+    playCountdownBeep();
+  }
   if(restRemaining <= 0){
     clearInterval(exRestInterval); exRestInterval = null;
     exTimerBtn.classList.remove('running');
     analogClock.classList.remove('running');
     setTimerLabel('Start Rest');
     analogClock.classList.remove('urgent');
-    playBeep();
+    playBuzzer();
     restDigital.textContent = 'Done';
     restDigital.classList.remove('low');
     analogClock.classList.add('done-flash');
