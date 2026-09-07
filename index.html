@@ -1454,7 +1454,7 @@ const REST_ALARM_SOURCES = {
   // CC0 / public-domain sources from OpenGameArt. These are used only for
   // the 10-second end-of-rest alarm; the 5-second countdown beep stays native
   // Web Audio so it remains exactly the same regardless of alarm selection.
-  oga_alarm: 'https://opengameart.org/sites/default/files/alarm_2.ogg',
+  oga_alarm: 'https://opengameart.org/sites/default/files/alarm_2.wav',
   bell: 'https://opengameart.org/sites/default/files/bell.wav',
   point_bell: 'https://opengameart.org/sites/default/files/sd_0.wav',
   chime_1: 'https://opengameart.org/sites/default/files/bell_ding1.wav',
@@ -1490,7 +1490,7 @@ function scheduleTone(freq, start, duration, type='sine', volume=.18, endFreq=nu
 }
 function playCountdownBeep(){
   // Keep the 5-second countdown sound identical no matter which alarm is selected.
-  const ctx=getRestAudioContext(); if(!ctx || restSoundChoice==='silent') return;
+  const ctx=getRestAudioContext(); if(!ctx) return;
   const t=ctx.currentTime+.01;
   scheduleTone(880,t,.13,'square',.18,880);
 }
@@ -1507,38 +1507,34 @@ function stopRestAlarm(){
   }
 }
 function playBuzzer(){
+  // Play exactly ONE selected alarm. Do not layer a synthesized fallback on top;
+  // that could make iOS sound like two alarms at once.
   stopRestAlarm();
   if(restSoundChoice==='silent') return;
 
   const src = REST_ALARM_SOURCES[restSoundChoice];
   if(!src) return;
 
-  const audio = new Audio(src);
+  const audio = new Audio();
   restAlarmAudio = audio;
   audio.preload = 'auto';
   audio.volume = .82;
   audio.loop = true;
   audio.playsInline = true;
+  audio.src = src;
 
   const endAlarm = () => {
     if(restAlarmAudio !== audio) return;
     stopRestAlarm();
   };
 
-  // Play immediately, then keep the selected open-source alarm looping for 10s.
+  // A single source is allowed to play for the full 10-second alarm window.
   const playPromise = audio.play();
   if(playPromise && typeof playPromise.catch === 'function'){
-    playPromise.catch(() => {
-      // If iOS/Safari blocks the external file, fall back to a strong local alarm.
-      if(restAlarmAudio !== audio) return;
-      const ctx=getRestAudioContext(); if(!ctx) return;
-      const start=ctx.currentTime+.01;
-      for(let i=0;i<10;i++){
-        const t=start+i*.9;
-        scheduleTone(240,t,.24,'sawtooth',.25,170);
-        scheduleTone(240,t+.28,.24,'sawtooth',.25,170);
-        scheduleTone(240,t+.56,.24,'sawtooth',.25,170);
-      }
+    playPromise.catch((err) => {
+      // Never add another sound on failure. This prevents a hidden second
+      // alarm from being heard alongside the selected open-source sound.
+      console.warn('RepLog alarm could not play:', err);
     });
   }
   restAlarmTimeouts.push(setTimeout(endAlarm, 10000));
