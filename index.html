@@ -1264,7 +1264,6 @@
 
 <div id="printLogArea" class="print-log-area"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 /* ---------------------------------------------------------
    EXERCISE LIBRARY
@@ -1310,8 +1309,6 @@ const SLOTS_PER_SIDE = 5;
 const WEEK_COUNT = 4;
 let currentUserId = null;
 let currentUser = null;
-let cloudDaysLoaded = false;
-let cloudHistoryLoaded = false;
 
 function emptySlotDef(){ return { exercise:"", sets:"", rest:"", custom:false }; }
 function emptyWeek(){
@@ -1345,102 +1342,160 @@ function normalizeDaysLength(parsed){
   return parsed;
 }
 
-/* ---- Cloud persistence (Supabase) ---- */
-async function loadDaysFromCloud(){
-  cloudDaysLoaded = false;
-  if(!currentUserId) return freshDays();
+/* ---- Local persistence (IndexedDB) ----
+   RepLog is now fully local. No Supabase/network database is required.
+   The complete 4-week program, completed sets, workout history and profile
+   metadata are stored in IndexedDB on this device/browser.
+--------------------------------------------------------- */
+const LOCAL_DB_NAME = 'RepLogLocalDB';
+const LOCAL_DB_VERSION = 1;
+const LOCAL_STATE_STORE = 'state';
+const LOCAL_STATE_KEY = 'replog';
+
+let localDbPromise = null;
+let localStateLoaded = false;
+
+function openLocalDB(){
+  if(localDbPromise) return localDbPromise;
+  localDbPromise = new Promise((resolve,reject)=>{
+    if(!window.indexedDB){ reject(new Error('IndexedDB is not available in this browser.')); return; }
+    const req = indexedDB.open(LOCAL_DB_NAME, LOCAL_DB_VERSION);
+    req.onupgradeneeded = () => {
+      const db = req.result;
+      if(!db.objectStoreNames.contains(LOCAL_STATE_STORE)) db.createObjectStore(LOCAL_STATE_STORE);
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error || new Error('Could not open local database.'));
+  });
+  return localDbPromise;
+}
+
+async function readLocalState(){
+  const db = await openLocalDB();
+  return new Promise((resolve,reject)=>{
+    const tx = db.transaction(LOCAL_STATE_STORE, 'readonly');
+    const req = tx.objectStore(LOCAL_STATE_STORE).get(LOCAL_STATE_KEY);
+    req.onsuccess = () => resolve(req.result || null);
+    req.onerror = () => reject(req.error || new Error('Could not read local data.'));
+  });
+}
+
+async function writeLocalState(patch){
+  const db = await openLocalDB();
+  return new Promise(async (resolve,reject)=>{
+    try{
+      const existing = await readLocalState();
+      const next = Object.assign({version:1}, existing || {}, patch || {}, {updatedAt:new Date().toISOString()});
+      const tx = db.transaction(LOCAL_STATE_STORE, 'readwrite');
+      tx.objectStore(LOCAL_STATE_STORE).put(next, LOCAL_STATE_KEY);
+      tx.oncomplete = () => resolve(next);
+      tx.onerror = () => reject(tx.error || new Error('Could not save local data.'));
+      tx.onabort = () => reject(tx.error || new Error('Could not save local data.'));
+    }catch(e){ reject(e); }
+  });
+}
+
+function findLegacyLocalBackup(){
   try{
-    const { data, error } = await supabaseClient
-      .from('program_state')
-      .select('days, updated_at')
-      .eq('user_id', currentUserId)
-      .order('updated_at', { ascending:false })
-      .limit(1);
-    if(error) throw error;
-    if(Array.isArray(data) && data.length){
-      const cloudDays = data[0].days;
-      if(!cloudDays || !isValidDaysShape(cloudDays)){
-        throw new Error('Saved program data has an unexpected format.');
-      }
-      const normalized = normalizeDaysLength(cloudDays);
-      cloudDaysLoaded = true;
-      try{ localStorage.setItem('REPLOG_CLOUD_DAYS_BACKUP_' + currentUserId, JSON.stringify(normalized)); }catch(_){}
-      return normalized;
+    const keys=[];
+    for(let i=0;i<localStorage.length;i++){
+      const k=localStorage.key(i);
+      if(k && k.indexOf('REPLOG_CLOUD_DAYS_BACKUP_')===0) keys.push(k);
     }
-    cloudDaysLoaded = true;
+    for(const k of keys){
+      try{
+        const parsed=JSON.parse(localStorage.getItem(k)||'null');
+        if(isValidDaysShape(parsed)) return normalizeDaysLength(parsed);
+      }catch(_){ }
+    }
+  }catch(_){ }
+  return null;
+}
+
+async function loadDaysFromLocal(){
+  localStateLoaded = false;
+  try{
+    const state = await readLocalState();
+    if(state && isValidDaysShape(state.days)){
+      localStateLoaded = true;
+      return normalizeDaysLength(state.days);
+    }
+
+    // One-time recovery path for the safety backup created by the previous
+    // Supabase version of RepLog. This does not contact Supabase or overwrite it.
+    const legacy = findLegacyLocalBackup();
+    if(legacy){
+      await writeLocalState({days:legacy});
+      localStateLoaded = true;
+      showToast('Recovered your saved program from this device.', 7000);
+      return legacy;
+    }
+
+    localStateLoaded = true;
     return freshDays();
   }catch(e){
-    console.error('loadDaysFromCloud failed', e);
-    try{
-      const backup = JSON.parse(localStorage.getItem('REPLOG_CLOUD_DAYS_BACKUP_' + currentUserId) || 'null');
-      if(isValidDaysShape(backup)){
-        showToast('Cloud sync could not be read. Showing your last saved copy; nothing was overwritten.', 9000);
-        return normalizeDaysLength(backup);
-      }
-    }catch(_){}
-    showToast('Could not load your saved workout program. Your cloud data was NOT overwritten.', 10000);
+    console.error('loadDaysFromLocal failed', e);
+    showToast('Could not read your local workout program. Nothing was overwritten.', 9000);
     return null;
   }
 }
-async function saveDaysToCloud(){
-  if(!currentUserId || !cloudDaysLoaded) return;
+
+async function saveDaysToLocal(){
+  if(!localStateLoaded) return false;
   try{
-    const { error } = await supabaseClient
-      .from('program_state')
-      .upsert({ user_id: currentUserId, days, updated_at: new Date().toISOString() }, { onConflict: 'user_id' });
-    if(error) throw error;
-  }catch(e){ console.error('saveDaysToCloud failed', e); showToast("Sync error: " + (e && (e.message || e.details || JSON.stringify(e))), 8000); }
+    await writeLocalState({days});
+    return true;
+  }catch(e){
+    console.error('saveDaysToLocal failed', e);
+    showToast('Local save failed. Your current data was not replaced.', 8000);
+    return false;
+  }
 }
+
 let saveDaysTimer = null;
 function saveDays(){
   clearTimeout(saveDaysTimer);
-  saveDaysTimer = setTimeout(saveDaysToCloud, 700);
+  saveDaysTimer = setTimeout(saveDaysToLocal, 250);
 }
 function flushSaveDays(){
   clearTimeout(saveDaysTimer);
-  saveDaysToCloud();
+  return saveDaysToLocal();
 }
 
-async function loadHistoryFromCloud(){
-  cloudHistoryLoaded = false;
-  if(!currentUserId) return [];
+async function loadHistoryFromLocal(){
   try{
-    const { data, error } = await supabaseClient
-      .from('workout_history')
-      .select('id, entry')
-      .eq('user_id', currentUserId)
-      .order('created_at', { ascending: false });
-    if(error) throw error;
-    cloudHistoryLoaded = true;
-    return (data || []).map(row => Object.assign({}, row.entry, { id: row.id }));
+    const state = await readLocalState();
+    return Array.isArray(state && state.history) ? state.history : [];
   }catch(e){
-    console.error('loadHistoryFromCloud failed', e);
-    showToast('Could not load workout history. Your cloud data was NOT overwritten.', 9000);
+    console.error('loadHistoryFromLocal failed', e);
+    showToast('Could not load local workout history.', 7000);
     return [];
   }
 }
-async function insertHistoryEntryToCloud(entry){
+
+async function insertHistoryEntryToLocal(entry){
   try{
-    const { data, error } = await supabaseClient
-      .from('workout_history')
-      .insert({ user_id: currentUserId, entry })
-      .select('id')
-      .single();
-    if(error) throw error;
-    return data.id;
-  }catch(e){ console.error('insertHistoryEntryToCloud failed', e); showToast("Save error: " + (e && (e.message || e.details || JSON.stringify(e))), 8000); return null; }
+    const state = await readLocalState() || {};
+    const list = Array.isArray(state.history) ? state.history.slice() : [];
+    const id = 'local-' + Date.now() + '-' + Math.random().toString(36).slice(2,8);
+    list.unshift(Object.assign({}, entry, {id}));
+    await writeLocalState({history:list});
+    return id;
+  }catch(e){
+    console.error('insertHistoryEntryToLocal failed', e);
+    showToast('Workout history could not be saved locally.', 8000);
+    return null;
+  }
 }
-async function deleteHistoryEntryFromCloud(id){
+
+async function deleteHistoryEntryFromLocal(id){
   try{
-    const { error } = await supabaseClient
-      .from('workout_history')
-      .delete()
-      .eq('id', id)
-      .eq('user_id', currentUserId);
-    if(error) throw error;
+    const state = await readLocalState() || {};
+    const list = Array.isArray(state.history) ? state.history.filter(x => x.id !== id) : [];
+    await writeLocalState({history:list});
     return true;
   }catch(e){
-    console.error('deleteHistoryEntryFromCloud failed', e);
+    console.error('deleteHistoryEntryFromLocal failed', e);
     return false;
   }
 }
@@ -2463,7 +2518,7 @@ document.getElementById('finishBtn').addEventListener('click', async () => {
     upper: upperSummary.map(e => ({ exercise: e.exercise, sets: e.sets, log: e.log })),
     lower: lowerSummary.map(e => ({ exercise: e.exercise, sets: e.sets, log: e.log }))
   };
-  const newId = await insertHistoryEntryToCloud(entry);
+  const newId = await insertHistoryEntryToLocal(entry);
   history.unshift(Object.assign({}, entry, { id: newId || `local-${Date.now()}` }));
   lastFinishedEntry = entry;
 
@@ -2541,7 +2596,7 @@ function renderLog(){
       history = history.filter(h => h.id !== entry.id);
       renderLog();
       if(entry.id && !String(entry.id).startsWith('local-')){
-        const ok = await deleteHistoryEntryFromCloud(entry.id);
+        const ok = await deleteHistoryEntryFromLocal(entry.id);
         if(!ok){ history = oldHistory; renderLog(); showToast("Could not delete workout. Your logbook was restored.", 5000); return; }
       }
       showToast("Workout deleted from Logbook.");
@@ -2820,31 +2875,21 @@ function renderAll(){
 }
 
 /* ---------------------------------------------------------
-   SUPABASE AUTH — splash/login gate
+   LOCAL MODE — no account server required
 --------------------------------------------------------- */
-const SUPABASE_URL = 'https://ijqbrtmuejwujsupfmye.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlqcWJydG11ZWp3dWpzdXBmbXllIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg2NDg0NjIsImV4cCI6MjEwNDIyNDQ2Mn0.NP_94r907-MMxOM-XrFFpmyuXLkg__cblWEn0kFhgrQ';
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
 const splashView = document.getElementById('splashView');
 const appTopbar = document.getElementById('appTopbar');
 const appWrap = document.getElementById('appWrap');
 const splashLogo = document.getElementById('splashLogo');
 const topbarLogo = document.getElementById('topbarLogo');
 
-// Color the logo itself (not its background) with the active RepLog accent.
 function syncLogoColor(){
   const flood = document.getElementById('replogLogoFlood');
   const neon = getComputedStyle(document.documentElement).getPropertyValue('--neon').trim();
   if(!neon) return;
-  if(flood){
-    flood.setAttribute('flood-color', neon);
-    flood.style.setProperty('flood-color', neon);
-  }
-  // Force Safari/iOS to repaint the SVG filter immediately after a Vibe change.
+  if(flood){ flood.setAttribute('flood-color', neon); flood.style.setProperty('flood-color', neon); }
   [splashLogo, topbarLogo].forEach(img => {
     if(!img) return;
-    const f=img.style.filter || getComputedStyle(img).filter;
     img.style.filter='none';
     void img.offsetWidth;
     img.style.filter='url(#replogLogoColor) drop-shadow(0 0 16px rgba(var(--neon-rgb),0.3))';
@@ -2862,122 +2907,103 @@ const authPassword = document.getElementById('authPassword');
 const authSubmitBtn = document.getElementById('authSubmitBtn');
 const authError = document.getElementById('authError');
 const authForgotBtn = document.getElementById('authForgotBtn');
+const authForgotNote = document.getElementById('authForgotNote');
 const logoutBtn = document.getElementById('logoutBtn');
 
-let authMode = 'login';
-function setAuthMode(mode){
-  authMode = mode;
-  authTabLogin.classList.toggle('active', mode === 'login');
-  authTabSignup.classList.toggle('active', mode === 'signup');
-  authSubmitBtn.textContent = mode === 'login' ? 'Log In' : 'Create Account';
-  authPassword.setAttribute('autocomplete', mode === 'login' ? 'current-password' : 'new-password');
-  authError.textContent = '';
-  authError.style.color = '';
+// Keep the existing splash markup, but make it a local-device entry screen.
+if(authTabSignup) authTabSignup.style.display='none';
+if(authTabLogin) authTabLogin.style.display='none';
+if(authForgotNote) authForgotNote.style.display='none';
+if(authPassword){ authPassword.required=false; authPassword.parentElement.style.display='none'; }
+if(authEmail){ authEmail.required=false; authEmail.placeholder='Optional profile name'; }
+if(authSubmitBtn) authSubmitBtn.textContent='Open RepLog';
+const authEmailLabel=authEmail && authEmail.closest('.auth-field') ? authEmail.closest('.auth-field').querySelector('label') : null;
+if(authEmailLabel) authEmailLabel.textContent='Profile name';
+const splashTagline=document.querySelector('.splash-tagline');
+if(splashTagline) splashTagline.textContent='4-Week Local Training Log';
+
+function makeLocalUser(name){
+  return {
+    id:'local-device',
+    email:name || 'Local Profile',
+    user_metadata:{username:name || ''}
+  };
 }
-authTabLogin.addEventListener('click', () => setAuthMode('login'));
-authTabSignup.addEventListener('click', () => setAuthMode('signup'));
-
-authForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  authError.style.color = '';
-  authError.textContent = '';
-  authSubmitBtn.disabled = true;
-  authSubmitBtn.textContent = authMode === 'login' ? 'Logging in…' : 'Creating account…';
-  const email = authEmail.value.trim();
-  const password = authPassword.value;
-  try{
-    if(authMode === 'login'){
-      const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
-      if(error) throw error;
-    } else {
-      const { data, error } = await supabaseClient.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: 'https://replog.trevdiggadee.workers.dev/'
-          }
-        });
-      if(error) throw error;
-      if(data && data.user && !data.session){
-        authError.style.color = 'var(--neon-strong)';
-        authError.textContent = 'Check your email to confirm your account, then log in.';
-        setAuthMode('login');
-      }
-    }
-  }catch(err){
-    authError.textContent = (err && err.message) || 'Something went wrong. Please try again.';
-  }finally{
-    authSubmitBtn.disabled = false;
-    authSubmitBtn.textContent = authMode === 'login' ? 'Log In' : 'Create Account';
-  }
-});
-
-authForgotBtn.addEventListener('click', async () => {
-  const email = authEmail.value.trim();
-  if(!email){ authError.textContent = 'Enter your email above first.'; return; }
-  authError.style.color = '';
-  try{
-    const { error } = await supabaseClient.auth.resetPasswordForEmail(email);
-    if(error) throw error;
-    authError.style.color = 'var(--neon-strong)';
-    authError.textContent = 'Password reset email sent.';
-  }catch(err){
-    authError.textContent = (err && err.message) || 'Could not send reset email.';
-  }
-});
-
-logoutBtn.addEventListener('click', async () => {
-  await supabaseClient.auth.signOut();
-});
 
 async function showApp(user){
-  currentUserId = user.id;
-  currentUser = user;
+  currentUserId = 'local-device';
+  currentUser = user || makeLocalUser('');
   splashView.classList.add('hide');
   activeDay = 0;
-  const [loadedDays, loadedHistory] = await Promise.all([loadDaysFromCloud(), loadHistoryFromCloud()]);
+  const [loadedDays, loadedHistory, state] = await Promise.all([
+    loadDaysFromLocal(),
+    loadHistoryFromLocal(),
+    readLocalState().catch(()=>null)
+  ]);
   if(!loadedDays){
-    appTopbar.style.display = 'none';
-    appWrap.style.display = 'none';
-    if(bottomDock) bottomDock.style.display = 'none';
+    appTopbar.style.display='none';
+    appWrap.style.display='none';
+    if(bottomDock) bottomDock.style.display='none';
     splashView.classList.remove('hide');
-    authError.textContent = 'Your saved program could not be loaded. Please do not create a new program yet.';
+    authError.textContent='Your local workout data could not be loaded. Nothing was overwritten.';
     return;
   }
-  days = loadedDays;
-  history = loadedHistory;
-  appTopbar.style.display = '';
-  appWrap.style.display = '';
-  if(bottomDock) bottomDock.style.display = '';
+  days=loadedDays;
+  history=loadedHistory;
+  if(state && state.user) currentUser=state.user;
+  appTopbar.style.display='';
+  appWrap.style.display='';
+  if(bottomDock) bottomDock.style.display='';
   renderProfile();
   renderAll();
 }
+
 function showSplash(){
-  currentUserId = null;
-  currentUser = null;
-  appTopbar.style.display = 'none';
-  appWrap.style.display = 'none';
-  if(bottomDock) bottomDock.style.display = 'none';
+  currentUserId=null;
+  currentUser=null;
+  appTopbar.style.display='none';
+  appWrap.style.display='none';
+  if(bottomDock) bottomDock.style.display='none';
   splashView.classList.remove('hide');
-  authForm.reset();
-  authError.textContent = '';
+  if(authError) authError.textContent='';
 }
 
-supabaseClient.auth.onAuthStateChange((event, session) => {
-  if(event === 'TOKEN_REFRESHED') return;
-  if(session && session.user){
-    if(session.user.id !== currentUserId) showApp(session.user);
-  } else {
-    showSplash();
+authForm.addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  authError.textContent='';
+  authSubmitBtn.disabled=true;
+  authSubmitBtn.textContent='Opening…';
+  try{
+    const name=(authEmail.value||'').trim();
+    const existing=await readLocalState();
+    const user=existing && existing.user ? existing.user : makeLocalUser(name);
+    if(name) user.email=name;
+    user.user_metadata=user.user_metadata||{};
+    if(name && !user.user_metadata.username) user.user_metadata.username=name;
+    await writeLocalState({user});
+    await showApp(user);
+  }catch(err){
+    console.error(err);
+    authError.textContent='Could not open local storage. Please make sure browser storage is enabled.';
+  }finally{
+    authSubmitBtn.disabled=false;
+    authSubmitBtn.textContent='Open RepLog';
   }
 });
 
-supabaseClient.auth.getSession().then(({ data }) => {
-  if(data && data.session && data.session.user){
-    showApp(data.session.user);
-  } else {
-    showSplash();
-  }
+logoutBtn.addEventListener('click', async ()=>{
+  await flushSaveDays();
+  showSplash();
+});
+
+// Automatically open the local app on this device. The splash remains
+// available through Log Out and can be used to name the local profile.
+readLocalState().then(state=>{
+  showApp(state && state.user ? state.user : makeLocalUser(''));
+}).catch(err=>{
+  console.error('RepLog local startup failed',err);
+  showSplash();
+  authError.textContent='Local storage is unavailable in this browser.';
 });
 
 /* ---------------------------------------------------------
@@ -3050,9 +3076,9 @@ function renderProfile(){
   profileMsg.textContent='';
 }
 async function updateProfileMetadata(patch, successText='Saved!'){
-  const {data,error}=await supabaseClient.auth.updateUser({data:patch});
-  if(error) throw error;
-  currentUser=data.user;
+  if(!currentUser) return;
+  currentUser.user_metadata=Object.assign({}, currentUser.user_metadata||{}, patch||{});
+  await writeLocalState({user:currentUser});
   profileMsg.style.color='var(--neon-strong)';
   profileMsg.textContent=successText;
   renderProfile();
