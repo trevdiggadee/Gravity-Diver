@@ -1,76 +1,812 @@
+Make this into a downloadable file. Absolutely. Here is the complete replacement index.html file for the temporary RepLog recovery page. It uses the new Supabase recovery function instead of directly querying the tables.
+
+Save this as index.html and replace the current recovery index.html in GitHub.
+
 <!doctype html>
+
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>RepLog Data Recovery</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-*{box-sizing:border-box}body{margin:0;background:#111;color:#f5f5f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}.card{width:100%;max-width:480px;background:#1b1b1b;border:1px solid #333;border-radius:22px;padding:28px;box-shadow:0 20px 60px #0008}h1{margin:0 0 8px;font-size:28px}h2{font-size:20px;margin:22px 0 8px}.sub{color:#aaa;line-height:1.5;margin-bottom:24px}.warning{background:#302814;border:1px solid #69551e;border-radius:14px;padding:14px;color:#eadb9a;line-height:1.45;margin:16px 0}.success{background:#17351f;border:1px solid #28633a;border-radius:14px;padding:16px;line-height:1.5}.error{background:#3a1919;border:1px solid #733333;border-radius:14px;padding:16px;line-height:1.5}.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0}.stat{background:#242424;border-radius:12px;padding:14px}.num{font-size:24px;font-weight:700}.label{color:#999;font-size:12px;margin-top:3px}label{display:block;color:#bbb;font-size:13px;margin:14px 0 6px}input{width:100%;padding:14px;border-radius:12px;border:1px solid #444;background:#111;color:#fff;font-size:16px}button{width:100%;padding:15px;border:0;border-radius:13px;background:#fff;color:#111;font-size:16px;font-weight:700;margin-top:18px}button:disabled{opacity:.45}button.secondary{background:#333;color:#fff}.small{font-size:13px;color:#999;margin-top:16px;line-height:1.5}.hidden{display:none}.check{display:flex;gap:10px;align-items:flex-start;color:#ddd;margin-top:16px;line-height:1.4}.check input{width:20px;height:20px;margin:1px 0 0}.spinner{display:inline-block;width:15px;height:15px;border:2px solid #777;border-top-color:#111;border-radius:50%;animation:spin .7s linear infinite;vertical-align:-2px;margin-right:7px}@keyframes spin{to{transform:rotate(360deg)}}
-</style></head>
-<body><main class="card">
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:#111;
+  color:#f5f5f5;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px
+}
+.card{
+  width:100%;
+  max-width:480px;
+  background:#1b1b1b;
+  border:1px solid #333;
+  border-radius:22px;
+  padding:28px;
+  box-shadow:0 20px 60px #0008
+}
+h1{
+  margin:0 0 8px;
+  font-size:28px
+}
+.sub{
+  color:#aaa;
+  line-height:1.5;
+  margin-bottom:24px
+}
+.warning{
+  background:#302814;
+  border:1px solid #69551e;
+  border-radius:14px;
+  padding:14px;
+  color:#eadb9a;
+  line-height:1.45;
+  margin:16px 0
+}
+.success{
+  background:#17351f;
+  border:1px solid #28633a;
+  border-radius:14px;
+  padding:16px;
+  line-height:1.5
+}
+.error{
+  background:#3a1919;
+  border:1px solid #733333;
+  border-radius:14px;
+  padding:16px;
+  line-height:1.5
+}
+.stats{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin:16px 0
+}
+.stat{
+  background:#242424;
+  border-radius:12px;
+  padding:14px
+}
+.num{
+  font-size:24px;
+  font-weight:700
+}
+.label{
+  color:#999;
+  font-size:12px;
+  margin-top:3px
+}
+label{
+  display:block;
+  color:#bbb;
+  font-size:13px;
+  margin:14px 0 6px
+}
+input{
+  width:100%;
+  padding:14px;
+  border-radius:12px;
+  border:1px solid #444;
+  background:#111;
+  color:#fff;
+  font-size:16px
+}
+button{
+  width:100%;
+  padding:15px;
+  border:0;
+  border-radius:13px;
+  background:#fff;
+  color:#111;
+  font-size:16px;
+  font-weight:700;
+  margin-top:18px
+}
+button:disabled{
+  opacity:.45
+}
+.small{
+  font-size:13px;
+  color:#999;
+  margin-top:16px;
+  line-height:1.5
+}
+.hidden{
+  display:none
+}
+.check{
+  display:flex;
+  gap:10px;
+  align-items:flex-start;
+  color:#ddd;
+  margin-top:16px;
+  line-height:1.4
+}
+.check input{
+  width:20px;
+  height:20px;
+  margin:1px 0 0
+}
+.spinner{
+  display:inline-block;
+  width:15px;
+  height:15px;
+  border:2px solid #777;
+  border-top-color:#111;
+  border-radius:50%;
+  animation:spin .7s linear infinite;
+  vertical-align:-2px;
+  margin-right:7px
+}
+@keyframes spin{
+  to{transform:rotate(360deg)}
+}
+</style>
+</head>
+<body>
+<main class="card">
 <h1>RepLog Data Recovery</h1>
-<div class="sub">This temporary page copies your old RepLog data from Supabase into the same local database used by the new Supabase-free app.</div>
-<div class="warning"><b>Read this first:</b> This page only reads your old Supabase data. It does not delete, update, or overwrite anything in Supabase.</div>
+<div class="sub">
+This temporary page copies your old RepLog data from Supabase into the same local database used by the new Supabase-free app.
+</div>
+<div class="warning">
+<b>Read this first:</b>
+This page only reads your old Supabase data.
+It does not delete, update, or overwrite anything in Supabase.
+</div>
 <section id="loginBox">
-<label>Email</label><input id="email" type="email" autocomplete="username" placeholder="Your old RepLog email">
-<label>Password</label><input id="password" type="password" autocomplete="current-password" placeholder="Your old RepLog password">
-<button id="loginBtn">Sign in & Recover My Data</button>
+
+Email
+
+<input
+id=“email”
+type=“email”
+autocomplete=“username”
+placeholder=“Your old RepLog email”
+
+Password
+
+<input
+id=“password”
+type=“password”
+autocomplete=“current-password”
+placeholder=“Your old RepLog password”
+
+<button id="loginBtn">
+Sign in & Recover My Data
+</button>
 <div id="loginMsg" class="small"></div>
 </section>
 <section id="resultBox" class="hidden">
 <div id="result"></div>
 <div id="stats" class="stats hidden"></div>
-<label id="replaceWrap" class="check hidden"><input id="replaceExisting" type="checkbox"><span>I understand that this will replace the RepLog data currently stored on this device with the recovered Supabase data.</span></label>
-<button id="recoverBtn" class="hidden">Copy Recovered Data to This Device</button>
-<div class="small">After recovery succeeds, replace this temporary <b>index.html</b> with your normal Supabase-free RepLog <b>index.html</b>. Do not edit workouts on this recovery page.</div>
+<label id="replaceWrap" class="check hidden">
+
+<input
+id=“replaceExisting”
+type=“checkbox”
+
+<span>
+I understand that this will replace the RepLog data currently stored on this device with the recovered Supabase data.
+</span>
+</label>
+<button id="recoverBtn" class="hidden">
+Copy Recovered Data to This Device
+</button>
+<div class="small">
+After recovery succeeds, replace this temporary
+<b>index.html</b>
+with your normal Supabase-free RepLog
+<b>index.html</b>.
+Do not edit workouts on this recovery page.
+</div>
 </section>
 </main>
 <script>
-const SUPABASE_URL='https://ijqbrtmuejwujsupfmye.supabase.co';
-const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlqcWJydG11ZWp3dWpzdXBmbXllIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg2NDg0NjIsImV4cCI6MjEwNDIyNDQ2Mn0.NP_94r907-MMxOM-XrFFpmyuXLkg__cblWEn0kFhgrQ';
-const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
-const DB_NAME='RepLogLocalDB', DB_VERSION=1, STORE='state', KEY='replog';
-let recovered=null;
-function isValidDaysShape(d){return Array.isArray(d)&&d.length>=1&&d.every(w=>w&&Array.isArray(w.days));}
-function openDB(){return new Promise((resolve,reject)=>{const r=indexedDB.open(DB_NAME,DB_VERSION);r.onupgradeneeded=()=>{if(!r.result.objectStoreNames.contains(STORE))r.result.createObjectStore(STORE)};r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error||new Error('Could not open local database.'));});}
-async function readLocal(){const db=await openDB();return new Promise((resolve,reject)=>{const tx=db.transaction(STORE,'readonly'),r=tx.objectStore(STORE).get(KEY);r.onsuccess=()=>resolve(r.result||null);r.onerror=()=>reject(r.error);});}
-async function writeLocal(state){const db=await openDB();return new Promise((resolve,reject)=>{const tx=db.transaction(STORE,'readwrite');tx.objectStore(STORE).put(state,KEY);tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error||new Error('Could not save local data.'));});}
-function setMsg(el,html,cls='small'){el.className=cls;el.innerHTML=html;}
-function showRecovered(days,history,user,existing){
- recovered={days,history,user};
- document.getElementById('loginBox').classList.add('hidden');document.getElementById('resultBox').classList.remove('hidden');
- const rb=document.getElementById('result'), stats=document.getElementById('stats'), rw=document.getElementById('replaceWrap'), btn=document.getElementById('recoverBtn');
- const weeks=Array.isArray(days)?days.length:0;const historyCount=Array.isArray(history)?history.length:0;
- let sets=0;try{for(const w of days||[])for(const d of w.days||[])for(const ex of (d.exercises||[]))for(const set of (ex.sets||[]))if(set.completed||set.done||set.weight||set.reps)sets++;}catch(e){}
- stats.innerHTML='<div class="stat"><div class="num">'+weeks+'</div><div class="label">Program weeks</div></div><div class="stat"><div class="num">'+historyCount+'</div><div class="label">Workout history entries</div></div><div class="stat"><div class="num">'+sets+'</div><div class="label">Set records found</div></div><div class="stat"><div class="num">✓</div><div class="label">Supabase read successful</div></div>';stats.classList.remove('hidden');
- if(existing&&isValidDaysShape(existing.days)){
-   setMsg(rb,'<b>Recovered data found.</b><br>Your device already has RepLog data, so nothing has been overwritten. Check the box below only if you want the recovered Supabase data to replace the current local data.','warning');
-   rw.classList.remove('hidden');btn.classList.remove('hidden');
- }else{
-   setMsg(rb,'<b>Your old RepLog data was found.</b><br>Everything is ready to copy into this device.','success');rw.classList.add('hidden');btn.classList.remove('hidden');
- }
+/* =========================================================
+   SUPABASE CONNECTION
+   ========================================================= */
+const SUPABASE_URL =
+  'https://ijqbrtmuejwujsupfmye.supabase.co';
+const SUPABASE_ANON_KEY =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlqcWJydG11ZWp3dWpzdXBmbXllIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg2NDg0NjIsImV4cCI6MjEwNDIyNDQ2Mn0.NP_94r907-MMxOM-XrFFpmyuXLkg__cblWEn0kFhgrQ';
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
+/* =========================================================
+   LOCAL REPLOG DATABASE
+   ========================================================= */
+const DB_NAME = 'RepLogLocalDB';
+const DB_VERSION = 1;
+const STORE = 'state';
+const KEY = 'replog';
+let recovered = null;
+/* =========================================================
+   VALIDATE PROGRAM STRUCTURE
+   ========================================================= */
+function isValidDaysShape(d){
+  return Array.isArray(d) &&
+    d.length >= 1 &&
+    d.every(
+      w => w && Array.isArray(w.days)
+    );
 }
+/* =========================================================
+   OPEN LOCAL DATABASE
+   ========================================================= */
+function openDB(){
+  return new Promise((resolve,reject)=>{
+    const request =
+      indexedDB.open(
+        DB_NAME,
+        DB_VERSION
+      );
+    request.onupgradeneeded = () => {
+      if(
+        !request.result.objectStoreNames.contains(
+          STORE
+        )
+      ){
+        request.result.createObjectStore(
+          STORE
+        );
+      }
+    };
+    request.onsuccess = () =>
+      resolve(request.result);
+    request.onerror = () =>
+      reject(
+        request.error ||
+        new Error(
+          'Could not open local database.'
+        )
+      );
+  });
+}
+/* =========================================================
+   READ LOCAL REPLOG DATA
+   ========================================================= */
+async function readLocal(){
+  const db = await openDB();
+  return new Promise((resolve,reject)=>{
+    const tx =
+      db.transaction(
+        STORE,
+        'readonly'
+      );
+    const request =
+      tx.objectStore(STORE).get(KEY);
+    request.onsuccess = () =>
+      resolve(
+        request.result || null
+      );
+    request.onerror = () =>
+      reject(request.error);
+  });
+}
+/* =========================================================
+   WRITE LOCAL REPLOG DATA
+   ========================================================= */
+async function writeLocal(state){
+  const db = await openDB();
+  return new Promise((resolve,reject)=>{
+    const tx =
+      db.transaction(
+        STORE,
+        'readwrite'
+      );
+    tx.objectStore(STORE).put(
+      state,
+      KEY
+    );
+    tx.oncomplete = () =>
+      resolve();
+    tx.onerror = () =>
+      reject(
+        tx.error ||
+        new Error(
+          'Could not save local data.'
+        )
+      );
+  });
+}
+/* =========================================================
+   MESSAGE HELPER
+   ========================================================= */
+function setMsg(
+  el,
+  html,
+  cls='small'
+){
+  el.className = cls;
+  el.innerHTML = html;
+}
+/* =========================================================
+   SHOW RECOVERED DATA
+   ========================================================= */
+function showRecovered(
+  days,
+  history,
+  user,
+  existing
+){
+  recovered = {
+    days,
+    history,
+    user
+  };
+  document
+    .getElementById('loginBox')
+    .classList.add('hidden');
+  document
+    .getElementById('resultBox')
+    .classList.remove('hidden');
+  const result =
+    document.getElementById(
+      'result'
+    );
+  const stats =
+    document.getElementById(
+      'stats'
+    );
+  const replaceWrap =
+    document.getElementById(
+      'replaceWrap'
+    );
+  const recoverBtn =
+    document.getElementById(
+      'recoverBtn'
+    );
+  const weeks =
+    Array.isArray(days)
+      ? days.length
+      : 0;
+  const historyCount =
+    Array.isArray(history)
+      ? history.length
+      : 0;
+  let sets = 0;
+  try{
+    for(
+      const week of days || []
+    ){
+      for(
+        const day of week.days || []
+      ){
+        for(
+          const exercise of
+          day.exercises || []
+        ){
+          for(
+            const set of
+            exercise.sets || []
+          ){
+            if(
+              set.completed ||
+              set.done ||
+              set.weight ||
+              set.reps
+            ){
+              sets++;
+            }
+          }
+        }
+      }
+    }
+  }catch(e){}
+  stats.innerHTML =
+    '<div class="stat">'+
+      '<div class="num">'+
+        weeks+
+      '</div>'+
+      '<div class="label">'+
+        'Program weeks'+
+      '</div>'+
+    '</div>'+
+    '<div class="stat">'+
+      '<div class="num">'+
+        historyCount+
+      '</div>'+
+      '<div class="label">'+
+        'Workout history entries'+
+      '</div>'+
+    '</div>'+
+    '<div class="stat">'+
+      '<div class="num">'+
+        sets+
+      '</div>'+
+      '<div class="label">'+
+        'Set records found'+
+      '</div>'+
+    '</div>'+
+    '<div class="stat">'+
+      '<div class="num">✓</div>'+
+      '<div class="label">'+
+        'Supabase recovery successful'+
+      '</div>'+
+    '</div>';
+  stats.classList.remove(
+    'hidden'
+  );
+  if(
+    existing &&
+    isValidDaysShape(
+      existing.days
+    )
+  ){
+    setMsg(
+      result,
+      '<b>Recovered data found.</b><br>'+
+      'Your device already has RepLog data, so nothing has been overwritten. '+
+      'Check the box below only if you want the recovered Supabase data to replace the current local data.',
+      'warning'
+    );
+    replaceWrap.classList.remove(
+      'hidden'
+    );
+    recoverBtn.classList.remove(
+      'hidden'
+    );
+  }else{
+    setMsg(
+      result,
+      '<b>Your old RepLog data was found.</b><br>'+
+      'Everything is ready to copy into this device.',
+      'success'
+    );
+    replaceWrap.classList.add(
+      'hidden'
+    );
+    recoverBtn.classList.remove(
+      'hidden'
+    );
+  }
+}
+/* =========================================================
+   RECOVER FROM SUPABASE RPC
+   =========================================================
+   IMPORTANT:
+   We no longer query:
+       program_state
+       workout_history
+   directly from the browser.
+   Instead we call:
+       replog_recover_my_data()
+   This is the SECURITY DEFINER function created
+   in Supabase specifically for this one-time recovery.
+   ========================================================= */
 async function fetchCloud(user){
- const p=await supabaseClient.from('program_state').select('days,updated_at').eq('user_id',user.id).order('updated_at',{ascending:false}).limit(1);
- if(p.error)throw new Error('Program data could not be read: '+p.error.message);
- const h=await supabaseClient.from('workout_history').select('id,entry').eq('user_id',user.id).order('created_at',{ascending:false});
- if(h.error)throw new Error('Workout history could not be read: '+h.error.message);
- const days=p.data&&p.data[0]?p.data[0].days:null;
- if(!isValidDaysShape(days))throw new Error('Supabase did not return a valid RepLog 4-week program. No local data was changed.');
- const history=(h.data||[]).map(row=>Object.assign({},row.entry||{},{id:row.id}));
- return {days,history};
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    'replog_recover_my_data'
+  );
+  if(error){
+    throw new Error(
+      'Recovery function could not read your old RepLog data: '+
+      error.message
+    );
+  }
+  if(!data){
+    throw new Error(
+      'The recovery function returned no data. '+
+      'Your Supabase account may not have an existing RepLog program.'
+    );
+  }
+  const program =
+    data.program || null;
+  const days =
+    program
+      ? program.days
+      : null;
+  if(
+    !isValidDaysShape(days)
+  ){
+    throw new Error(
+      'Supabase did not return a valid RepLog 4-week program. '+
+      'No local data was changed.'
+    );
+  }
+  const rawHistory =
+    Array.isArray(data.history)
+      ? data.history
+      : [];
+  const history =
+    rawHistory.map(row => {
+      const entry =
+        row && row.entry
+          ? row.entry
+          : {};
+      return Object.assign(
+        {},
+        entry,
+        {
+          id:
+            row && row.id
+              ? row.id
+              : undefined
+        }
+      );
+    });
+  return {
+    days,
+    history
+  };
 }
-document.getElementById('loginBtn').onclick=async()=>{
- const email=document.getElementById('email').value.trim(),password=document.getElementById('password').value,btn=document.getElementById('loginBtn'),msg=document.getElementById('loginMsg');
- if(!email||!password){setMsg(msg,'Enter the email and password you used for the old RepLog.','error');return;}
- btn.disabled=true;btn.innerHTML='<span class="spinner"></span>Signing in and reading data…';
- try{const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});if(error)throw new Error(error.message);const user=data.user;const cloud=await fetchCloud(user);const existing=await readLocal();showRecovered(cloud.days,cloud.history,user,existing);}catch(e){setMsg(msg,'<b>Recovery stopped.</b><br>'+String(e.message||e)+'<br><br>No local data was changed.','error');btn.disabled=false;btn.textContent='Sign in & Recover My Data';}}
-document.getElementById('recoverBtn').onclick=async()=>{
- const btn=document.getElementById('recoverBtn'),replace=document.getElementById('replaceExisting').checked;btn.disabled=true;btn.innerHTML='<span class="spinner"></span>Copying data…';
- try{const existing=await readLocal();if(existing&&isValidDaysShape(existing.days)&&!replace)throw new Error('Local data already exists. Check the replacement box if you want to replace it.');
-   const state={version:1,user:recovered.user,days:recovered.days,history:recovered.history,updatedAt:new Date().toISOString(),recoverySource:'RepLog Supabase one-time recovery'};
-   if(existing&&isValidDaysShape(existing.days)){state.preRecoveryBackup=existing;state.preRecoveryBackupAt=new Date().toISOString();}
-   await writeLocal(state);const verify=await readLocal();if(!verify||!isValidDaysShape(verify.days))throw new Error('Verification failed after saving.');
-   setMsg(document.getElementById('result'),'<b>RECOVERY COMPLETE ✓</b><br>Your program and workout history are now stored in this device’s RepLog local database. Supabase was not modified.<br><br><b>Next:</b> replace this recovery index.html with your normal Supabase-free RepLog index.html and open the app.','success');btn.classList.add('hidden');document.getElementById('replaceWrap').classList.add('hidden');
- }catch(e){setMsg(document.getElementById('result'),'<b>Nothing was overwritten.</b><br>'+String(e.message||e),'error');btn.disabled=false;btn.textContent='Copy Recovered Data to This Device';}}
-</script></body></html>
+/* =========================================================
+   LOGIN + RECOVERY
+   ========================================================= */
+document
+  .getElementById('loginBtn')
+  .onclick = async () => {
+  const email =
+    document
+      .getElementById('email')
+      .value
+      .trim();
+  const password =
+    document
+      .getElementById('password')
+      .value;
+  const btn =
+    document
+      .getElementById('loginBtn');
+  const msg =
+    document
+      .getElementById('loginMsg');
+  if(
+    !email ||
+    !password
+  ){
+    setMsg(
+      msg,
+      'Enter the email and password you used for the old RepLog.',
+      'error'
+    );
+    return;
+  }
+  btn.disabled = true;
+  btn.innerHTML =
+    '<span class="spinner"></span>'+
+    'Signing in and recovering data…';
+  try{
+    /* ---------------------------------------------
+       SIGN IN
+       --------------------------------------------- */
+    const {
+      data,
+      error
+    } =
+      await supabaseClient.auth.signInWithPassword({
+        email,
+        password
+      });
+    if(error){
+      throw new Error(
+        error.message
+      );
+    }
+    const user =
+      data.user;
+    if(!user){
+      throw new Error(
+        'Supabase login succeeded but no user session was returned.'
+      );
+    }
+    /* ---------------------------------------------
+       VERIFY SESSION
+       --------------------------------------------- */
+    const {
+      data:sessionData,
+      error:sessionError
+    } =
+      await supabaseClient.auth.getSession();
+    if(sessionError){
+      throw new Error(
+        'Could not verify the Supabase login session: '+
+        sessionError.message
+      );
+    }
+    if(
+      !sessionData.session ||
+      !sessionData.session.user
+    ){
+      throw new Error(
+        'The login did not create an authenticated Supabase session.'
+      );
+    }
+    /* ---------------------------------------------
+       CALL RECOVERY RPC
+       --------------------------------------------- */
+    const cloud =
+      await fetchCloud(
+        user
+      );
+    /* ---------------------------------------------
+       CHECK CURRENT DEVICE DATA
+       --------------------------------------------- */
+    const existing =
+      await readLocal();
+    /* ---------------------------------------------
+       SHOW RECOVERED DATA
+       --------------------------------------------- */
+    showRecovered(
+      cloud.days,
+      cloud.history,
+      user,
+      existing
+    );
+  }catch(e){
+    setMsg(
+      msg,
+      '<b>Recovery stopped.</b><br>'+
+      String(
+        e.message || e
+      )+
+      '<br><br>No local data was changed.',
+      'error'
+    );
+    btn.disabled = false;
+    btn.textContent =
+      'Sign in & Recover My Data';
+  }
+};
+/* =========================================================
+   COPY RECOVERED DATA INTO LOCAL DATABASE
+   ========================================================= */
+document
+  .getElementById('recoverBtn')
+  .onclick = async () => {
+  const btn =
+    document
+      .getElementById('recoverBtn');
+  const replace =
+    document
+      .getElementById('replaceExisting')
+      .checked;
+  btn.disabled = true;
+  btn.innerHTML =
+    '<span class="spinner"></span>'+
+    'Copying data…';
+  try{
+    const existing =
+      await readLocal();
+    /* ---------------------------------------------
+       DO NOT OVERWRITE EXISTING DATA UNLESS
+       USER EXPLICITLY CHECKS THE BOX
+       --------------------------------------------- */
+    if(
+      existing &&
+      isValidDaysShape(
+        existing.days
+      ) &&
+      !replace
+    ){
+      throw new Error(
+        'Local data already exists. Check the replacement box if you want to replace it.'
+      );
+    }
+    /* ---------------------------------------------
+       CREATE LOCAL REPLOG STATE
+       --------------------------------------------- */
+    const state = {
+      version:1,
+      user:recovered.user,
+      days:recovered.days,
+      history:recovered.history,
+      updatedAt:
+        new Date().toISOString(),
+      recoverySource:
+        'RepLog Supabase one-time recovery'
+    };
+    /* ---------------------------------------------
+       PRESERVE CURRENT DEVICE DATA AS BACKUP
+       --------------------------------------------- */
+    if(
+      existing &&
+      isValidDaysShape(
+        existing.days
+      )
+    ){
+      state.preRecoveryBackup =
+        existing;
+      state.preRecoveryBackupAt =
+        new Date().toISOString();
+    }
+    /* ---------------------------------------------
+       WRITE LOCAL DATA
+       --------------------------------------------- */
+    await writeLocal(
+      state
+    );
+    /* ---------------------------------------------
+       VERIFY WRITE
+       --------------------------------------------- */
+    const verify =
+      await readLocal();
+    if(
+      !verify ||
+      !isValidDaysShape(
+        verify.days
+      )
+    ){
+      throw new Error(
+        'Verification failed after saving.'
+      );
+    }
+    const recoveredHistory =
+      Array.isArray(
+        verify.history
+      )
+        ? verify.history.length
+        : 0;
+    /* ---------------------------------------------
+       SUCCESS
+       --------------------------------------------- */
+    setMsg(
+      document
+        .getElementById('result'),
+      '<b>RECOVERY COMPLETE ✓</b><br>'+
+      'Your program and workout history are now stored in this device’s RepLog local database.'+
+      '<br><br>'+
+      '<b>Program:</b> '+
+      verify.days.length+
+      ' weeks recovered.'+
+      '<br>'+
+      '<b>Workout history:</b> '+
+      recoveredHistory+
+      ' entries recovered.'+
+      '<br><br>'+
+      '<b>Supabase was not modified.</b>'+
+      '<br><br>'+
+      '<b>Next:</b> replace this temporary recovery index.html with your normal Supabase-free RepLog index.html and open the app.',
+      'success'
+    );
+    btn.classList.add(
+      'hidden'
+    );
+    document
+      .getElementById('replaceWrap')
+      .classList.add(
+        'hidden'
+      );
+  }catch(e){
+    setMsg(
+      document
+        .getElementById('result'),
+      '<b>Nothing was overwritten.</b><br>'+
+      String(
+        e.message || e
+      ),
+      'error'
+    );
+    btn.disabled = false;
+    btn.textContent =
+      'Copy Recovered Data to This Device';
+  }
+};
+</script>
+</body>
+</html>
+
+Then
+
+1. Put this entire file in your GitHub repo as index.html.
+2. Let Cloudflare deploy.
+3. Open https://replog.trevdiggadee.workers.dev/.
+4. Sign in using your old RepLog credentials.
+
+This version will not directly access program_state, which is where we were getting the permission error. It uses the recovery function we just successfully created.
+
+If it works, don’t replace the recovery page with your normal app yet. First tell me what numbers it shows for Program weeks and Workout history entries, and we’ll make sure your data is actually there.
