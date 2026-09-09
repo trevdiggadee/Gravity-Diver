@@ -1178,16 +1178,17 @@
       <div class="rest-sound-row">
         <label for="restSoundSelect">Alarm sound</label>
         <select id="restSoundSelect" class="rest-sound-select">
-          <option value="digital_alarm">Digital Alarm</option>
-          <option value="classic_bell">Classic Bell</option>
-          <option value="triple_beep">Triple Beep</option>
-          <option value="chime_rise">Chime Rise</option>
-          <option value="chime_fall">Chime Fall</option>
+          <option value="alarm_clock">Alarm Clock</option>
+          <option value="security_alarm">Security Alarm</option>
           <option value="siren">Siren</option>
-          <option value="buzzer">Buzzer</option>
-          <option value="doorbell">Doorbell</option>
-          <option value="foghorn">Foghorn</option>
-          <option value="retro_alarm">Retro Alarm</option>
+          <option value="biohazard">Biohazard Alert</option>
+          <option value="community">Community Alert</option>
+          <option value="car_horn">Car Horn</option>
+          <option value="scratch">Scratch</option>
+          <option value="japan_eas">Japan EAS</option>
+          <option value="greece_eas">Greece EAS</option>
+          <option value="malaysia_eas">Malaysia EAS</option>
+          <option value="saudi_arabia_eas">Saudi Arabia EAS</option>
           <option value="silent">Silent</option>
         </select>
       </div>
@@ -1545,8 +1546,9 @@ function formatHMS(totalSeconds){
 let restAudioCtx = null;
 let restAlarmTimeouts = [];
 let restAlarmOscillators = [];
+let restAlarmAudio = null;
 let restCountdownPlayed = new Set();
-let restSoundChoice = 'digital_alarm';
+let restSoundChoice = 'alarm_clock';
 
 function getRestAudioContext(){
   try{
@@ -1579,41 +1581,43 @@ function playCountdownBeep(){
 }
 function stopRestAlarm(){
   clearRestAudioTimers();
+  if(restAlarmAudio){
+    try{ restAlarmAudio.pause(); restAlarmAudio.currentTime = 0; }catch(e){}
+    restAlarmAudio = null;
+  }
   restAlarmOscillators.forEach(o => { try{ o.stop(); }catch(e){} });
   restAlarmOscillators = [];
 }
 
-// Fully self-contained (Web Audio only) alarm bank — no external files, so it
-// always plays, offline or online. Each entry's `play(t)` schedules one cycle
-// starting at time t; `cycle` is that pattern's length so playBuzzer() can
-// tile it back-to-back to fill the full 5-second alarm window.
-const ALARM_PATTERNS = {
-  digital_alarm: { cycle: 0.5, play:(t)=>{ scheduleTone(1000,t,0.15,'square',.22); scheduleTone(800,t+0.22,0.15,'square',.22); } },
-  classic_bell:  { cycle: 0.9, play:(t)=>{ scheduleTone(1046.5,t,0.8,'sine',.25,880); scheduleTone(1568,t,0.6,'sine',.10,1400); } },
-  triple_beep:   { cycle: 0.7, play:(t)=>{ scheduleTone(1200,t,0.1,'square',.22); scheduleTone(1200,t+0.16,0.1,'square',.22); scheduleTone(1200,t+0.32,0.1,'square',.22); } },
-  chime_rise:    { cycle: 0.7, play:(t)=>{ [523.25,659.25,783.99,1046.5].forEach((f,i)=>scheduleTone(f,t+i*0.12,0.28,'triangle',.2)); } },
-  chime_fall:    { cycle: 0.7, play:(t)=>{ [1046.5,783.99,659.25,523.25].forEach((f,i)=>scheduleTone(f,t+i*0.12,0.28,'triangle',.2)); } },
-  siren:         { cycle: 1.0, play:(t)=>{ scheduleTone(500,t,0.5,'sawtooth',.16,1000); scheduleTone(1000,t+0.5,0.5,'sawtooth',.16,500); } },
-  buzzer:        { cycle: 0.5, play:(t)=>{ scheduleTone(180,t,0.22,'sawtooth',.28,140); scheduleTone(180,t+0.28,0.22,'sawtooth',.28,140); } },
-  doorbell:      { cycle: 0.9, play:(t)=>{ scheduleTone(783.99,t,0.35,'sine',.22); scheduleTone(659.25,t+0.30,0.45,'sine',.22); } },
-  foghorn:       { cycle: 1.1, play:(t)=>{ scheduleTone(160,t,0.9,'sawtooth',.2,150); } },
-  retro_alarm:   { cycle: 0.32, play:(t)=>{ scheduleTone(1400,t,0.08,'square',.2); scheduleTone(900,t+0.1,0.08,'square',.2); } }
+// Alarm bank — real audio files living alongside this page in /sounds.
+// Each entry maps a select option's value to the file that plays for it.
+const ALARM_FILES = {
+  alarm_clock:      'sounds/alarm_clock.mp3',
+  security_alarm:   'sounds/security-alarm.mp3',
+  siren:            'sounds/Siren.mp3',
+  biohazard:        'sounds/biohazard.mp3',
+  community:        'sounds/community.mp3',
+  car_horn:         'sounds/Car.mp3',
+  scratch:          'sounds/scratch.mp3',
+  japan_eas:        'sounds/japan-eas.mp3',
+  greece_eas:       'sounds/greece-eas.mp3',
+  malaysia_eas:     'sounds/malaysia-eas.mp3',
+  saudi_arabia_eas: 'sounds/saudi-arabia-eas.mp3'
 };
-const REST_ALARM_DURATION = 5; // seconds the buzzer sounds off for when the timer ends
+const REST_ALARM_DURATION = 5; // seconds the alarm sounds off for when the timer ends
 
 function playBuzzer(){
   stopRestAlarm();
   if(restSoundChoice === 'silent') return;
-  const pattern = ALARM_PATTERNS[restSoundChoice];
-  if(!pattern) return;
-  const ctx = getRestAudioContext();
-  if(!ctx) return;
-  const startAt = ctx.currentTime + 0.02;
-  let t = startAt;
-  while(t < startAt + REST_ALARM_DURATION){
-    pattern.play(t);
-    t += pattern.cycle;
-  }
+  const file = ALARM_FILES[restSoundChoice];
+  if(!file) return;
+  restAlarmAudio = new Audio(file);
+  restAlarmAudio.loop = true; // tile the clip back-to-back to fill the alarm window
+  restAlarmAudio.play().catch(()=>{});
+  const stopId = setTimeout(() => {
+    if(restAlarmAudio){ try{ restAlarmAudio.pause(); restAlarmAudio.currentTime = 0; }catch(e){} }
+  }, REST_ALARM_DURATION * 1000);
+  restAlarmTimeouts.push(stopId);
 }
 function playBeep(){
   try{
@@ -2028,7 +2032,7 @@ exTimerBtn.addEventListener('click', () => {
   d[exModalSide][exModalIndex].rest = exRestSeconds.value;
   saveDays();
 
-  restSoundChoice = document.getElementById('restSoundSelect')?.value || 'digital_alarm';
+  restSoundChoice = document.getElementById('restSoundSelect')?.value || 'alarm_clock';
   getRestAudioContext();
   clearRestAudioTimers();
   restCountdownPlayed = new Set();
@@ -2062,15 +2066,19 @@ function persistRestValue(){
   highlightRestPreset();
 }
 const restSoundSelect = document.getElementById('restSoundSelect');
-try{ restSoundSelect.value = localStorage.getItem('REPLOG_REST_SOUND') || 'digital_alarm'; }catch(e){}
-restSoundChoice = restSoundSelect.value || 'digital_alarm';
+try{ restSoundSelect.value = localStorage.getItem('REPLOG_REST_SOUND') || 'alarm_clock'; }catch(e){}
+restSoundChoice = restSoundSelect.value || 'alarm_clock';
+let restPreviewAudio = null;
 restSoundSelect.addEventListener('change', () => {
   restSoundChoice = restSoundSelect.value;
   try{ localStorage.setItem('REPLOG_REST_SOUND', restSoundChoice); }catch(e){}
-  // Play a quick one-cycle preview so you can hear each option as you pick it
-  const ctx = getRestAudioContext();
-  if(ctx && restSoundChoice !== 'silent' && ALARM_PATTERNS[restSoundChoice]){
-    ALARM_PATTERNS[restSoundChoice].play(ctx.currentTime + 0.02);
+  // Play a short preview so you can hear each option as you pick it
+  if(restPreviewAudio){ try{ restPreviewAudio.pause(); }catch(e){} restPreviewAudio = null; }
+  const file = ALARM_FILES[restSoundChoice];
+  if(restSoundChoice !== 'silent' && file){
+    restPreviewAudio = new Audio(file);
+    restPreviewAudio.play().catch(()=>{});
+    setTimeout(() => { if(restPreviewAudio){ try{ restPreviewAudio.pause(); }catch(e){} } }, 2500);
   }
 });
 
