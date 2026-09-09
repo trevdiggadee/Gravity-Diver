@@ -1547,6 +1547,7 @@ let restAudioCtx = null;
 let restAlarmTimeouts = [];
 let restAlarmOscillators = [];
 let restAlarmAudio = null;
+let primedAlarmAudio = {};
 let restCountdownPlayed = new Set();
 let restSoundChoice = 'alarm_clock';
 
@@ -1606,13 +1607,39 @@ const ALARM_FILES = {
 };
 const REST_ALARM_DURATION = 5; // seconds the alarm sounds off for when the timer ends
 
+// Mobile browsers only allow audio playback that's triggered directly by a
+// user gesture (a tap/click). The rest timer fires from a background
+// setInterval, which doesn't count — so we "prime" the chosen clip (play it
+// silently for an instant, then pause) right when Start Rest is tapped. That
+// unlocks playback on this same <audio> element so it can play later when
+// the timer actually ends.
+function primeAlarmAudio(key){
+  if(key === 'silent') return;
+  const file = ALARM_FILES[key];
+  if(!file) return;
+  let audio = primedAlarmAudio[key];
+  if(!audio){
+    audio = new Audio(file);
+    audio.loop = true;
+    primedAlarmAudio[key] = audio;
+  }
+  const wasMuted = audio.muted;
+  audio.muted = true;
+  const p = audio.play();
+  if(p && p.catch) p.catch(()=>{});
+  audio.pause();
+  audio.currentTime = 0;
+  audio.muted = wasMuted;
+}
+
 function playBuzzer(){
   stopRestAlarm();
   if(restSoundChoice === 'silent') return;
   const file = ALARM_FILES[restSoundChoice];
   if(!file) return;
-  restAlarmAudio = new Audio(file);
+  restAlarmAudio = primedAlarmAudio[restSoundChoice] || new Audio(file);
   restAlarmAudio.loop = true; // tile the clip back-to-back to fill the alarm window
+  restAlarmAudio.currentTime = 0;
   restAlarmAudio.play().catch(()=>{});
   const stopId = setTimeout(() => {
     if(restAlarmAudio){ try{ restAlarmAudio.pause(); restAlarmAudio.currentTime = 0; }catch(e){} }
@@ -2033,6 +2060,7 @@ exTimerBtn.addEventListener('click', () => {
   saveDays();
 
   restSoundChoice = document.getElementById('restSoundSelect')?.value || 'alarm_clock';
+  primeAlarmAudio(restSoundChoice);
   getRestAudioContext();
   clearRestAudioTimers();
   restCountdownPlayed = new Set();
@@ -2072,6 +2100,7 @@ let restPreviewAudio = null;
 restSoundSelect.addEventListener('change', () => {
   restSoundChoice = restSoundSelect.value;
   try{ localStorage.setItem('REPLOG_REST_SOUND', restSoundChoice); }catch(e){}
+  primeAlarmAudio(restSoundChoice);
   // Play a short preview so you can hear each option as you pick it
   if(restPreviewAudio){ try{ restPreviewAudio.pause(); }catch(e){} restPreviewAudio = null; }
   const file = ALARM_FILES[restSoundChoice];
