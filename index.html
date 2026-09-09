@@ -1121,6 +1121,18 @@
           <div class="profile-save-row"><button type="button" class="btn-primary" id="savePrsBtn">Save Personal Records</button></div>
           <div class="profile-note">PRs can later be used to calculate estimated 1RM percentages, relative intensity, volume load, and progression targets.</div>
         </div>
+
+        <div class="profile-card wide">
+          <h3>Backup &amp; Restore</h3>
+          <div class="profile-card-sub">RepLog stores everything on this device only. Export a backup file regularly so a cleared browser, a new device, or a new browser never costs you your program or history.</div>
+          <input id="importBackupInput" type="file" accept="application/json,.json" hidden>
+          <div class="profile-save-row">
+            <button type="button" class="btn-primary" id="exportBackupBtn">Export Backup</button>
+            <button type="button" class="btn-ghost" id="importBackupBtn">Import Backup</button>
+          </div>
+          <div class="profile-msg" id="backupMsg"></div>
+          <div class="profile-note">Importing replaces your current program, history, profile, and Vibe color on this device with whatever is in the backup file.</div>
+        </div>
       </div>
     </div>
   </div>
@@ -3123,6 +3135,104 @@ savePrsBtn.addEventListener('click',async()=>{
   try{await updateProfileMetadata({personal_records:prs},'Personal records saved!');}
   catch(err){profileMsg.style.color='var(--danger)';profileMsg.textContent=err.message||'Could not save personal records.';}
   finally{savePrsBtn.disabled=false;}
+});
+
+/* ---------------------------------------------------------
+   BACKUP & RESTORE — full local state as a downloadable JSON file
+--------------------------------------------------------- */
+const exportBackupBtn = document.getElementById('exportBackupBtn');
+const importBackupBtn = document.getElementById('importBackupBtn');
+const importBackupInput = document.getElementById('importBackupInput');
+const backupMsg = document.getElementById('backupMsg');
+
+function readLocalThemeRaw(){
+  try{ return JSON.parse(localStorage.getItem(STORAGE_THEME) || 'null'); }
+  catch(e){ return null; }
+}
+function readLocalRestSoundRaw(){
+  try{ return localStorage.getItem('REPLOG_REST_SOUND') || null; }
+  catch(e){ return null; }
+}
+
+exportBackupBtn.addEventListener('click', async () => {
+  exportBackupBtn.disabled = true;
+  backupMsg.style.color = '';
+  backupMsg.textContent = 'Preparing backup…';
+  try{
+    const state = await readLocalState();
+    const backup = {
+      app: 'RepLog',
+      backupVersion: 1,
+      exportedAt: new Date().toISOString(),
+      days: (state && state.days) || days,
+      history: (state && state.history) || history,
+      user: (state && state.user) || currentUser,
+      theme: readLocalThemeRaw(),
+      restSound: readLocalRestSoundRaw()
+    };
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const stamp = new Date().toISOString().slice(0,10);
+    a.href = url;
+    a.download = `replog-backup-${stamp}.json`;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+    backupMsg.style.color = 'var(--neon-strong)';
+    backupMsg.textContent = 'Backup downloaded!';
+  }catch(err){
+    backupMsg.style.color = 'var(--danger)';
+    backupMsg.textContent = (err && err.message) || 'Could not create backup.';
+  }finally{
+    exportBackupBtn.disabled = false;
+  }
+});
+
+importBackupBtn.addEventListener('click', () => importBackupInput.click());
+importBackupInput.addEventListener('change', async () => {
+  const file = importBackupInput.files && importBackupInput.files[0];
+  importBackupInput.value = '';
+  if(!file) return;
+
+  backupMsg.style.color = '';
+  backupMsg.textContent = 'Reading backup…';
+  try{
+    const text = await file.text();
+    const parsed = JSON.parse(text);
+    if(!parsed || !isValidDaysShape(parsed.days)){
+      throw new Error("That file doesn't look like a RepLog backup.");
+    }
+    const ok = confirm('This will replace your current program, history, profile, and Vibe color on this device with the contents of this backup file. This cannot be undone. Continue?');
+    if(!ok){ backupMsg.textContent = ''; return; }
+
+    const restoredDays = normalizeDaysLength(parsed.days);
+    const restoredHistory = Array.isArray(parsed.history) ? parsed.history : [];
+    const restoredUser = parsed.user || currentUser;
+
+    await writeLocalState({ days: restoredDays, history: restoredHistory, user: restoredUser });
+    localStateLoaded = true;
+    days = restoredDays;
+    history = restoredHistory;
+    currentUser = restoredUser;
+
+    if(parsed.theme && parsed.theme.hex){
+      applyTheme(parsed.theme, { silent: true });
+    }
+    if(parsed.restSound){
+      try{ localStorage.setItem('REPLOG_REST_SOUND', parsed.restSound); }catch(e){}
+      if(restSoundSelect) restSoundSelect.value = parsed.restSound;
+    }
+
+    activeDay = 0;
+    renderProfile();
+    renderAll();
+    backupMsg.style.color = 'var(--neon-strong)';
+    backupMsg.textContent = 'Backup restored!';
+    showToast('Backup restored successfully.', 5000);
+  }catch(err){
+    backupMsg.style.color = 'var(--danger)';
+    backupMsg.textContent = (err && err.message) || 'Could not restore that backup file.';
+  }
 });
 
 </script>
