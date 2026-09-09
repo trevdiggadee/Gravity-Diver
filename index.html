@@ -1178,16 +1178,16 @@
       <div class="rest-sound-row">
         <label for="restSoundSelect">Alarm sound</label>
         <select id="restSoundSelect" class="rest-sound-select">
-          <option value="oga_alarm">Digital Alarm</option>
-          <option value="bell">Classic Bell</option>
-          <option value="point_bell">Point Bell</option>
-          <option value="chime_1">Chime 1</option>
-          <option value="chime_2">Chime 2</option>
-          <option value="chime_3">Chime 3</option>
-          <option value="chime_4">Chime 4</option>
-          <option value="pleasing">Pleasing Bell</option>
+          <option value="digital_alarm">Digital Alarm</option>
+          <option value="classic_bell">Classic Bell</option>
+          <option value="triple_beep">Triple Beep</option>
+          <option value="chime_rise">Chime Rise</option>
+          <option value="chime_fall">Chime Fall</option>
+          <option value="siren">Siren</option>
+          <option value="buzzer">Buzzer</option>
           <option value="doorbell">Doorbell</option>
-          <option value="vocal">Vocal Alarm</option>
+          <option value="foghorn">Foghorn</option>
+          <option value="retro_alarm">Retro Alarm</option>
           <option value="silent">Silent</option>
         </select>
       </div>
@@ -1544,25 +1544,9 @@ function formatHMS(totalSeconds){
 }
 let restAudioCtx = null;
 let restAlarmTimeouts = [];
+let restAlarmOscillators = [];
 let restCountdownPlayed = new Set();
-let restSoundChoice = 'oga_alarm';
-let restAlarmAudio = null;
-
-const REST_ALARM_SOURCES = {
-  // CC0 / public-domain sources from OpenGameArt. These are used only for
-  // the 10-second end-of-rest alarm; the 5-second countdown beep stays native
-  // Web Audio so it remains exactly the same regardless of alarm selection.
-  oga_alarm: 'https://opengameart.org/sites/default/files/alarm_2.wav',
-  bell: 'https://opengameart.org/sites/default/files/bell.wav',
-  point_bell: 'https://opengameart.org/sites/default/files/sd_0.wav',
-  chime_1: 'https://opengameart.org/sites/default/files/bell_ding1.wav',
-  chime_2: 'https://opengameart.org/sites/default/files/bell_ding2.wav',
-  chime_3: 'https://opengameart.org/sites/default/files/bell_ding3.wav',
-  chime_4: 'https://opengameart.org/sites/default/files/bell_ding4.wav',
-  pleasing: 'https://opengameart.org/sites/default/files/pleasing-bell.wav',
-  doorbell: 'https://opengameart.org/sites/default/files/doorbell.wav',
-  vocal: 'https://opengameart.org/sites/default/files/alarme_0.ogg'
-};
+let restSoundChoice = 'digital_alarm';
 
 function getRestAudioContext(){
   try{
@@ -1585,6 +1569,7 @@ function scheduleTone(freq, start, duration, type='sine', volume=.18, endFreq=nu
   g.gain.exponentialRampToValueAtTime(volume,start+.008);
   g.gain.exponentialRampToValueAtTime(.0001,start+duration);
   o.start(start); o.stop(start+duration+.02);
+  restAlarmOscillators.push(o);
 }
 function playCountdownBeep(){
   // Keep the 5-second countdown sound identical no matter which alarm is selected.
@@ -1594,48 +1579,41 @@ function playCountdownBeep(){
 }
 function stopRestAlarm(){
   clearRestAudioTimers();
-  if(restAlarmAudio){
-    try{
-      restAlarmAudio.pause();
-      restAlarmAudio.currentTime = 0;
-      restAlarmAudio.removeAttribute('src');
-      restAlarmAudio.load();
-    }catch(e){}
-    restAlarmAudio=null;
-  }
+  restAlarmOscillators.forEach(o => { try{ o.stop(); }catch(e){} });
+  restAlarmOscillators = [];
 }
+
+// Fully self-contained (Web Audio only) alarm bank — no external files, so it
+// always plays, offline or online. Each entry's `play(t)` schedules one cycle
+// starting at time t; `cycle` is that pattern's length so playBuzzer() can
+// tile it back-to-back to fill the full 5-second alarm window.
+const ALARM_PATTERNS = {
+  digital_alarm: { cycle: 0.5, play:(t)=>{ scheduleTone(1000,t,0.15,'square',.22); scheduleTone(800,t+0.22,0.15,'square',.22); } },
+  classic_bell:  { cycle: 0.9, play:(t)=>{ scheduleTone(1046.5,t,0.8,'sine',.25,880); scheduleTone(1568,t,0.6,'sine',.10,1400); } },
+  triple_beep:   { cycle: 0.7, play:(t)=>{ scheduleTone(1200,t,0.1,'square',.22); scheduleTone(1200,t+0.16,0.1,'square',.22); scheduleTone(1200,t+0.32,0.1,'square',.22); } },
+  chime_rise:    { cycle: 0.7, play:(t)=>{ [523.25,659.25,783.99,1046.5].forEach((f,i)=>scheduleTone(f,t+i*0.12,0.28,'triangle',.2)); } },
+  chime_fall:    { cycle: 0.7, play:(t)=>{ [1046.5,783.99,659.25,523.25].forEach((f,i)=>scheduleTone(f,t+i*0.12,0.28,'triangle',.2)); } },
+  siren:         { cycle: 1.0, play:(t)=>{ scheduleTone(500,t,0.5,'sawtooth',.16,1000); scheduleTone(1000,t+0.5,0.5,'sawtooth',.16,500); } },
+  buzzer:        { cycle: 0.5, play:(t)=>{ scheduleTone(180,t,0.22,'sawtooth',.28,140); scheduleTone(180,t+0.28,0.22,'sawtooth',.28,140); } },
+  doorbell:      { cycle: 0.9, play:(t)=>{ scheduleTone(783.99,t,0.35,'sine',.22); scheduleTone(659.25,t+0.30,0.45,'sine',.22); } },
+  foghorn:       { cycle: 1.1, play:(t)=>{ scheduleTone(160,t,0.9,'sawtooth',.2,150); } },
+  retro_alarm:   { cycle: 0.32, play:(t)=>{ scheduleTone(1400,t,0.08,'square',.2); scheduleTone(900,t+0.1,0.08,'square',.2); } }
+};
+const REST_ALARM_DURATION = 5; // seconds the buzzer sounds off for when the timer ends
+
 function playBuzzer(){
-  // Play exactly ONE selected alarm. Do not layer a synthesized fallback on top;
-  // that could make iOS sound like two alarms at once.
   stopRestAlarm();
-  if(restSoundChoice==='silent') return;
-
-  const src = REST_ALARM_SOURCES[restSoundChoice];
-  if(!src) return;
-
-  const audio = new Audio();
-  restAlarmAudio = audio;
-  audio.preload = 'auto';
-  audio.volume = .82;
-  audio.loop = true;
-  audio.playsInline = true;
-  audio.src = src;
-
-  const endAlarm = () => {
-    if(restAlarmAudio !== audio) return;
-    stopRestAlarm();
-  };
-
-  // A single source is allowed to play for the full 10-second alarm window.
-  const playPromise = audio.play();
-  if(playPromise && typeof playPromise.catch === 'function'){
-    playPromise.catch((err) => {
-      // Never add another sound on failure. This prevents a hidden second
-      // alarm from being heard alongside the selected open-source sound.
-      console.warn('RepLog alarm could not play:', err);
-    });
+  if(restSoundChoice === 'silent') return;
+  const pattern = ALARM_PATTERNS[restSoundChoice];
+  if(!pattern) return;
+  const ctx = getRestAudioContext();
+  if(!ctx) return;
+  const startAt = ctx.currentTime + 0.02;
+  let t = startAt;
+  while(t < startAt + REST_ALARM_DURATION){
+    pattern.play(t);
+    t += pattern.cycle;
   }
-  restAlarmTimeouts.push(setTimeout(endAlarm, 10000));
 }
 function playBeep(){
   try{
@@ -2050,7 +2028,7 @@ exTimerBtn.addEventListener('click', () => {
   d[exModalSide][exModalIndex].rest = exRestSeconds.value;
   saveDays();
 
-  restSoundChoice = document.getElementById('restSoundSelect')?.value || 'classic';
+  restSoundChoice = document.getElementById('restSoundSelect')?.value || 'digital_alarm';
   getRestAudioContext();
   clearRestAudioTimers();
   restCountdownPlayed = new Set();
@@ -2084,12 +2062,16 @@ function persistRestValue(){
   highlightRestPreset();
 }
 const restSoundSelect = document.getElementById('restSoundSelect');
-try{ restSoundSelect.value = localStorage.getItem('REPLOG_REST_SOUND') || 'oga_alarm'; }catch(e){}
-restSoundChoice = restSoundSelect.value || 'oga_alarm';
+try{ restSoundSelect.value = localStorage.getItem('REPLOG_REST_SOUND') || 'digital_alarm'; }catch(e){}
+restSoundChoice = restSoundSelect.value || 'digital_alarm';
 restSoundSelect.addEventListener('change', () => {
   restSoundChoice = restSoundSelect.value;
   try{ localStorage.setItem('REPLOG_REST_SOUND', restSoundChoice); }catch(e){}
-  getRestAudioContext();
+  // Play a quick one-cycle preview so you can hear each option as you pick it
+  const ctx = getRestAudioContext();
+  if(ctx && restSoundChoice !== 'silent' && ALARM_PATTERNS[restSoundChoice]){
+    ALARM_PATTERNS[restSoundChoice].play(ctx.currentTime + 0.02);
+  }
 });
 
 function highlightRestPreset(){
