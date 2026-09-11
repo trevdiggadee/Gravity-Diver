@@ -344,6 +344,43 @@
     font-size:22px; line-height:1; cursor:pointer; z-index:3;
   }
   .ex-modal-close:hover{ color: var(--danger); }
+  .calc-open-btn{
+    position:absolute; top:10px; left:12px; z-index:3;
+    background: var(--panel-3); border:1px solid var(--line); color: var(--chalk-dim);
+    width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-size:15px; cursor:pointer; transition: all .15s ease;
+  }
+  .calc-open-btn:hover{ color: var(--neon); border-color: var(--neon); background: rgba(var(--neon-rgb),0.08); }
+
+  .calc-modal-overlay{
+    display:none; position:fixed; inset:0; z-index:60; background: rgba(3,4,4,.82); backdrop-filter: blur(6px);
+    align-items:center; justify-content:center; padding:20px;
+  }
+  .calc-modal-overlay.show{ display:flex; animation: fadeIn .18s ease; }
+  .calc-modal{
+    position:relative; width:100%; max-width:300px; background: var(--panel); border:1px solid var(--neon);
+    border-radius: 22px; padding: 18px 16px 16px; box-shadow: 0 0 55px rgba(var(--neon-rgb),0.25); animation: popIn .2s ease;
+  }
+  .calc-display{
+    background: var(--panel-3); border:1px solid var(--line); border-radius: var(--radius-sm);
+    padding: 16px 14px; text-align:right; margin-bottom:12px;
+  }
+  .calc-display .calc-prev{ font-size:12px; color: var(--chalk-faint); min-height:14px; font-family:'JetBrains Mono',monospace; }
+  .calc-display .calc-current{ font-size:30px; color: var(--chalk); font-family:'JetBrains Mono',monospace; font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .calc-grid{ display:grid; grid-template-columns: repeat(4, 1fr); gap:8px; }
+  .calc-key{
+    background: var(--panel-3); border:1px solid var(--line); color: var(--chalk); font:inherit; font-size:17px; font-weight:600;
+    padding:14px 0; border-radius: var(--radius-sm); cursor:pointer; transition: all .12s ease;
+  }
+  .calc-key:active{ transform: scale(.94); }
+  .calc-key:hover{ border-color: var(--chalk-dim); }
+  .calc-key.op{ background: rgba(var(--neon-rgb),0.1); color: var(--neon-strong); border-color: rgba(var(--neon-rgb),0.3); }
+  .calc-key.op:hover{ border-color: var(--neon); }
+  .calc-key.clear{ color: var(--danger); }
+  .calc-key.wide{ grid-column: span 2; }
+  .calc-insert-row{ display:flex; gap:8px; margin-top:12px; }
+  .calc-insert-row button{ flex:1; }
+  .calc-target-label{ text-align:center; font-size:11px; color: var(--chalk-faint); margin-top:10px; letter-spacing:.03em; }
   .ex-modal .eyebrow{ font-size:11px; letter-spacing:.14em; color: var(--chalk-faint); text-transform:uppercase; text-align:center; margin-bottom:6px; }
   .ex-modal-title{ text-align:center; font-family:'Oswald',sans-serif; font-size:19px; color: var(--chalk); margin-bottom: 10px; }
 
@@ -1154,6 +1191,7 @@
 <div class="ex-modal-overlay" id="exModalOverlay">
   <div class="ex-modal" id="exModal">
     <button type="button" class="ex-modal-close" id="exModalClose" title="Close">×</button>
+    <button type="button" class="calc-open-btn" id="calcOpenBtn" title="Calculator">🧮</button>
     <div class="eyebrow">Logging Sets</div>
     <div class="ex-modal-title" id="exModalTitle">Exercise</div>
     <div class="ex-pr-badge" id="exPrBadge"></div>
@@ -1179,14 +1217,14 @@
         <label for="restSoundSelect">Alarm sound</label>
         <select id="restSoundSelect" class="rest-sound-select">
           <option value="alarm_clock">Alarm Clock</option>
-          <option value="security_alarm">Security Alarm</option>
+          <option value="car">Car</option>
           <option value="siren">Siren</option>
-          <option value="biohazard">Biohazard Alert</option>
-          <option value="community">Community Alert</option>
-          <option value="car_horn">Car Horn</option>
+          <option value="security_alarm">Security Alarm</option>
+          <option value="biohazard">Biohazard</option>
+          <option value="community">Community</option>
           <option value="scratch">Scratch</option>
-          <option value="japan_eas">Japan EAS</option>
           <option value="greece_eas">Greece EAS</option>
+          <option value="japan_eas">Japan EAS</option>
           <option value="malaysia_eas">Malaysia EAS</option>
           <option value="saudi_arabia_eas">Saudi Arabia EAS</option>
           <option value="silent">Silent</option>
@@ -1219,6 +1257,42 @@
       <button type="button" class="timer-btn-wide" id="exTimerBtn"></button>
     </div>
     <button type="button" class="btn-primary" id="exFinishBtn">Finish Exercise</button>
+  </div>
+</div>
+
+<!-- CALCULATOR POPUP -->
+<div class="calc-modal-overlay" id="calcModalOverlay">
+  <div class="calc-modal">
+    <button type="button" class="ex-modal-close" id="calcModalClose" title="Close">×</button>
+    <div class="calc-display">
+      <div class="calc-prev" id="calcPrev">&nbsp;</div>
+      <div class="calc-current" id="calcCurrent">0</div>
+    </div>
+    <div class="calc-grid">
+      <button type="button" class="calc-key clear" data-key="C">C</button>
+      <button type="button" class="calc-key op" data-key="backspace">⌫</button>
+      <button type="button" class="calc-key op" data-key="%">%</button>
+      <button type="button" class="calc-key op" data-key="/">÷</button>
+      <button type="button" class="calc-key" data-key="7">7</button>
+      <button type="button" class="calc-key" data-key="8">8</button>
+      <button type="button" class="calc-key" data-key="9">9</button>
+      <button type="button" class="calc-key op" data-key="*">×</button>
+      <button type="button" class="calc-key" data-key="4">4</button>
+      <button type="button" class="calc-key" data-key="5">5</button>
+      <button type="button" class="calc-key" data-key="6">6</button>
+      <button type="button" class="calc-key op" data-key="-">−</button>
+      <button type="button" class="calc-key" data-key="1">1</button>
+      <button type="button" class="calc-key" data-key="2">2</button>
+      <button type="button" class="calc-key" data-key="3">3</button>
+      <button type="button" class="calc-key op" data-key="+">+</button>
+      <button type="button" class="calc-key wide" data-key="0">0</button>
+      <button type="button" class="calc-key" data-key=".">.</button>
+      <button type="button" class="calc-key op" data-key="=">=</button>
+    </div>
+    <div class="calc-target-label" id="calcTargetLabel">Tap a Reps, Weight, or Rest field, then use this</div>
+    <div class="calc-insert-row">
+      <button type="button" class="btn-primary" id="calcInsertBtn">Use This Value</button>
+    </div>
   </div>
 </div>
 
@@ -1545,11 +1619,10 @@ function formatHMS(totalSeconds){
 }
 let restAudioCtx = null;
 let restAlarmTimeouts = [];
-let restAlarmOscillators = [];
-let restAlarmAudio = null;
-let primedAlarmAudio = {};
 let restCountdownPlayed = new Set();
 let restSoundChoice = 'alarm_clock';
+let restAlarmAudio = null;
+let restAlarmStopTimer = null;
 
 function getRestAudioContext(){
   try{
@@ -1572,7 +1645,6 @@ function scheduleTone(freq, start, duration, type='sine', volume=.18, endFreq=nu
   g.gain.exponentialRampToValueAtTime(volume,start+.008);
   g.gain.exponentialRampToValueAtTime(.0001,start+duration);
   o.start(start); o.stop(start+duration+.02);
-  restAlarmOscillators.push(o);
 }
 function playCountdownBeep(){
   // Keep the 5-second countdown sound identical no matter which alarm is selected.
@@ -1582,69 +1654,49 @@ function playCountdownBeep(){
 }
 function stopRestAlarm(){
   clearRestAudioTimers();
+  if(restAlarmStopTimer){ clearTimeout(restAlarmStopTimer); restAlarmStopTimer = null; }
   if(restAlarmAudio){
     try{ restAlarmAudio.pause(); restAlarmAudio.currentTime = 0; }catch(e){}
     restAlarmAudio = null;
   }
-  restAlarmOscillators.forEach(o => { try{ o.stop(); }catch(e){} });
-  restAlarmOscillators = [];
 }
 
-// Alarm bank — real audio files living alongside this page in /sounds.
-// Each entry maps a select option's value to the file that plays for it.
-const ALARM_FILES = {
+// Real alarm-sound files, sitting right next to index.html (same folder), so a
+// plain relative filename resolves correctly wherever RepLog is deployed.
+const ALARM_SOUND_FILES = {
   alarm_clock:      'alarm_clock.mp3',
-  security_alarm:   'security-alarm.mp3',
+  car:              'Car.mp3',
   siren:            'Siren.mp3',
+  security_alarm:   'security-alarm.mp3',
   biohazard:        'biohazard.mp3',
   community:        'community.mp3',
-  car_horn:         'Car.mp3',
   scratch:          'scratch.mp3',
-  japan_eas:        'japan-eas.mp3',
   greece_eas:       'greece-eas.mp3',
+  japan_eas:        'japan-eas.mp3',
   malaysia_eas:     'malaysia-eas.mp3',
   saudi_arabia_eas: 'saudi-arabia-eas.mp3'
 };
-const REST_ALARM_DURATION = 5; // seconds the alarm sounds off for when the timer ends
-
-// Mobile browsers only allow audio playback that's triggered directly by a
-// user gesture (a tap/click). The rest timer fires from a background
-// setInterval, which doesn't count — so we "prime" the chosen clip (play it
-// silently for an instant, then pause) right when Start Rest is tapped. That
-// unlocks playback on this same <audio> element so it can play later when
-// the timer actually ends.
-function primeAlarmAudio(key){
-  if(key === 'silent') return;
-  const file = ALARM_FILES[key];
-  if(!file) return;
-  let audio = primedAlarmAudio[key];
-  if(!audio){
-    audio = new Audio(file);
-    audio.loop = true;
-    primedAlarmAudio[key] = audio;
-  }
-  const wasMuted = audio.muted;
-  audio.muted = true;
-  const p = audio.play();
-  if(p && p.catch) p.catch(()=>{});
-  audio.pause();
-  audio.currentTime = 0;
-  audio.muted = wasMuted;
-}
+const REST_ALARM_DURATION = 5; // seconds the buzzer sounds off for when the timer ends
 
 function playBuzzer(){
   stopRestAlarm();
   if(restSoundChoice === 'silent') return;
-  const file = ALARM_FILES[restSoundChoice];
+  const file = ALARM_SOUND_FILES[restSoundChoice];
   if(!file) return;
-  restAlarmAudio = primedAlarmAudio[restSoundChoice] || new Audio(file);
-  restAlarmAudio.loop = true; // tile the clip back-to-back to fill the alarm window
-  restAlarmAudio.currentTime = 0;
-  restAlarmAudio.play().catch(()=>{});
-  const stopId = setTimeout(() => {
-    if(restAlarmAudio){ try{ restAlarmAudio.pause(); restAlarmAudio.currentTime = 0; }catch(e){} }
+
+  const audio = new Audio(file);
+  restAlarmAudio = audio;
+  audio.loop = true; // fills the full window even if the clip itself is shorter than 5s
+  audio.volume = 0.85;
+  audio.playsInline = true;
+
+  const playPromise = audio.play();
+  if(playPromise && typeof playPromise.catch === 'function'){
+    playPromise.catch((err) => console.warn('RepLog alarm could not play:', err));
+  }
+  restAlarmStopTimer = setTimeout(() => {
+    if(restAlarmAudio === audio) stopRestAlarm();
   }, REST_ALARM_DURATION * 1000);
-  restAlarmTimeouts.push(stopId);
 }
 function playBeep(){
   try{
@@ -2059,8 +2111,7 @@ exTimerBtn.addEventListener('click', () => {
   d[exModalSide][exModalIndex].rest = exRestSeconds.value;
   saveDays();
 
-  restSoundChoice = document.getElementById('restSoundSelect')?.value || 'alarm_clock';
-  primeAlarmAudio(restSoundChoice);
+  restSoundChoice = document.getElementById('restSoundSelect')?.value || 'digital_alarm';
   getRestAudioContext();
   clearRestAudioTimers();
   restCountdownPlayed = new Set();
@@ -2094,20 +2145,17 @@ function persistRestValue(){
   highlightRestPreset();
 }
 const restSoundSelect = document.getElementById('restSoundSelect');
-try{ restSoundSelect.value = localStorage.getItem('REPLOG_REST_SOUND') || 'alarm_clock'; }catch(e){}
-restSoundChoice = restSoundSelect.value || 'alarm_clock';
-let restPreviewAudio = null;
+try{ restSoundSelect.value = localStorage.getItem('REPLOG_REST_SOUND') || 'digital_alarm'; }catch(e){}
+restSoundChoice = restSoundSelect.value || 'digital_alarm';
 restSoundSelect.addEventListener('change', () => {
   restSoundChoice = restSoundSelect.value;
   try{ localStorage.setItem('REPLOG_REST_SOUND', restSoundChoice); }catch(e){}
-  primeAlarmAudio(restSoundChoice);
-  // Play a short preview so you can hear each option as you pick it
-  if(restPreviewAudio){ try{ restPreviewAudio.pause(); }catch(e){} restPreviewAudio = null; }
-  const file = ALARM_FILES[restSoundChoice];
-  if(restSoundChoice !== 'silent' && file){
-    restPreviewAudio = new Audio(file);
-    restPreviewAudio.play().catch(()=>{});
-    setTimeout(() => { if(restPreviewAudio){ try{ restPreviewAudio.pause(); }catch(e){} } }, 2500);
+  // Play a short preview clip so you can hear each option as you pick it
+  if(restSoundChoice !== 'silent' && ALARM_SOUND_FILES[restSoundChoice]){
+    const preview = new Audio(ALARM_SOUND_FILES[restSoundChoice]);
+    preview.volume = 0.85;
+    preview.play().catch(() => {});
+    setTimeout(() => { try{ preview.pause(); }catch(e){} }, 1500);
   }
 });
 
@@ -2294,6 +2342,132 @@ function closeExerciseModal(){
   renderSlots();
 }
 exModalClose.addEventListener('click', closeExerciseModal);
+
+/* ---------------------------------------------------------
+   CALCULATOR — quick plate/weight math, inserts into whichever
+   Reps, Weight, or Rest field you last tapped in the exercise popup
+--------------------------------------------------------- */
+const calcModalOverlay = document.getElementById('calcModalOverlay');
+const calcOpenBtn = document.getElementById('calcOpenBtn');
+const calcModalClose = document.getElementById('calcModalClose');
+const calcCurrent = document.getElementById('calcCurrent');
+const calcPrev = document.getElementById('calcPrev');
+const calcInsertBtn = document.getElementById('calcInsertBtn');
+const calcTargetLabel = document.getElementById('calcTargetLabel');
+
+let calcTargetInput = null;
+let calcDisplay = '0';
+let calcStored = null;
+let calcOperator = null;
+let calcResetOnNextDigit = false;
+
+document.addEventListener('focusin', (e) => {
+  if(!exModalOverlay.classList.contains('show')) return;
+  if(e.target.matches && e.target.matches('.ex-reps, .ex-weight, #exRestSeconds')){
+    calcTargetInput = e.target;
+    updateCalcTargetLabel();
+  }
+});
+
+function updateCalcTargetLabel(){
+  if(!calcTargetLabel) return;
+  if(!calcTargetInput || !document.body.contains(calcTargetInput)){
+    calcTargetLabel.textContent = 'Tap a Reps, Weight, or Rest field, then use this';
+    return;
+  }
+  let label = 'that field';
+  if(calcTargetInput.classList.contains('ex-reps')) label = 'Reps';
+  else if(calcTargetInput.classList.contains('ex-weight')) label = 'Weight';
+  else if(calcTargetInput.id === 'exRestSeconds') label = 'Rest seconds';
+  calcTargetLabel.textContent = `Result will fill: ${label}`;
+}
+
+function calcOpSymbol(op){ return { '+':'+', '-':'−', '*':'×', '/':'÷' }[op] || ''; }
+function formatCalcNum(n){
+  if(!isFinite(n)) return '0';
+  return String(Math.round(n * 1e6) / 1e6);
+}
+function calcRender(){
+  calcCurrent.textContent = calcDisplay;
+  calcPrev.textContent = (calcStored != null && calcOperator) ? `${formatCalcNum(calcStored)} ${calcOpSymbol(calcOperator)}` : '\u00a0';
+}
+function calcInputDigit(d){
+  if(calcResetOnNextDigit || calcDisplay === '0'){
+    calcDisplay = (d === '.') ? '0.' : d;
+    calcResetOnNextDigit = false;
+  } else {
+    if(d === '.' && calcDisplay.includes('.')) return;
+    calcDisplay += d;
+  }
+  calcRender();
+}
+function calcCompute(a, b, op){
+  switch(op){
+    case '+': return a + b;
+    case '-': return a - b;
+    case '*': return a * b;
+    case '/': return b === 0 ? 0 : a / b;
+    default: return b;
+  }
+}
+function calcApplyOperator(op){
+  const current = parseFloat(calcDisplay) || 0;
+  if(calcStored != null && calcOperator && !calcResetOnNextDigit){
+    calcStored = calcCompute(calcStored, current, calcOperator);
+    calcDisplay = formatCalcNum(calcStored);
+  } else {
+    calcStored = current;
+  }
+  calcOperator = (op === '=') ? null : op;
+  calcResetOnNextDigit = true;
+  calcRender();
+}
+function calcClear(){
+  calcDisplay = '0'; calcStored = null; calcOperator = null; calcResetOnNextDigit = false;
+  calcRender();
+}
+function calcBackspace(){
+  if(calcResetOnNextDigit) return;
+  calcDisplay = calcDisplay.length > 1 ? calcDisplay.slice(0,-1) : '0';
+  calcRender();
+}
+function calcPercent(){
+  calcDisplay = formatCalcNum((parseFloat(calcDisplay) || 0) / 100);
+  calcRender();
+}
+document.querySelectorAll('.calc-key').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const key = btn.dataset.key;
+    if(key === 'C') calcClear();
+    else if(key === 'backspace') calcBackspace();
+    else if(key === '%') calcPercent();
+    else if(key === '+' || key === '-' || key === '*' || key === '/' || key === '=') calcApplyOperator(key);
+    else calcInputDigit(key);
+  });
+});
+
+function openCalcModal(){
+  calcClear();
+  updateCalcTargetLabel();
+  calcModalOverlay.classList.add('show');
+}
+function closeCalcModal(){
+  calcModalOverlay.classList.remove('show');
+}
+calcOpenBtn.addEventListener('click', openCalcModal);
+calcModalClose.addEventListener('click', closeCalcModal);
+calcModalOverlay.addEventListener('click', (e) => { if(e.target === calcModalOverlay) closeCalcModal(); });
+
+calcInsertBtn.addEventListener('click', () => {
+  if(!calcTargetInput || !document.body.contains(calcTargetInput)){
+    showToast("Tap a Reps, Weight, or Rest field first, then use the calculator.");
+    return;
+  }
+  calcTargetInput.value = calcDisplay;
+  calcTargetInput.dispatchEvent(new Event('input', { bubbles: true }));
+  calcTargetInput.focus();
+  closeCalcModal();
+});
 
 /* ---------------------------------------------------------
    SESSION (TOTAL WORKOUT TIME) TIMER
