@@ -356,27 +356,40 @@
     display:none; position:fixed; inset:0; z-index:60; background: rgba(3,4,4,.82); backdrop-filter: blur(6px);
     align-items:center; justify-content:center; padding:20px;
   }
-  .calc-modal-overlay.show{ display:flex; animation: fadeIn .18s ease; }
+  .calc-modal-overlay.show{ display:flex; animation: calcOverlayIn .1s ease; }
+  @keyframes calcOverlayIn{ from{ opacity:0; } to{ opacity:1; } }
+  @keyframes calcPopIn{ 0%{ transform:scale(.7); opacity:0; } 100%{ transform:scale(1); opacity:1; } }
   .calc-modal{
-    position:relative; width:100%; max-width:300px; background: var(--panel); border:1px solid var(--neon);
-    border-radius: 22px; padding: 18px 16px 16px; box-shadow: 0 0 55px rgba(var(--neon-rgb),0.25); animation: popIn .2s ease;
+    position:relative; width:100%; max-width:300px;
+    background: linear-gradient(160deg, rgba(var(--neon-rgb),0.10), var(--panel) 55%); border:1px solid var(--neon);
+    border-radius: 22px; padding: 18px 16px 16px; box-shadow: 0 0 60px rgba(var(--neon-rgb),0.35), 0 0 0 1px rgba(var(--neon-rgb),0.15) inset;
+    animation: calcPopIn .16s cubic-bezier(.34,1.56,.64,1);
+  }
+  .calc-heading{
+    text-align:center; font-family:'Oswald',sans-serif; font-size:13px; font-weight:700; letter-spacing:.14em;
+    text-transform:uppercase; color: var(--neon-strong); text-shadow: 0 0 12px rgba(var(--neon-rgb),0.5); margin-bottom:12px;
   }
   .calc-display{
-    background: var(--panel-3); border:1px solid var(--line); border-radius: var(--radius-sm);
+    background: rgba(var(--neon-rgb),0.06); border:1px solid rgba(var(--neon-rgb),0.25); border-radius: var(--radius-sm);
     padding: 16px 14px; text-align:right; margin-bottom:12px;
   }
   .calc-display .calc-prev{ font-size:12px; color: var(--chalk-faint); min-height:14px; font-family:'JetBrains Mono',monospace; }
-  .calc-display .calc-current{ font-size:30px; color: var(--chalk); font-family:'JetBrains Mono',monospace; font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .calc-display .calc-current{
+    font-size:30px; color: var(--neon-strong); font-family:'JetBrains Mono',monospace; font-weight:700;
+    text-shadow: 0 0 14px rgba(var(--neon-rgb),0.35); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
   .calc-grid{ display:grid; grid-template-columns: repeat(4, 1fr); gap:8px; }
   .calc-key{
-    background: var(--panel-3); border:1px solid var(--line); color: var(--chalk); font:inherit; font-size:17px; font-weight:600;
+    background: rgba(var(--neon-rgb),0.05); border:1px solid rgba(var(--neon-rgb),0.14); color: var(--chalk); font:inherit; font-size:17px; font-weight:600;
     padding:14px 0; border-radius: var(--radius-sm); cursor:pointer; transition: all .12s ease;
   }
-  .calc-key:active{ transform: scale(.94); }
-  .calc-key:hover{ border-color: var(--chalk-dim); }
-  .calc-key.op{ background: rgba(var(--neon-rgb),0.1); color: var(--neon-strong); border-color: rgba(var(--neon-rgb),0.3); }
-  .calc-key.op:hover{ border-color: var(--neon); }
-  .calc-key.clear{ color: var(--danger); }
+  .calc-key:active{ transform: scale(.9); }
+  .calc-key:hover{ border-color: rgba(var(--neon-rgb),0.4); background: rgba(var(--neon-rgb),0.1); }
+  .calc-key.op{ background: rgba(var(--neon-rgb),0.14); color: var(--neon-strong); border-color: rgba(var(--neon-rgb),0.4); }
+  .calc-key.op:hover{ border-color: var(--neon); background: rgba(var(--neon-rgb),0.22); }
+  .calc-key.op[data-key="="]{ background: var(--neon); color:#0a0c02; border-color: var(--neon); font-weight:800; box-shadow: 0 0 18px rgba(var(--neon-rgb),0.4); }
+  .calc-key.op[data-key="="]:hover{ filter: brightness(1.1); }
+  .calc-key.clear{ color: var(--danger); border-color: rgba(255,92,114,0.3); background: rgba(255,92,114,0.06); }
   .calc-key.wide{ grid-column: span 2; }
   .calc-insert-row{ display:flex; gap:8px; margin-top:12px; }
   .calc-insert-row button{ flex:1; }
@@ -1264,6 +1277,7 @@
 <div class="calc-modal-overlay" id="calcModalOverlay">
   <div class="calc-modal">
     <button type="button" class="ex-modal-close" id="calcModalClose" title="Close">×</button>
+    <div class="calc-heading">Calculator</div>
     <div class="calc-display">
       <div class="calc-prev" id="calcPrev">&nbsp;</div>
       <div class="calc-current" id="calcCurrent">0</div>
@@ -1655,9 +1669,19 @@ function playCountdownBeep(){
 function stopRestAlarm(){
   clearRestAudioTimers();
   if(restAlarmStopTimer){ clearTimeout(restAlarmStopTimer); restAlarmStopTimer = null; }
-  if(restAlarmAudio){
-    try{ restAlarmAudio.pause(); restAlarmAudio.currentTime = 0; }catch(e){}
-    restAlarmAudio = null;
+  const audio = restAlarmAudio;
+  restAlarmAudio = null;
+  if(audio){
+    audio.loop = false;
+    const silence = () => { try{ audio.pause(); audio.currentTime = 0; audio.muted = true; }catch(e){} };
+    // If play() hasn't actually resolved yet, pausing immediately can lose the
+    // race on some mobile browsers and the audio ends up playing anyway.
+    // Waiting for the promise to settle first makes the stop reliable.
+    if(audio._playPromise && typeof audio._playPromise.then === 'function'){
+      audio._playPromise.then(silence, silence);
+    } else {
+      silence();
+    }
   }
 }
 
@@ -1690,9 +1714,9 @@ function playBuzzer(){
   audio.volume = 0.85;
   audio.playsInline = true;
 
-  const playPromise = audio.play();
-  if(playPromise && typeof playPromise.catch === 'function'){
-    playPromise.catch((err) => console.warn('RepLog alarm could not play:', err));
+  audio._playPromise = audio.play();
+  if(audio._playPromise && typeof audio._playPromise.catch === 'function'){
+    audio._playPromise.catch((err) => console.warn('RepLog alarm could not play:', err));
   }
   restAlarmStopTimer = setTimeout(() => {
     if(restAlarmAudio === audio) stopRestAlarm();
@@ -2147,15 +2171,32 @@ function persistRestValue(){
 const restSoundSelect = document.getElementById('restSoundSelect');
 try{ restSoundSelect.value = localStorage.getItem('REPLOG_REST_SOUND') || 'digital_alarm'; }catch(e){}
 restSoundChoice = restSoundSelect.value || 'digital_alarm';
+let restPreviewAudio = null;
+function stopRestPreview(){
+  const audio = restPreviewAudio;
+  restPreviewAudio = null;
+  if(!audio) return;
+  const silence = () => { try{ audio.pause(); audio.currentTime = 0; audio.muted = true; }catch(e){} };
+  if(audio._playPromise && typeof audio._playPromise.then === 'function'){
+    audio._playPromise.then(silence, silence);
+  } else {
+    silence();
+  }
+}
 restSoundSelect.addEventListener('change', () => {
   restSoundChoice = restSoundSelect.value;
   try{ localStorage.setItem('REPLOG_REST_SOUND', restSoundChoice); }catch(e){}
   // Play a short preview clip so you can hear each option as you pick it
+  stopRestPreview();
   if(restSoundChoice !== 'silent' && ALARM_SOUND_FILES[restSoundChoice]){
     const preview = new Audio(ALARM_SOUND_FILES[restSoundChoice]);
+    restPreviewAudio = preview;
     preview.volume = 0.85;
-    preview.play().catch(() => {});
-    setTimeout(() => { try{ preview.pause(); }catch(e){} }, 1500);
+    preview._playPromise = preview.play();
+    if(preview._playPromise && typeof preview._playPromise.catch === 'function'){
+      preview._playPromise.catch(() => {});
+    }
+    setTimeout(() => { if(restPreviewAudio === preview) stopRestPreview(); }, 1500);
   }
 });
 
@@ -2338,6 +2379,7 @@ exAddSetBtn.addEventListener('click', () => {
 
 function closeExerciseModal(){
   if(exRestInterval){ clearInterval(exRestInterval); exRestInterval = null; }
+  stopRestAlarm();
   exModalOverlay.classList.remove('show');
   renderSlots();
 }
