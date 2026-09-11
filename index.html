@@ -2515,15 +2515,17 @@ function openCalcModal(){
   calcModalOverlay.classList.add('show');
 }
 function closeCalcModal(){
+  // Close only the calculator and return to the exercise/set screen
+  // where the calculator icon lives. Do not navigate to the Log tab.
   calcModalOverlay.classList.remove('show');
-  // When finished with the calculator, return to the RepLog logbook.
   if(exModalOverlay.classList.contains('show')){
-    exModalOverlay.classList.remove('show');
-    if(exRestInterval){ clearInterval(exRestInterval); exRestInterval = null; }
-    stopRestAlarm();
-    renderSlots();
+    setTimeout(() => {
+      const target = calcTargetInput;
+      if(target && document.body.contains(target)){
+        target.focus();
+      }
+    }, 0);
   }
-  switchView('log');
 }
 calcOpenBtn.addEventListener('click', openCalcModal);
 calcModalClose.addEventListener('click', closeCalcModal);
