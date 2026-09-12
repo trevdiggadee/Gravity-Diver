@@ -669,26 +669,36 @@
   .metric-unit{ color:var(--chalk-faint); font-size:8px; margin-top:3px; }
   .profile-save-row{ display:flex; gap:6px; margin-top:8px; }
   .profile-save-row button{ flex:1; padding:7px 9px; font-size:10px; }
-  .pr-highlight{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:5px; margin-bottom:8px; }
-  .pr-highlight-card{ border:1px solid rgba(var(--neon-rgb),.22); background:rgba(var(--neon-rgb),.035); border-radius:8px; padding:6px 5px; text-align:center; }
-  .pr-highlight-card .pr-name{font-size:7px;color:var(--chalk-dim);text-transform:uppercase;letter-spacing:.05em;}
-  .pr-highlight-card .pr-value{font:700 15px 'Oswald',sans-serif;color:var(--neon-strong);margin-top:2px;white-space:nowrap;}
-  .pr-tabs{display:flex;gap:5px;padding:0 0 7px;}
-  .pr-tab{flex:1;border:1px solid var(--neon);background:rgba(var(--neon-rgb),.09);color:var(--neon-strong);border-radius:999px;padding:5px 9px;font:inherit;font-size:9px;text-transform:uppercase;letter-spacing:.06em;cursor:default;text-align:center;}
+  .pr-highlight{display:none!important;}
+  .pr-tabs{display:none!important;}
   .pr-panels{display:block;}
   .pr-panel{display:block;}
-  .pr-accordion{ margin:0 0 6px; border:1px solid rgba(255,255,255,.07); border-radius:9px; overflow:hidden; background:rgba(255,255,255,.012); }
-  .pr-accordion summary{ list-style:none; display:flex; align-items:center; gap:8px; min-height:34px; padding:7px 9px; cursor:pointer; user-select:none; color:var(--chalk); font-family:'Oswald',sans-serif; font-size:12px; letter-spacing:.03em; }
-  .pr-accordion summary::-webkit-details-marker{display:none;}
-  .pr-accordion summary::before{ content:'›'; color:var(--neon); font-family:Inter,sans-serif; font-size:17px; line-height:1; transform:rotate(0deg); transition:transform .16s ease; }
-  .pr-accordion[open] summary::before{ transform:rotate(90deg); }
-  .pr-accordion summary .pr-section-count{ margin-left:auto; color:var(--chalk-faint); font:500 8px 'Inter',sans-serif; }
-  .pr-accordion summary .pr-section-type{ color:var(--neon); font:700 8px 'Inter',sans-serif; text-transform:uppercase; letter-spacing:.08em; margin-left:2px; }
-  .pr-accordion-body{ padding:0 7px 7px; }
-  .pr-panel.active{display:block;}
-  .pr-field{min-width:0;padding:6px 7px;border:1px solid rgba(255,255,255,.055);border-radius:8px;background:rgba(255,255,255,.018);}
-  .pr-field input{font-family:'JetBrains Mono',monospace;font-size:11px;padding:5px 6px;}
+  .pr-wheel-wrap{position:relative;margin:10px auto 12px;width:min(270px,82vw);height:min(270px,82vw);display:grid;place-items:center;isolation:isolate;}
+  .pr-wheel-wrap::before{content:"";position:absolute;inset:17%;border:1px solid rgba(var(--neon-rgb),.14);border-radius:50%;box-shadow:0 0 35px rgba(var(--neon-rgb),.08),inset 0 0 28px rgba(var(--neon-rgb),.035);animation:prWheelPulse 4.8s ease-in-out infinite;}
+  .pr-wheel-wrap::after{content:"";position:absolute;inset:5%;border-radius:50%;background:radial-gradient(circle,rgba(var(--neon-rgb),.09),transparent 62%);filter:blur(7px);z-index:-1;animation:prWheelGlow 7s ease-in-out infinite alternate;}
+  .pr-wheel-core{width:72px;height:72px;border-radius:50%;border:1px solid rgba(var(--neon-rgb),.5);background:rgba(10,12,13,.88);display:grid;place-items:center;text-align:center;color:var(--neon-strong);font:700 9px 'Oswald',sans-serif;letter-spacing:.13em;text-transform:uppercase;box-shadow:0 0 18px rgba(var(--neon-rgb),.15),inset 0 0 20px rgba(var(--neon-rgb),.06);transition:.3s ease;}
+  .pr-wheel-core span{font:500 7px 'Inter',sans-serif;color:var(--chalk-faint);letter-spacing:.08em;margin-top:2px;}
+  .pr-wheel-item{position:absolute;width:108px;height:108px;border-radius:50%;border:1px solid rgba(var(--neon-rgb),.28);background:rgba(15,17,19,.82);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:var(--chalk);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;transition:transform .28s ease,border-color .28s ease,box-shadow .28s ease,background .28s ease;box-shadow:0 8px 24px rgba(0,0,0,.24);}
+  .pr-wheel-item:nth-child(2){top:-2px;left:50%;transform:translateX(-50%);}
+  .pr-wheel-item:nth-child(3){right:-2px;top:50%;transform:translateY(-50%);}
+  .pr-wheel-item:nth-child(4){bottom:-2px;left:50%;transform:translateX(-50%);}
+  .pr-wheel-item:nth-child(5){left:-2px;top:50%;transform:translateY(-50%);}
+  .pr-wheel-item:hover,.pr-wheel-item.active{border-color:var(--neon);background:rgba(var(--neon-rgb),.11);box-shadow:0 0 22px rgba(var(--neon-rgb),.16),inset 0 0 20px rgba(var(--neon-rgb),.04);}
+  .pr-wheel-item.active:nth-child(2){transform:translateX(-50%) scale(1.055);}.pr-wheel-item.active:nth-child(3){transform:translateY(-50%) scale(1.055);}.pr-wheel-item.active:nth-child(4){transform:translateX(-50%) scale(1.055);}.pr-wheel-item.active:nth-child(5){transform:translateY(-50%) scale(1.055);}
+  .pr-wheel-icon{width:27px;height:27px;border:1px solid rgba(var(--neon-rgb),.4);border-radius:50%;display:grid;place-items:center;color:var(--neon);font-size:13px;box-shadow:0 0 12px rgba(var(--neon-rgb),.12);}
+  .pr-wheel-label{font:700 10px 'Oswald',sans-serif;letter-spacing:.1em;text-transform:uppercase;}.pr-wheel-count{font:500 7px 'Inter',sans-serif;color:var(--chalk-faint);}
+  .pr-wheel-detail{border-top:1px solid rgba(var(--neon-rgb),.13);padding-top:8px;animation:prPanelIn .28s ease both;}
+  .pr-wheel-detail-head{display:flex;align-items:center;justify-content:space-between;margin:0 2px 7px;}
+  .pr-wheel-detail-title{font:700 13px 'Oswald',sans-serif;color:var(--neon-strong);letter-spacing:.06em;text-transform:uppercase;}
+  .pr-wheel-detail-hint{font-size:7px;color:var(--chalk-faint);text-transform:uppercase;letter-spacing:.08em;}
   .pr-section-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;}
+  .pr-accordion{margin:0 0 6px;border:1px solid rgba(255,255,255,.07);border-radius:9px;overflow:hidden;background:rgba(255,255,255,.012);}
+  .pr-accordion summary{list-style:none;display:flex;align-items:center;gap:8px;min-height:34px;padding:7px 9px;cursor:pointer;user-select:none;color:var(--chalk);font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.03em;}
+  .pr-accordion summary::-webkit-details-marker{display:none;}.pr-accordion summary::before{content:'›';color:var(--neon);font-family:Inter,sans-serif;font-size:17px;line-height:1;transform:rotate(0deg);transition:transform .16s ease;}.pr-accordion[open] summary::before{transform:rotate(90deg);}.pr-accordion summary .pr-section-count{margin-left:auto;color:var(--chalk-faint);font:500 8px 'Inter',sans-serif;}.pr-accordion summary .pr-section-type{color:var(--neon);font:700 8px 'Inter',sans-serif;text-transform:uppercase;letter-spacing:.08em;margin-left:2px;}.pr-accordion-body{padding:0 7px 7px;}
+  .pr-field{min-width:0;padding:6px 7px;border:1px solid rgba(255,255,255,.055);border-radius:8px;background:rgba(255,255,255,.018);}.pr-field input{font-family:'JetBrains Mono',monospace;font-size:11px;padding:5px 6px;}
+  @keyframes prWheelPulse{0%,100%{transform:scale(.98);opacity:.55;}50%{transform:scale(1.02);opacity:1;}}
+  @keyframes prWheelGlow{0%{transform:scale(.96);opacity:.5;}100%{transform:scale(1.04);opacity:1;}}
+  @keyframes prPanelIn{from{opacity:0;transform:translateY(5px);}to{opacity:1;transform:translateY(0);}}
   .pr-title{ color:var(--neon-strong); text-shadow:0 0 12px rgba(var(--neon-rgb),.28); font-size:18px!important; letter-spacing:.04em; margin-bottom:4px!important; }
   .profile-note{font-size:8px;color:var(--chalk-faint);line-height:1.4;margin-top:7px;}
   #savePrsBtn{display:none!important}
@@ -1261,11 +1271,6 @@ input,select,textarea{background-color:rgba(8,10,10,.72)!important;backdrop-filt
         <div class="profile-card wide">
           <h3 class="pr-title">Personal Records</h3>
           <div class="profile-card-sub">Automatically calculated from your recorded workouts.</div>
-          <div class="pr-highlight">
-            <div class="pr-highlight-card"><div class="pr-name">Bench</div><div class="pr-value" id="prBenchQuick">—</div></div>
-            <div class="pr-highlight-card"><div class="pr-name">Squat</div><div class="pr-value" id="prSquatQuick">—</div></div>
-            <div class="pr-highlight-card"><div class="pr-name">Deadlift</div><div class="pr-value" id="prDeadliftQuick">—</div></div>
-          </div>
           <div class="pr-tabs" id="prTabs" role="tablist"></div>
           <div class="pr-panels" id="prPanels"></div>
           <div class="profile-note">Highest weight actually recorded for each exercise.</div>
@@ -1498,6 +1503,14 @@ const LOWER_LIBRARY = {
   "Full Lower / Compound": ["Barbell Squat (High Bar)","Barbell Squat (Low Bar)","Trap Bar Deadlift","Kettlebell Swing","Wall Sit","Broad Jump","Box Jump"]
 };
 
+const CARDIO_LIBRARY = {
+  "Walking / Incline": ["Walking","Incline Walk","Treadmill Incline Walk","12-3-30 Walk","Outdoor Hike","Stair Climber"],
+  "Running": ["Treadmill Run","Outdoor Run","Interval Run","Sprint","Hill Sprint","Jogging"],
+  "Cycling": ["Stationary Bike","Outdoor Cycling","Spin Bike","Cycling Intervals"],
+  "Rowing": ["Rowing Machine","Rowing Intervals"],
+  "Other Cardio": ["Elliptical","Arc Trainer","Ski Erg","Jump Rope","Battle Ropes","Swimming" ]
+};
+
 function buildOptions(library){
   let html = '<option value="">— Select exercise —</option>';
   for(const group in library){
@@ -1510,6 +1523,7 @@ function buildOptions(library){
 }
 const UPPER_OPTIONS_HTML = buildOptions(UPPER_LIBRARY);
 const LOWER_OPTIONS_HTML = buildOptions(LOWER_LIBRARY);
+const CARDIO_OPTIONS_HTML = buildOptions(CARDIO_LIBRARY);
 const CLOCK_ICON_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3.2 2"></path></svg>`;
 
 /* ---------------------------------------------------------
@@ -3473,57 +3487,48 @@ function renderPrFields(){
   if(!tabs || !panels) return;
   tabs.innerHTML=''; panels.innerHTML='';
 
-  const tab=document.createElement('button');
-  tab.type='button'; tab.className='pr-tab active'; tab.textContent='All Exercises';
-  tab.setAttribute('role','tab'); tab.setAttribute('aria-selected','true');
-  tabs.appendChild(tab);
-
-  const panel=document.createElement('div');
-  panel.className='pr-panel active'; panel.id='prPanel_0'; panel.setAttribute('role','tabpanel');
-
   const labelMap=Object.fromEntries(PR_FIELDS);
   const allNames=collectAllExerciseNames();
   const keyForName=new Map();
   allNames.forEach(n=>{const k=exerciseToPrKey(n); if(k && !keyForName.has(k)) keyForName.set(k,n);});
 
-  const makeAccordion=(type,label,items,open=false)=>{
-    if(!items.length) return null;
-    const details=document.createElement('details'); details.className='pr-accordion'; details.open=open;
-    const summary=document.createElement('summary');
-    summary.innerHTML=`<span class="pr-section-type">${type}</span><span>${label}</span><span class="pr-section-count">${items.length}</span>`;
-    details.appendChild(summary);
-    const body=document.createElement('div'); body.className='pr-accordion-body';
-    const grid=document.createElement('div'); grid.className='pr-section-grid';
-    items.forEach(key=>{
-      const name=labelMap[key] || keyForName.get(key) || key;
-      const field=document.createElement('div'); field.className='pr-field';
-      field.innerHTML=`<label for="pr_${key}">${name}</label><input id="pr_${key}" type="number" min="0" max="3000" step="0.5" placeholder="—" inputmode="decimal" readonly aria-readonly="true"><div class="metric-unit">lbs</div>`;
-      grid.appendChild(field);
-    });
-    body.appendChild(grid); details.appendChild(body); return details;
-  };
+  const libKeys=(lib)=>{const keys=[]; const seen=new Set(); Object.values(lib).flat().forEach(n=>{const k=exerciseToPrKey(n); if(k && keyForName.has(k) && !seen.has(k)){seen.add(k);keys.push(k);}}); return keys;};
+  const upper=libKeys(UPPER_LIBRARY), lower=libKeys(LOWER_LIBRARY), cardio=libKeys(CARDIO_LIBRARY);
+  const known=new Set([...upper,...lower,...cardio]);
+  const custom=Array.from(keyForName.keys()).filter(k=>!known.has(k));
 
-  const appendLibrarySections=(type,lib)=>{
-    const used=new Set();
-    Object.entries(lib).forEach(([label,names])=>{
-      const keys=[]; names.forEach(n=>{const k=exerciseToPrKey(n); if(k && keyForName.has(k) && !used.has(k)){used.add(k);keys.push(k);}});
-      const sec=makeAccordion(type,label,keys,false); if(sec) panel.appendChild(sec);
-    });
-    return used;
-  };
-  const upperUsed=appendLibrarySections('Upper',UPPER_LIBRARY);
-  const lowerUsed=appendLibrarySections('Lower',LOWER_LIBRARY);
+  const categories=[
+    {id:'upper',label:'Upper',icon:'↟',keys:upper},
+    {id:'lower',label:'Lower',icon:'↡',keys:lower},
+    {id:'custom',label:'Custom',icon:'✦',keys:custom},
+    {id:'cardio',label:'Cardio',icon:'◌',keys:cardio}
+  ];
+  const wheel=document.createElement('div'); wheel.className='pr-wheel-wrap';
+  const core=document.createElement('div'); core.className='pr-wheel-core'; core.innerHTML='PR HUB<span>SELECT TYPE</span>'; wheel.appendChild(core);
+  const detail=document.createElement('div'); detail.className='pr-wheel-detail';
+  panels.appendChild(wheel); panels.appendChild(detail);
 
-  // The library already gives us exercise types; keep any custom/recorded exercises visible too.
-  const known=new Set([...upperUsed,...lowerUsed]);
-  const other=Array.from(keyForName.keys()).filter(k=>!known.has(k));
-  const otherSec=makeAccordion('Other','Recorded / Custom',other,false); if(otherSec) panel.appendChild(otherSec);
-
-  // If a user has no exercises yet, show a compact empty state.
-  if(!panel.children.length){
-    const empty=document.createElement('div'); empty.className='profile-card-sub'; empty.textContent='No exercises are available yet.'; panel.appendChild(empty);
+  function showCategory(cat,button){
+    wheel.querySelectorAll('.pr-wheel-item').forEach(b=>b.classList.remove('active')); button.classList.add('active');
+    core.innerHTML=`${cat.label.toUpperCase()}<span>${cat.keys.length} EXERCISES</span>`;
+    detail.innerHTML='';
+    const head=document.createElement('div'); head.className='pr-wheel-detail-head';
+    head.innerHTML=`<div class="pr-wheel-detail-title">${cat.label} Exercises</div><div class="pr-wheel-detail-hint">Tap a row to expand</div>`; detail.appendChild(head);
+    if(!cat.keys.length){const e=document.createElement('div'); e.className='profile-card-sub'; e.textContent=cat.id==='custom'?'No custom or unclassified exercises recorded yet.':'No recorded exercises in this category yet.'; detail.appendChild(e); return;}
+    if(cat.id==='custom'){
+      const d=document.createElement('details'); d.className='pr-accordion'; d.open=true; const sm=document.createElement('summary'); sm.innerHTML=`<span class="pr-section-type">CUSTOM</span><span>Recorded / Custom</span><span class="pr-section-count">${cat.keys.length}</span>`; d.appendChild(sm);
+      const body=document.createElement('div'); body.className='pr-accordion-body'; const grid=document.createElement('div'); grid.className='pr-section-grid';
+      cat.keys.forEach(key=>grid.appendChild(makePRField(key))); body.appendChild(grid); d.appendChild(body); detail.appendChild(d);
+    } else {
+      const lib=cat.id==='upper'?UPPER_LIBRARY:cat.id==='lower'?LOWER_LIBRARY:CARDIO_LIBRARY;
+      Object.entries(lib).forEach(([label,names])=>{const keys=[]; const seen=new Set(); names.forEach(n=>{const k=exerciseToPrKey(n); if(k && keyForName.has(k) && !seen.has(k)){seen.add(k);keys.push(k);}}); if(!keys.length)return; const d=document.createElement('details'); d.className='pr-accordion'; const sm=document.createElement('summary'); sm.innerHTML=`<span class="pr-section-type">${cat.label}</span><span>${label}</span><span class="pr-section-count">${keys.length}</span>`; d.appendChild(sm); const body=document.createElement('div'); body.className='pr-accordion-body'; const grid=document.createElement('div'); grid.className='pr-section-grid'; keys.forEach(key=>grid.appendChild(makePRField(key))); body.appendChild(grid); d.appendChild(body); detail.appendChild(d);});
+    }
   }
-  panels.appendChild(panel);
+  function makePRField(key){const name=labelMap[key]||keyForName.get(key)||key; const field=document.createElement('div'); field.className='pr-field'; field.innerHTML=`<label for="pr_${key}">${name}</label><input id="pr_${key}" type="number" min="0" max="3000" step="0.5" placeholder="—" inputmode="decimal" readonly aria-readonly="true"><div class="metric-unit">lbs</div>`; return field;}
+  categories.forEach(cat=>{const b=document.createElement('button'); b.type='button'; b.className='pr-wheel-item'; b.innerHTML=`<span class="pr-wheel-icon">${cat.icon}</span><span class="pr-wheel-label">${cat.label}</span><span class="pr-wheel-count">${cat.keys.length} EXERCISES</span>`; b.addEventListener('click',()=>showCategory(cat,b)); wheel.appendChild(b);});
+  // Start on Upper only when there is data; otherwise keep the wheel clean and centered.
+  const initial=categories.find(c=>c.keys.length)||categories[0]; const initialButton=Array.from(wheel.querySelectorAll('.pr-wheel-item')).find(b=>b.querySelector('.pr-wheel-label')?.textContent===initial.label);
+  if(initialButton) showCategory(initial,initialButton);
 }
 function renderQuickPRs(prs){
   const q=[['prBenchQuick','bench_press'],['prSquatQuick','back_squat'],['prDeadliftQuick','deadlift']];
