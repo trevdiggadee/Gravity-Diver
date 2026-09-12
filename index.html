@@ -630,10 +630,33 @@
   .profile-card.wide{ grid-column:1/-1; }
   .profile-card h3{ margin:0 0 8px; font-size:15px; }
   .profile-card-sub{ color:var(--chalk-faint); font-size:9px; margin:-3px 0 9px; line-height:1.35; }
-  .profile-head{ text-align:center; }
-  .profile-avatar{ width:66px; height:66px; border-radius:50%; margin:0 auto 6px; display:flex; align-items:center; justify-content:center; overflow:hidden; background:rgba(var(--neon-rgb),.12); border:2px solid var(--neon); color:var(--neon-strong); font-family:'Oswald',sans-serif; font-size:25px; font-weight:700; text-shadow:0 0 12px rgba(var(--neon-rgb),.5); }
+  .profile-head{ text-align:center; padding:8px 10px 9px; }
+  /* Compact profile identity: about half the previous vertical footprint. */
+  .profile-identity{ position:relative; min-height:78px; display:flex; align-items:center; justify-content:center; gap:10px; padding:4px 34px 4px 6px; overflow:hidden; border-radius:12px; }
+  .profile-identity::before{ content:''; position:absolute; inset:-55%; background:radial-gradient(circle at 50% 50%, rgba(var(--neon-rgb),.20), transparent 30%),radial-gradient(circle at 20% 70%, rgba(var(--neon-rgb),.13), transparent 28%),radial-gradient(circle at 80% 25%, rgba(var(--neon-strong-rgb),.11), transparent 25%); filter:blur(12px); animation:profileFlow 9s ease-in-out infinite alternate; pointer-events:none; }
+  .profile-identity::after{ content:'•  ·  ✦  ·  •  ·  ✧  ·  •'; position:absolute; inset:-18px; color:var(--neon-strong); opacity:.18; font-size:15px; letter-spacing:18px; white-space:nowrap; filter:blur(1.5px); transform:rotate(-8deg); animation:profileDustFlow 13s linear infinite; pointer-events:none; }
+  @keyframes profileFlow{0%{transform:translate3d(-8%,-3%,0) scale(.92) rotate(-3deg)}50%{transform:translate3d(6%,4%,0) scale(1.08) rotate(3deg)}100%{transform:translate3d(-3%,1%,0) scale(.98) rotate(-1deg)}}
+  @keyframes profileDustFlow{0%{transform:translateX(-24px) rotate(-8deg)}50%{transform:translateX(28px) rotate(-5deg)}100%{transform:translateX(-24px) rotate(-8deg)}}
+  .profile-avatar{ position:relative; z-index:2; flex:0 0 34px; width:34px; height:34px; border-radius:50%; margin:0; display:flex; align-items:center; justify-content:center; overflow:hidden; background:rgba(var(--neon-rgb),.14); border:1.5px solid var(--neon); color:var(--neon-strong); font-family:'Oswald',sans-serif; font-size:14px; font-weight:700; text-shadow:0 0 10px rgba(var(--neon-rgb),.5); box-shadow:0 0 18px rgba(var(--neon-rgb),.20); }
   .profile-avatar img{ width:100%; height:100%; object-fit:cover; display:block; }
-  .profile-photo-btn{ display:inline-flex; align-items:center; justify-content:center; gap:5px; margin:0 auto 8px; padding:5px 9px; border:1px solid var(--line); border-radius:100px; background:var(--panel-3); color:var(--chalk-dim); font:inherit; font-size:10px; cursor:pointer; }
+  .profile-photo-btn{ display:inline-flex; align-items:center; justify-content:center; gap:5px; margin:0; padding:4px 7px; border:1px solid var(--line); border-radius:100px; background:rgba(19,20,23,.72); color:var(--chalk-dim); font:inherit; font-size:9px; cursor:pointer; }
+  .profile-identity-text{ position:relative; z-index:2; min-width:0; text-align:left; }
+  .profile-identity-text .identity-label{ display:block; font-size:7px; color:var(--chalk-faint); text-transform:uppercase; letter-spacing:.13em; margin-bottom:2px; }
+  .profile-identity-text .identity-name{ font-family:'Oswald',sans-serif; font-size:15px; line-height:1.05; color:#fff; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:180px; }
+  .profile-settings-gear{ position:absolute; z-index:4; top:6px; right:5px; width:26px; height:26px; border:1px solid rgba(var(--neon-rgb),.42); border-radius:50%; background:rgba(19,20,23,.72); color:var(--neon); display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:14px; box-shadow:0 0 10px rgba(var(--neon-rgb),.10); }
+  .profile-settings-gear:hover{ border-color:var(--neon); box-shadow:0 0 14px rgba(var(--neon-rgb),.25); }
+  .profile-settings-area{ margin-top:4px; max-height:0; overflow:hidden; opacity:0; transition:max-height .25s ease,opacity .2s ease,margin .25s ease; }
+  .profile-settings-area.open{ max-height:230px; opacity:1; margin-top:7px; }
+  .profile-settings-area .profile-username-row{ margin-bottom:5px; }
+  .profile-settings-area .profile-email{ margin-top:4px; }
+  .profile-metrics-inline{ display:grid; grid-template-columns:1fr 1.35fr; gap:6px; align-items:end; margin-top:6px; padding-top:6px; border-top:1px solid rgba(255,255,255,.06); }
+  .profile-metrics-inline .metric-field{ min-width:0; }
+  .profile-metrics-inline .metric-field label{ margin-bottom:2px; }
+  .profile-metrics-inline input{ padding:5px 7px; font-size:11px; }
+  .profile-metrics-inline .metric-unit{ font-size:7px; margin-top:1px; }
+  .profile-metrics-inline .height-grid{ gap:4px; }
+  .profile-metrics-inline .profile-save-row{ margin-top:5px; grid-column:1/-1; }
+  .profile-metrics-inline .btn-primary{ padding:5px 8px; font-size:9px; }
   .profile-photo-btn:hover{color:var(--chalk); border-color:var(--neon);}
   .profile-username-row{ text-align:left; margin-bottom:7px; }
   .profile-username-row label,.metric-field label,.pr-field label{ display:block; font-size:8px; color:var(--chalk-dim); letter-spacing:.05em; text-transform:uppercase; margin-bottom:4px; }
@@ -1212,26 +1235,27 @@ input,select,textarea{background-color:rgba(8,10,10,.72)!important;backdrop-filt
       </div>
       <div class="profile-grid">
         <div class="profile-card profile-head">
-          <div class="profile-avatar" id="profileAvatar">?</div>
-          <input id="profileImageInput" type="file" accept="image/*" hidden>
-          <button type="button" class="profile-photo-btn" id="profileImageBtn">Add Profile Image</button>
-          <div class="profile-username-row">
-            <label for="usernameInput">Username</label>
-            <input id="usernameInput" type="text" maxlength="24" placeholder="Choose a username" autocomplete="off">
+          <div class="profile-identity">
+            <div class="profile-avatar" id="profileAvatar">?</div>
+            <div class="profile-identity-text"><span class="identity-label">RepLog Athlete</span><div class="identity-name" id="profileDisplayName">Athlete</div></div>
+            <input id="profileImageInput" type="file" accept="image/*" hidden>
+            <button type="button" class="profile-settings-gear" id="profileSettingsBtn" aria-label="Edit profile settings" aria-expanded="false">⚙</button>
           </div>
-          <button type="button" class="btn-primary" id="saveUsernameBtn">Save Profile</button>
-          <div class="profile-msg" id="profileMsg"></div>
-          <div class="profile-email">Signed in as <span id="profileEmail"></span></div>
-        </div>
-
-        <div class="profile-card profile-metrics-compact">
-          <h3>Body Metrics</h3>
-          <div class="profile-card-sub">Weight + height for training estimates.</div>
-          <div class="metrics-grid">
-            <div class="metric-field"><label for="bodyWeightInput">Weight</label><input id="bodyWeightInput" type="number" min="1" max="999" step="0.1" placeholder="150"><div class="metric-unit">lbs</div></div>
-            <div class="metric-field"><label>Height</label><div class="height-grid"><input id="heightFtInput" type="number" min="3" max="8" step="1" placeholder="5" inputmode="numeric" aria-label="Height feet"><input id="heightInInput" type="number" min="0" max="11" step="1" placeholder="8" inputmode="numeric" aria-label="Height inches"></div><div class="metric-unit">ft&nbsp;&nbsp;&nbsp;&nbsp;in</div></div>
+          <div class="profile-settings-area" id="profileSettingsArea">
+            <button type="button" class="profile-photo-btn" id="profileImageBtn">Change Image</button>
+            <div class="profile-username-row">
+              <label for="usernameInput">Username</label>
+              <input id="usernameInput" type="text" maxlength="24" placeholder="Choose a username" autocomplete="off">
+            </div>
+            <button type="button" class="btn-primary" id="saveUsernameBtn">Save Profile</button>
+            <div class="profile-metrics-inline">
+              <div class="metric-field"><label for="bodyWeightInput">Body Weight</label><input id="bodyWeightInput" type="number" min="1" max="999" step="0.1" placeholder="150"><div class="metric-unit">lbs</div></div>
+              <div class="metric-field"><label>Height</label><div class="height-grid"><input id="heightFtInput" type="number" min="3" max="8" step="1" placeholder="5" inputmode="numeric" aria-label="Height feet"><input id="heightInInput" type="number" min="0" max="11" step="1" placeholder="8" inputmode="numeric" aria-label="Height inches"></div><div class="metric-unit">ft&nbsp;&nbsp;in</div></div>
+              <div class="profile-save-row"><button type="button" class="btn-primary" id="saveMetricsBtn">Save Metrics</button></div>
+            </div>
+            <div class="profile-msg" id="profileMsg"></div>
+            <div class="profile-email">Signed in as <span id="profileEmail"></span></div>
           </div>
-          <div class="profile-save-row"><button type="button" class="btn-primary" id="saveMetricsBtn">Save Metrics</button></div>
         </div>
 
         <div class="profile-card wide">
@@ -3511,6 +3535,8 @@ function renderProfile(){
   const meta=profileMetadata();
   const username=meta.username || '';
   usernameInput.value=username;
+  const displayName=document.getElementById('profileDisplayName');
+  if(displayName) displayName.textContent=username || 'Athlete';
   profileEmail.textContent=currentUser.email || '';
   const photo=meta.profile_image || '';
   if(photo){ profileAvatar.innerHTML=`<img src="${photo}" alt="Profile image">`; }
@@ -3532,6 +3558,15 @@ async function updateProfileMetadata(patch, successText='Saved!'){
   profileMsg.textContent=successText;
   renderProfile();
 }
+const profileSettingsBtn=document.getElementById('profileSettingsBtn');
+const profileSettingsArea=document.getElementById('profileSettingsArea');
+if(profileSettingsBtn && profileSettingsArea){
+  profileSettingsBtn.addEventListener('click',()=>{
+    const open=profileSettingsArea.classList.toggle('open');
+    profileSettingsBtn.setAttribute('aria-expanded',String(open));
+  });
+}
+
 profileImageBtn.addEventListener('click',()=>profileImageInput.click());
 profileImageInput.addEventListener('change', async()=>{
   const file=profileImageInput.files && profileImageInput.files[0]; if(!file) return;
