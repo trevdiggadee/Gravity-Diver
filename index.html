@@ -46,6 +46,15 @@
   html,body{ margin:0; padding:0; width:100%; max-width:100%; overflow-x:hidden; overscroll-behavior-x:none; }
     html{ overscroll-behavior:none; }
     body{ touch-action:pan-y; }
+  /* ---- Vibe particle field ---- */
+  #vibeParticleCanvas{ position:fixed; inset:0; width:100%; height:100%; z-index:0; pointer-events:none; opacity:.78; }
+  body > *:not(#vibeParticleCanvas){ position:relative; z-index:1; }
+  .topbar{ background:rgba(8,9,10,.72); }
+  .auth-card,.nav-block,.day-tab,.week-tab,.exercise-card,.profile-card,.log-card,.summary-card,.summary-block-complete,.finish-bar,.bottom-dock,.session-active,.ex-modal,.calc-modal,.theme-modal-overlay,.theme-modal,.setup-modal,.modal,.rest-step,.rest-chip,.rest-sound-select,.ex-prev-row{ backdrop-filter:blur(8px); }
+  .auth-card,.nav-block,.day-tab,.week-tab,.exercise-card,.profile-card,.log-card,.summary-card,.finish-bar,.bottom-dock,.session-active{ background-color:rgba(19,20,23,.62); }
+  .ex-modal{ background:rgba(19,20,23,.78); }
+  .calc-modal{ background:linear-gradient(160deg,rgba(var(--neon-rgb),.14),rgba(19,20,23,.78) 55%); }
+
   body{
     background: var(--bg);
     color: var(--chalk);
@@ -365,6 +374,21 @@
   .calc-open-btn .calc-dot{fill:currentColor;stroke:none;}
   .calc-open-btn:hover{color:var(--neon-strong);border-color:var(--neon);background:linear-gradient(145deg,rgba(var(--neon-rgb),0.27),rgba(0,0,0,0.38));box-shadow:inset 0 0 0 1px rgba(255,255,255,0.045),inset 0 0 15px rgba(var(--neon-rgb),0.14),0 0 18px rgba(var(--neon-rgb),0.48);transform:translateY(-1px) scale(1.035);}
   .calc-open-btn:active{transform:scale(.95);box-shadow:inset 0 0 10px rgba(var(--neon-rgb),0.18),0 0 10px rgba(var(--neon-rgb),0.30);}
+
+  /* ---- Floating rest timer: stays visible outside the exercise popup ---- */
+  .global-rest-timer{
+    position:fixed; right:14px; bottom:92px; z-index:125; display:none; align-items:center; gap:9px;
+    padding:8px 10px 8px 12px; border:1px solid var(--neon); border-radius:16px;
+    background:rgba(10,12,12,.72); backdrop-filter:blur(12px); box-shadow:0 0 24px rgba(var(--neon-rgb),.24), inset 0 0 16px rgba(var(--neon-rgb),.06);
+  }
+  .global-rest-timer.show{ display:flex; animation:popIn .2s ease; }
+  .global-rest-timer .grt-label{ font-size:9px; text-transform:uppercase; letter-spacing:.12em; color:var(--chalk-faint); }
+  .global-rest-timer .grt-time{ font:700 18px 'JetBrains Mono',monospace; color:var(--neon-strong); min-width:58px; text-align:center; text-shadow:0 0 12px rgba(var(--neon-rgb),.45); }
+  .global-rest-timer .grt-btn{ width:28px;height:28px;border-radius:9px;border:1px solid rgba(var(--neon-rgb),.32);background:rgba(var(--neon-rgb),.08);color:var(--neon);font:700 13px 'Inter',sans-serif;cursor:pointer; }
+  .global-rest-timer .grt-btn:active{ transform:scale(.92); background:rgba(var(--neon-rgb),.2); }
+  .global-rest-timer.done{ animation:timerDone .55s ease 2; }
+  @keyframes timerDone{ 50%{ box-shadow:0 0 38px rgba(var(--neon-rgb),.7),inset 0 0 20px rgba(var(--neon-rgb),.15); transform:scale(1.04); } }
+  @media(max-width:520px){ .global-rest-timer{ right:10px; bottom:84px; } }
 
   .calc-modal-overlay{
     display:none; position:fixed; inset:0; z-index:200; background: rgba(3,4,4,.82); backdrop-filter: blur(6px);
@@ -1024,6 +1048,7 @@
 </style>
 </head>
 <body>
+<canvas id="vibeParticleCanvas" aria-hidden="true"></canvas>
   <!-- Recolors the logo itself to the active RepLog neon color while preserving its transparency. -->
   <svg width="0" height="0" aria-hidden="true" style="position:absolute">
     <defs>
@@ -1292,6 +1317,15 @@
     </div>
     <button type="button" class="btn-primary" id="exFinishBtn">Finish Exercise</button>
   </div>
+</div>
+
+<!-- FLOATING REST TIMER -->
+<div class="global-rest-timer" id="globalRestTimer" aria-live="polite">
+  <span class="grt-label">Rest</span>
+  <button type="button" class="grt-btn" id="globalRestMinus" aria-label="Subtract 15 seconds">−15</button>
+  <span class="grt-time mono" id="globalRestTime">00:00</span>
+  <button type="button" class="grt-btn" id="globalRestPlus" aria-label="Add 15 seconds">+15</button>
+  <button type="button" class="grt-btn" id="globalRestStop" aria-label="Stop rest timer">×</button>
 </div>
 
 <!-- CALCULATOR POPUP -->
@@ -1723,26 +1757,33 @@ const ALARM_SOUND_FILES = {
 };
 const REST_ALARM_DURATION = 5; // seconds the buzzer sounds off for when the timer ends
 
+function playSynthAlarm(){
+  const ctx=getRestAudioContext(); if(!ctx) return;
+  const start=ctx.currentTime+.01;
+  // Reliable iOS-safe synthesized alarm; no external audio file is required.
+  for(let i=0;i<8;i++){
+    const t=start+i*.42;
+    scheduleTone(i%2?740:1040,t,.22,'square',.24);
+    scheduleTone(i%2?520:820,t+.23,.13,'square',.18);
+  }
+}
 function playBuzzer(){
   stopRestAlarm();
   if(restSoundChoice === 'silent') return;
   const file = ALARM_SOUND_FILES[restSoundChoice];
-  if(!file) return;
-
+  if(!file){ playSynthAlarm(); return; }
   const audio = new Audio(file);
   restAlarmAudio = audio;
-  audio.loop = true; // fills the full window even if the clip itself is shorter than 5s
-  audio.volume = 0.85;
-  audio.playsInline = true;
-
+  audio.loop = true; audio.volume = .9; audio.playsInline = true;
   audio._playPromise = audio.play();
   if(audio._playPromise && typeof audio._playPromise.catch === 'function'){
-    audio._playPromise.catch((err) => console.warn('RepLog alarm could not play:', err));
+    audio._playPromise.catch(() => {
+      if(restAlarmAudio === audio){ restAlarmAudio=null; playSynthAlarm(); }
+    });
   }
-  restAlarmStopTimer = setTimeout(() => {
-    if(restAlarmAudio === audio) stopRestAlarm();
-  }, REST_ALARM_DURATION * 1000);
+  restAlarmStopTimer = setTimeout(() => { if(restAlarmAudio === audio) stopRestAlarm(); }, REST_ALARM_DURATION*1000);
 }
+
 function playBeep(){
   try{
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -2076,6 +2117,18 @@ let exRestInterval = null;
 let restDeadline = 0;
 let restRemaining = 0, restTotal = 0;
 
+const globalRestTimer = document.getElementById('globalRestTimer');
+const globalRestTime = document.getElementById('globalRestTime');
+const globalRestMinus = document.getElementById('globalRestMinus');
+const globalRestPlus = document.getElementById('globalRestPlus');
+const globalRestStop = document.getElementById('globalRestStop');
+function updateGlobalRestTimer(){
+  if(!globalRestTimer || !exRestInterval) return;
+  globalRestTime.textContent = formatMMSS(restRemaining);
+  globalRestTimer.classList.add('show');
+}
+function hideGlobalRestTimer(){ if(globalRestTimer) globalRestTimer.classList.remove('show','done'); }
+
 function setTimerLabel(text){
   exTimerBtn.innerHTML = CLOCK_ICON_SVG + `<span class="tb-label">${text}</span>`;
 }
@@ -2095,6 +2148,7 @@ function resetTimerVisual(){
   restHand.style.transform = 'translateX(-50%) rotate(0deg)';
   ringComet.style.transform = 'translateX(-50%) rotate(0deg)';
   exTimerPopup.classList.remove('show');
+  hideGlobalRestTimer();
   restRemaining = 0; restTotal = 0;
 }
 
@@ -2115,6 +2169,7 @@ function tickRestTimer(){
   if(nextRemaining !== restRemaining){
     restRemaining = nextRemaining;
     updateClockVisual(restRemaining, restTotal);
+    updateGlobalRestTimer();
     if(restRemaining > 0 && restRemaining <= 5 && !restCountdownPlayed.has(restRemaining)){
       restCountdownPlayed.add(restRemaining);
       playCountdownBeep();
@@ -2129,6 +2184,8 @@ function tickRestTimer(){
     setTimerLabel('Start Rest');
     analogClock.classList.remove('urgent');
     playBuzzer();
+    if(globalRestTimer) globalRestTimer.classList.add('done');
+    if(globalRestTime) globalRestTime.textContent='Done';
     restDigital.textContent='Done';
     restDigital.classList.remove('low');
     analogClock.classList.add('done-flash');
@@ -2140,6 +2197,7 @@ function tickRestTimer(){
       ringComet.style.transform='translateX(-50%) rotate(0deg)';
       analogClock.classList.remove('done-flash');
       exTimerPopup.classList.remove('show');
+      hideGlobalRestTimer();
     },1800);
   }
 }
@@ -2168,18 +2226,27 @@ exTimerBtn.addEventListener('click', () => {
   exTimerPopup.classList.add('show');
   setTimerLabel('Stop');
   updateClockVisual(restRemaining, restTotal);
+  updateGlobalRestTimer();
 
   exRestInterval = setInterval(tickRestTimer, 100);
 });
 
 function nudgeRestTimer(deltaSeconds){
   if(!exRestInterval) return;
-  restRemaining = Math.max(1, restRemaining + deltaSeconds);
+  const now = Date.now();
+  const current = Math.max(0, Math.ceil((restDeadline - now)/1000));
+  const next = Math.max(1, current + deltaSeconds);
+  restDeadline = now + next * 1000;
+  restRemaining = next;
   if(restRemaining > restTotal) restTotal = restRemaining;
   updateClockVisual(restRemaining, restTotal);
+  updateGlobalRestTimer();
 }
 restNudgeDown.addEventListener('click', () => nudgeRestTimer(-15));
 restNudgeUp.addEventListener('click', () => nudgeRestTimer(15));
+globalRestMinus?.addEventListener('click', () => nudgeRestTimer(-15));
+globalRestPlus?.addEventListener('click', () => nudgeRestTimer(15));
+globalRestStop?.addEventListener('click', () => resetTimerVisual());
 
 function persistRestValue(){
   if(exModalSide != null && exModalIndex != null){
@@ -2376,9 +2443,37 @@ function persistExRows(){
   updatePRBadge();
 }
 
+function exerciseToPrKey(name){
+  const n=String(name||'').trim().toLowerCase().replace(/[–—]/g,'-');
+  const aliases={
+    'bench press':'bench_press','back squat':'back_squat','deadlift':'deadlift','overhead press':'overhead_press',
+    'barbell row':'barbell_row','front squat':'front_squat','romanian deadlift':'romanian_deadlift','incline bench press':'incline_bench',
+    'close-grip bench press':'close_grip_bench','close grip bench press':'close_grip_bench','leg press':'leg_press','hack squat':'hack_squat',
+    'barbell hip thrust':'hip_thrust','hip thrust':'hip_thrust','power clean':'power_clean','clean & jerk':'clean_and_jerk','clean and jerk':'clean_and_jerk',
+    'snatch':'snatch','dumbbell bench press':'dumbbell_bench','weighted pull-up':'pull_up','weighted pull up':'pull_up',
+    'weighted dip':'dip','barbell curl':'barbell_curl','skull crusher':'skull_crusher','calf raise':'calf_raise','pendlay row':'pendlay_row'
+  };
+  return aliases[n] || null;
+}
+async function autoSaveExercisePR(){
+  if(!currentUser || exModalSide==null || exModalIndex==null) return;
+  const slot=days[activeDay]?.[exModalSide]?.[exModalIndex];
+  const key=exerciseToPrKey(slot?.exercise); if(!key) return;
+  const maxWeight=exModalRowsData.reduce((m,r)=>Math.max(m,Number(r.weight)||0),0);
+  if(!(maxWeight>0)) return;
+  const meta=profileMetadata();
+  const prs=Object.assign({},meta.personal_records||{});
+  const old=Number(prs[key])||0;
+  if(maxWeight>old){
+    prs[key]=maxWeight;
+    await updateProfileMetadata({personal_records:prs}, `${slot.exercise} PR updated: ${maxWeight} lb`);
+  }
+}
+
 const exFinishBtn = document.getElementById('exFinishBtn');
 exFinishBtn.addEventListener('click', () => {
   persistExRows();
+  autoSaveExercisePR().catch(()=>{});
   const anyLogged = exModalRowsData.some(r => r.reps !== "" && r.reps != null);
   if(anyLogged && !exModalCelebrated){
     exModalCelebrated = true;
@@ -3402,6 +3497,24 @@ savePrsBtn.addEventListener('click',async()=>{
   catch(err){profileMsg.style.color='var(--danger)';profileMsg.textContent=err.message||'Could not save personal records.';}
   finally{savePrsBtn.disabled=false;}
 });
+
+/* ---------------------------------------------------------
+   VIBE PARTICLES — subtle neon field behind transparent panels
+--------------------------------------------------------- */
+(function initVibeParticles(){
+  const canvas=document.getElementById('vibeParticleCanvas'); if(!canvas) return;
+  const ctx=canvas.getContext('2d'); let particles=[]; let w=0,h=0,dpr=1;
+  function cssVar(name,fallback){ return (getComputedStyle(document.documentElement).getPropertyValue(name)||fallback).trim(); }
+  function resize(){ dpr=Math.min(window.devicePixelRatio||1,2); w=innerWidth; h=innerHeight; canvas.width=w*dpr; canvas.height=h*dpr; canvas.style.width=w+'px'; canvas.style.height=h+'px'; ctx.setTransform(dpr,0,0,dpr,0,0); const count=Math.min(95,Math.max(48,Math.floor(w*h/15000))); particles=Array.from({length:count},()=>({x:Math.random()*w,y:Math.random()*h,r:.7+Math.random()*1.8,v:.12+Math.random()*.42,a:.18+Math.random()*.5,drift:(Math.random()-.5)*.18,tw:Math.random()*Math.PI*2})); }
+  function draw(t){
+    ctx.clearRect(0,0,w,h);
+    const neon=cssVar('--neon','#b6ff00'); const strong=cssVar('--neon-strong','#d9ff66');
+    particles.forEach(p=>{ p.y-=p.v; p.x+=p.drift+Math.sin(t*.0005+p.tw)*.08; p.tw+=.008; if(p.y<-8){p.y=h+8;p.x=Math.random()*w;} if(p.x<-8)p.x=w+8;if(p.x>w+8)p.x=-8;
+      const pulse=.55+.45*Math.sin(t*.0015+p.tw); ctx.globalAlpha=p.a*pulse; ctx.fillStyle=(p.r>1.7?strong:neon); ctx.shadowBlur=7; ctx.shadowColor=neon; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
+    }); ctx.globalAlpha=1; ctx.shadowBlur=0; requestAnimationFrame(draw);
+  }
+  resize(); addEventListener('resize',resize,{passive:true}); requestAnimationFrame(draw);
+})();
 
 /* ---------------------------------------------------------
    BACKUP & RESTORE — full local state as a downloadable JSON file
