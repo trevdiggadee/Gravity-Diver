@@ -2131,6 +2131,26 @@ function updateGlobalRestTimer(){
 }
 function hideGlobalRestTimer(){ if(globalRestTimer) globalRestTimer.classList.remove('show','done','inside-exercise-hidden'); }
 
+// Tapping the floating/small timer returns to the full main timer for the
+// exercise that was active when the timer was started. The countdown itself
+// is never reset; only the display changes.
+if(globalRestTimer){
+  globalRestTimer.addEventListener('click', ()=>{
+    if(!exRestInterval || exModalSide == null || exModalIndex == null) return;
+    try{
+      // Re-open the exercise window without changing the active timer.
+      openExerciseModal(exModalSide, exModalIndex);
+      exTimerPopup.classList.add('show');
+      updateClockVisual(restRemaining, restTotal);
+      updateGlobalRestTimer();
+    }catch(err){
+      console.warn('Could not reopen main rest timer:', err);
+    }
+  });
+  globalRestTimer.style.cursor='pointer';
+}
+
+
 function setTimerLabel(text){
   exTimerBtn.innerHTML = CLOCK_ICON_SVG + `<span class="tb-label">${text}</span>`;
 }
