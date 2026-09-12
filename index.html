@@ -660,7 +660,7 @@
   .profile-photo-btn:hover{color:var(--chalk); border-color:var(--neon);}
   .profile-username-row{ text-align:left; margin-bottom:7px; }
   .profile-username-row label,.metric-field label,.pr-field label{ display:block; font-size:8px; color:var(--chalk-dim); letter-spacing:.05em; text-transform:uppercase; margin-bottom:4px; }
-  #saveUsernameBtn{ width:100%; margin-bottom:5px; padding:7px 10px; }
+  
   .profile-msg{ font-size:10px; min-height:13px; margin-bottom:4px; color:var(--neon-strong); }
   .profile-email{ font-size:9px; color:var(--chalk-dim); margin:5px 0 0; padding-top:7px; border-top:1px solid var(--line); word-break:break-word; }
   .metrics-grid{ display:grid; grid-template-columns:1fr 1.35fr; gap:7px; }
@@ -1120,6 +1120,20 @@ input,select,textarea{background-color:rgba(8,10,10,.72)!important;backdrop-filt
 
 /* The floating timer is only the outside-of-exercise timer. The full clock inside the exercise window is the only clock shown there. */
 .global-rest-timer.inside-exercise-hidden{display:none!important;}
+
+  .pr-wheel-core{position:relative;overflow:visible;}
+  .pr-wheel-core img{position:relative;z-index:3;width:72%;height:72%;object-fit:contain;filter:drop-shadow(0 0 10px rgba(var(--neon-rgb),.45));}
+  .pr-wheel-core .core-text{display:none!important;}
+  .pr-wheel-core .core-glow{position:absolute;inset:8%;border-radius:50%;background:radial-gradient(circle,rgba(var(--neon-rgb),.48) 0%,rgba(var(--neon-rgb),.20) 34%,transparent 70%);filter:blur(13px);animation:corePulse 1.9s ease-in-out infinite;z-index:1;}
+  @keyframes corePulse{0%,100%{transform:scale(.82);opacity:.55;box-shadow:0 0 22px rgba(var(--neon-rgb),.2)}50%{transform:scale(1.12);opacity:1;box-shadow:0 0 55px rgba(var(--neon-rgb),.65)}}
+  .pr-wheel-label,.pr-wheel-count{display:none!important;}
+  .pr-wheel-item .pr-wheel-icon{position:relative;z-index:2;font-size:64px;opacity:.30;}
+  .profile-avatar{cursor:pointer;flex-basis:62px;width:62px;height:62px;font-size:24px;}
+  .profile-identity{justify-content:flex-start;gap:16px;min-height:92px;padding:6px 38px 6px 12px;}
+  .profile-identity-text{flex:1;min-width:0;}
+  .profile-identity-text .identity-name{font-size:28px;line-height:1;max-width:none;letter-spacing:.02em;}
+  .backup-import-label{display:flex;align-items:center;justify-content:center;cursor:pointer;}
+  .profile-photo-btn{cursor:pointer;}
 </style>
 </head>
 <body>
@@ -1250,22 +1264,20 @@ input,select,textarea{background-color:rgba(8,10,10,.72)!important;backdrop-filt
       <div class="profile-grid">
         <div class="profile-card profile-head">
           <div class="profile-identity">
-            <div class="profile-avatar" id="profileAvatar">?</div>
-            <div class="profile-identity-text"><span class="identity-label">RepLog Athlete</span><div class="identity-name" id="profileDisplayName">Athlete</div></div>
+            <button type="button" class="profile-avatar" id="profileAvatar" aria-label="Change profile image">?</button>
+            <div class="profile-identity-text"><div class="identity-name" id="profileDisplayName">Athlete</div></div>
             <input id="profileImageInput" type="file" accept="image/*" hidden>
             <button type="button" class="profile-settings-gear" id="profileSettingsBtn" aria-label="Edit profile settings" aria-expanded="false">⚙</button>
           </div>
           <div class="profile-settings-area" id="profileSettingsArea">
             <button type="button" class="profile-photo-btn" id="profileImageBtn">Change Image</button>
             <div class="profile-username-row">
-              <label for="usernameInput">Username</label>
-              <input id="usernameInput" type="text" maxlength="24" placeholder="Choose a username" autocomplete="off">
+              <input id="usernameInput" type="text" maxlength="24" placeholder="Username" autocomplete="off" aria-label="Username">
             </div>
-            <button type="button" class="btn-primary" id="saveUsernameBtn">Save Profile</button>
             <div class="profile-metrics-inline">
               <div class="metric-field"><label for="bodyWeightInput">Body Weight</label><input id="bodyWeightInput" type="number" min="1" max="999" step="0.1" placeholder="150"><div class="metric-unit">lbs</div></div>
               <div class="metric-field"><label>Height</label><div class="height-grid"><input id="heightFtInput" type="number" min="3" max="8" step="1" placeholder="5" inputmode="numeric" aria-label="Height feet"><input id="heightInInput" type="number" min="0" max="11" step="1" placeholder="8" inputmode="numeric" aria-label="Height inches"></div><div class="metric-unit">ft&nbsp;&nbsp;in</div></div>
-              <div class="profile-save-row"><button type="button" class="btn-primary" id="saveMetricsBtn">Save Metrics</button></div>
+              <div class="profile-save-row"><button type="button" class="btn-primary" id="saveProfileBtn">Save Profile</button></div>
             </div>
             <div class="profile-msg" id="profileMsg"></div>
             <div class="profile-email">Signed in as <span id="profileEmail"></span></div>
@@ -1286,7 +1298,7 @@ input,select,textarea{background-color:rgba(8,10,10,.72)!important;backdrop-filt
           <input id="importBackupInput" type="file" accept="application/json,.json" hidden>
           <div class="profile-save-row">
             <button type="button" class="btn-primary" id="exportBackupBtn">Export Backup</button>
-            <button type="button" class="btn-ghost" id="importBackupBtn">Import Backup</button>
+            <label class="btn-ghost backup-import-label" for="importBackupInput">Import Backup</label>
           </div>
           <div class="profile-msg" id="backupMsg"></div>
           <div class="profile-note">Importing replaces your current program, history, profile, and Vibe color on this device with whatever is in the backup file.</div>
@@ -3510,7 +3522,7 @@ function renderPrFields(){
   ];
   const wheel=document.createElement('div'); wheel.className='pr-wheel-wrap';
   const fire=document.createElement('div'); fire.className='pr-wheel-fire'; wheel.appendChild(fire);
-  const core=document.createElement('div'); core.className='pr-wheel-core'; core.innerHTML='<img src="center.png" alt=""><div class="core-text">PR HUB<span>SELECT TYPE</span></div>'; wheel.appendChild(core);
+  const core=document.createElement('div'); core.className='pr-wheel-core'; core.innerHTML='<div class="core-glow"></div><img src="center.png" alt="">'; wheel.appendChild(core);
   const detail=document.createElement('div'); detail.className='pr-wheel-detail'; panels.appendChild(wheel); panels.appendChild(detail);
   function makePRField(key){
     const name=labelMap[key]||keyForName.get(key)||key;
@@ -3520,7 +3532,7 @@ function renderPrFields(){
   }
   function showCategory(cat,button){
     wheel.querySelectorAll('.pr-wheel-item').forEach(b=>b.classList.remove('active')); button.classList.add('active');
-    core.querySelector('.core-text').innerHTML=`${cat.label.toUpperCase()}<span>${cat.keys.length} EXERCISES</span>`;
+    
     detail.innerHTML='';
     const head=document.createElement('div'); head.className='pr-wheel-detail-head';
     head.innerHTML=`<div class="pr-wheel-detail-title">${cat.label} Records</div><div class="pr-wheel-detail-hint">PR • LB</div>`; detail.appendChild(head);
@@ -3533,7 +3545,7 @@ function renderPrFields(){
     });
     detail.appendChild(grid);
   }
-  categories.forEach(cat=>{const b=document.createElement('button');b.type='button';b.className='pr-wheel-item';b.innerHTML=`<span class="pr-wheel-icon">${cat.icon}</span><span class="pr-wheel-label">${cat.label}</span><span class="pr-wheel-count">${cat.keys.length} EXERCISES</span>`;b.addEventListener('click',()=>showCategory(cat,b));wheel.appendChild(b);});
+  categories.forEach(cat=>{const b=document.createElement('button');b.type='button';b.className='pr-wheel-item';b.innerHTML=`<span class="pr-wheel-icon">${cat.icon}</span>`;b.addEventListener('click',()=>showCategory(cat,b));wheel.appendChild(b);});
   const initial=categories.find(c=>c.keys.length)||categories[0];
   const initialButton=Array.from(wheel.querySelectorAll('.pr-wheel-item')).find(b=>b.querySelector('.pr-wheel-label')?.textContent===initial.label);
   if(initialButton) showCategory(initial,initialButton);
@@ -3576,6 +3588,7 @@ if(profileSettingsBtn && profileSettingsArea){
 }
 
 profileImageBtn.addEventListener('click',()=>profileImageInput.click());
+profileAvatar.addEventListener('click',()=>profileImageInput.click());
 profileImageInput.addEventListener('change', async()=>{
   const file=profileImageInput.files && profileImageInput.files[0]; if(!file) return;
   if(!file.type.startsWith('image/')) return;
@@ -3583,36 +3596,28 @@ profileImageInput.addEventListener('change', async()=>{
   try{
     const dataUrl=await new Promise((resolve,reject)=>{
       const img=new Image(); const reader=new FileReader();
-      reader.onload=()=>{img.onload=()=>{ const size=256; const c=document.createElement('canvas'); c.width=size;c.height=size; const ctx=c.getContext('2d');
-        const scale=Math.max(size/img.width,size/img.height); const w=img.width*scale,h=img.height*scale; ctx.drawImage(img,(size-w)/2,(size-h)/2,w,h); resolve(c.toDataURL('image/jpeg',.82)); }; img.onerror=reject; img.src=reader.result;};
+      reader.onload=()=>{img.onload=()=>{ const size=512; const c=document.createElement('canvas'); c.width=size;c.height=size; const ctx=c.getContext('2d');
+        const scale=Math.max(size/img.width,size/img.height); const w=img.width*scale,h=img.height*scale; ctx.drawImage(img,(size-w)/2,(size-h)/2,w,h); resolve(c.toDataURL('image/jpeg',.88)); }; img.onerror=reject; img.src=reader.result;};
       reader.onerror=reject; reader.readAsDataURL(file);
     });
-    await updateProfileMetadata({profile_image:dataUrl},'Profile image saved!');
-  }catch(err){ profileMsg.style.color='var(--danger)'; profileMsg.textContent=err.message||'Could not save profile image.'; }
+    await updateProfileMetadata({profile_image:dataUrl},'Profile image ready. Tap Save Profile to save.');
+  }catch(err){ profileMsg.style.color='var(--danger)'; profileMsg.textContent=err.message||'Could not prepare profile image.'; }
   finally{ profileImageBtn.disabled=false; profileImageInput.value=''; }
 });
-saveUsernameBtn.addEventListener('click', async()=>{
+async function saveWholeProfile(){
   const username=usernameInput.value.trim();
-  if(!username){profileMsg.style.color='var(--danger)';profileMsg.textContent='Enter a username first.';return;}
-  saveUsernameBtn.disabled=true; profileMsg.textContent='Saving…';
-  try{ await updateProfileMetadata({username},'Profile saved!'); }
-  catch(err){profileMsg.style.color='var(--danger)';profileMsg.textContent=err.message||'Could not save profile.';}
-  finally{saveUsernameBtn.disabled=false;}
-});
-usernameInput.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();saveUsernameBtn.click();}});
-saveMetricsBtn.addEventListener('click',async()=>{
   const weight=parseFloat(bodyWeightInput.value), feet=parseInt(heightFtInput.value,10), inches=parseFloat(heightInInput.value);
   const height=(Number.isFinite(feet)?feet*12:0)+(Number.isFinite(inches)?inches:0);
+  if(!username){profileMsg.style.color='var(--danger)';profileMsg.textContent='Enter a username first.';return;}
   if(!(weight>0) || !(height>0) || feet<3 || feet>8 || inches<0 || inches>=12){profileMsg.style.color='var(--danger)';profileMsg.textContent='Enter a valid weight and height.';return;}
-  saveMetricsBtn.disabled=true; profileMsg.textContent='Saving metrics…';
-  try{await updateProfileMetadata({body_weight:weight,height_inches:height},'Body metrics saved!');}
-  catch(err){profileMsg.style.color='var(--danger)';profileMsg.textContent=err.message||'Could not save metrics.';}
-  finally{saveMetricsBtn.disabled=false;}
-});
-savePrsBtn.addEventListener('click',async()=>{
-  const prs=await syncAllExercisePRsFromLogs();
-  renderProfile();
-});
+  saveProfileBtn.disabled=true; profileMsg.textContent='Saving profile…';
+  try{await updateProfileMetadata({username,body_weight:weight,height_inches:height},'Profile saved!');}
+  catch(err){profileMsg.style.color='var(--danger)';profileMsg.textContent=err.message||'Could not save profile.';}
+  finally{saveProfileBtn.disabled=false;}
+}
+saveProfileBtn.addEventListener('click',saveWholeProfile);
+usernameInput.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();saveWholeProfile();}});
+savePrsBtn.addEventListener('click',async()=>{ await syncAllExercisePRsFromLogs(); renderProfile(); });
 
 /* ---------------------------------------------------------
    VIBE PARTICLES — subtle neon field behind transparent panels
@@ -3649,50 +3654,38 @@ function readLocalRestSoundRaw(){
   catch(e){ return null; }
 }
 
-exportBackupBtn.addEventListener('click', async () => {
-  exportBackupBtn.disabled = true; backupMsg.textContent = 'Preparing backup…';
+exportBackupBtn.addEventListener('click', async()=>{
+  exportBackupBtn.disabled=true; backupMsg.textContent='Creating backup…';
   try{
-    const state = await readLocalState();
-    const backup={app:'RepLog',backupVersion:3,exportedAt:new Date().toISOString(),days:(state&&state.days)||days,history:(state&&state.history)||history,user:(state&&state.user)||currentUser,theme:readLocalThemeRaw(),restSound:readLocalRestSoundRaw()};
+    const state=await readLocalState();
+    const backup={app:'RepLog',backupVersion:4,exportedAt:new Date().toISOString(),days:(state&&state.days)||days,history:(state&&state.history)||history,user:(state&&state.user)||currentUser,theme:readLocalThemeRaw(),restSound:readLocalRestSoundRaw()};
     const json=JSON.stringify(backup,null,2);
     const filename=`replog-backup-${new Date().toISOString().slice(0,10)}.json`;
     const blob=new Blob([json],{type:'application/json'});
     const file=new File([blob],filename,{type:'application/json'});
-    if(navigator.share){
-      try{
-        if(!navigator.canShare || navigator.canShare({files:[file]})){
-          await navigator.share({title:'RepLog Backup',text:'RepLog workout backup',files:[file]});
-          backupMsg.style.color='var(--neon-strong)'; backupMsg.textContent='Backup ready — choose Save to Files.'; return;
-        }
-      }catch(e){ if(e && e.name==='AbortError'){backupMsg.textContent='Backup share cancelled.';return;} }
+    if(navigator.share && (!navigator.canShare || navigator.canShare({files:[file]}))){
+      try{await navigator.share({title:'RepLog Backup',text:'RepLog backup — save this file to Files.',files:[file]}); backupMsg.style.color='var(--neon-strong)'; backupMsg.textContent='Backup shared — choose Save to Files.'; return;}
+      catch(e){if(e&&e.name==='AbortError'){backupMsg.textContent='Backup share cancelled.';return;}}
     }
-    const url=URL.createObjectURL(blob);
-    const a=document.createElement('a'); a.href=url; a.download=filename; a.rel='noopener'; document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(()=>URL.revokeObjectURL(url),10000);
-    backupMsg.style.color='var(--neon-strong)'; backupMsg.textContent='Backup file created.';
-  }catch(err){ console.error('RepLog export failed',err); backupMsg.style.color='var(--danger)'; backupMsg.textContent=(err&&err.message)||'Could not create backup.'; }
-  finally{ exportBackupBtn.disabled=false; }
-});
-
-importBackupBtn.addEventListener('click',(e)=>{
-  e.preventDefault(); e.stopPropagation();
-  if(importBackupInput){ importBackupInput.value=''; importBackupInput.click(); }
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=filename; a.target='_blank'; a.rel='noopener'; a.style.display='none'; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},15000);
+    backupMsg.style.color='var(--neon-strong)'; backupMsg.textContent='Backup file created. Check Files/Downloads.';
+  }catch(err){console.error('RepLog export failed',err);backupMsg.style.color='var(--danger)';backupMsg.textContent=err.message||'Could not create backup.';}
+  finally{exportBackupBtn.disabled=false;}
 });
 importBackupInput.addEventListener('change',async()=>{
-  const file=importBackupInput.files&&importBackupInput.files[0];
-  if(!file)return;
+  const file=importBackupInput.files&&importBackupInput.files[0]; if(!file)return;
   backupMsg.textContent='Reading backup…';
   try{
-    const text=await file.text(); const parsed=JSON.parse(text);
-    if(!parsed || parsed.app!=='RepLog' || !isValidDaysShape(parsed.days)) throw new Error("That file doesn't look like a valid RepLog backup.");
+    const parsed=JSON.parse(await file.text());
+    if(!parsed||parsed.app!=='RepLog'||!isValidDaysShape(parsed.days)) throw new Error("That file doesn't look like a valid RepLog backup.");
     if(!confirm('This will replace your current program, history, profile, and Vibe color on this device. Continue?')){backupMsg.textContent='';return;}
-    const restoredDays=normalizeDaysLength(parsed.days), restoredHistory=Array.isArray(parsed.history)?parsed.history:[], restoredUser=parsed.user||currentUser;
+    const restoredDays=normalizeDaysLength(parsed.days),restoredHistory=Array.isArray(parsed.history)?parsed.history:[],restoredUser=parsed.user||currentUser;
     await writeLocalState({days:restoredDays,history:restoredHistory,user:restoredUser});
-    localStateLoaded=true; days=restoredDays; history=restoredHistory; currentUser=restoredUser;
-    if(parsed.theme&&parsed.theme.hex) applyTheme(parsed.theme,{silent:true});
-    if(parsed.restSound){try{localStorage.setItem('REPLOG_REST_SOUND',parsed.restSound);}catch(e){} if(restSoundSelect)restSoundSelect.value=parsed.restSound;}
-    activeDay=0; renderProfile(); renderAll(); backupMsg.style.color='var(--neon-strong)'; backupMsg.textContent='Backup restored!'; showToast('Backup restored successfully.',5000);
-  }catch(err){console.error('RepLog import failed',err);backupMsg.style.color='var(--danger)';backupMsg.textContent=(err&&err.message)||'Could not restore that backup file.';}
+    localStateLoaded=true;days=restoredDays;history=restoredHistory;currentUser=restoredUser;
+    if(parsed.theme&&parsed.theme.hex)applyTheme(parsed.theme,{silent:true});
+    if(parsed.restSound){try{localStorage.setItem('REPLOG_REST_SOUND',parsed.restSound);}catch(e){}if(restSoundSelect)restSoundSelect.value=parsed.restSound;}
+    activeDay=0;renderProfile();renderAll();backupMsg.style.color='var(--neon-strong)';backupMsg.textContent='Backup restored!';showToast('Backup restored successfully.',5000);
+  }catch(err){console.error('RepLog import failed',err);backupMsg.style.color='var(--danger)';backupMsg.textContent=err.message||'Could not restore that backup file.';}
   finally{importBackupInput.value='';}
 });
 
