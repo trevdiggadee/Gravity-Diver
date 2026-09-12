@@ -625,42 +625,56 @@
   .profile-heart:nth-child(4){left:70%; bottom:-55px; animation-delay:-7s; transform:scale(.6) rotate(-45deg);}
   .profile-heart:nth-child(5){left:88%; bottom:-45px; animation-delay:-2s; transform:scale(.8) rotate(-45deg);}
   @keyframes profileHeartFloat{0%{opacity:0;translate:0 0}12%{opacity:.55}88%{opacity:.55}100%{opacity:0;translate:12px -900px}}
-  .profile-grid{ display:grid; grid-template-columns:minmax(240px,.72fr) minmax(0,1.28fr); gap:12px; max-width:860px; margin:16px auto 0; align-items:start; }
-  .profile-card{ position:relative; z-index:1; background:rgba(19,20,23,.94); border:1px solid var(--line); border-radius:var(--radius); padding:18px 16px; box-shadow:0 16px 50px rgba(0,0,0,.25); }
+  .profile-grid{ display:grid; grid-template-columns:minmax(190px,.58fr) minmax(0,1.42fr); gap:10px; max-width:860px; margin:10px auto 0; align-items:start; }
+  .profile-card{ position:relative; z-index:1; background:rgba(19,20,23,.94); border:1px solid var(--line); border-radius:var(--radius); padding:13px 13px; box-shadow:0 16px 50px rgba(0,0,0,.25); }
   .profile-card.wide{ grid-column:1/-1; }
-  .profile-card h3{ margin:0 0 12px; font-size:16px; }
-  .profile-card-sub{ color:var(--chalk-faint); font-size:10px; margin:-6px 0 12px; line-height:1.4; }
+  .profile-card h3{ margin:0 0 8px; font-size:15px; }
+  .profile-card-sub{ color:var(--chalk-faint); font-size:9px; margin:-3px 0 9px; line-height:1.35; }
   .profile-head{ text-align:center; }
-  .profile-avatar{ width:88px; height:88px; border-radius:50%; margin:0 auto 9px; display:flex; align-items:center; justify-content:center; overflow:hidden; background:rgba(var(--neon-rgb),.12); border:2px solid var(--neon); color:var(--neon-strong); font-family:'Oswald',sans-serif; font-size:32px; font-weight:700; text-shadow:0 0 12px rgba(var(--neon-rgb),.5); }
+  .profile-avatar{ width:66px; height:66px; border-radius:50%; margin:0 auto 6px; display:flex; align-items:center; justify-content:center; overflow:hidden; background:rgba(var(--neon-rgb),.12); border:2px solid var(--neon); color:var(--neon-strong); font-family:'Oswald',sans-serif; font-size:25px; font-weight:700; text-shadow:0 0 12px rgba(var(--neon-rgb),.5); }
   .profile-avatar img{ width:100%; height:100%; object-fit:cover; display:block; }
-  .profile-photo-btn{ display:inline-flex; align-items:center; justify-content:center; gap:7px; margin:0 auto 13px; padding:7px 12px; border:1px solid var(--line); border-radius:100px; background:var(--panel-3); color:var(--chalk-dim); font:inherit; font-size:11px; cursor:pointer; }
+  .profile-photo-btn{ display:inline-flex; align-items:center; justify-content:center; gap:5px; margin:0 auto 8px; padding:5px 9px; border:1px solid var(--line); border-radius:100px; background:var(--panel-3); color:var(--chalk-dim); font:inherit; font-size:10px; cursor:pointer; }
   .profile-photo-btn:hover{color:var(--chalk); border-color:var(--neon);}
-  .profile-username-row{ text-align:left; margin-bottom:10px; }
-  .profile-username-row label,.metric-field label,.pr-field label{ display:block; font-size:9px; color:var(--chalk-dim); letter-spacing:.05em; text-transform:uppercase; margin-bottom:5px; }
-  #saveUsernameBtn{ width:100%; margin-bottom:8px; }
-  .profile-msg{ font-size:11px; min-height:15px; margin-bottom:7px; color:var(--neon-strong); }
-  .profile-email{ font-size:10px; color:var(--chalk-dim); margin:8px 0 0; padding-top:10px; border-top:1px solid var(--line); word-break:break-word; }
-  .metrics-grid{ display:grid; grid-template-columns:1fr 1.35fr; gap:10px; }
-  .height-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+  .profile-username-row{ text-align:left; margin-bottom:7px; }
+  .profile-username-row label,.metric-field label,.pr-field label{ display:block; font-size:8px; color:var(--chalk-dim); letter-spacing:.05em; text-transform:uppercase; margin-bottom:4px; }
+  #saveUsernameBtn{ width:100%; margin-bottom:5px; padding:7px 10px; }
+  .profile-msg{ font-size:10px; min-height:13px; margin-bottom:4px; color:var(--neon-strong); }
+  .profile-email{ font-size:9px; color:var(--chalk-dim); margin:5px 0 0; padding-top:7px; border-top:1px solid var(--line); word-break:break-word; }
+  .metrics-grid{ display:grid; grid-template-columns:1fr 1.35fr; gap:7px; }
+  .height-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;}
   .metric-field input,.pr-field input{ width:100%; }
-  .metric-unit{ color:var(--chalk-faint); font-size:9px; margin-top:4px; }
-  .profile-save-row{ display:flex; gap:8px; margin-top:11px; }
-  .profile-save-row button{ flex:1; }
-  .pr-highlight{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; margin-bottom:11px; }
-  .pr-highlight-card{ border:1px solid rgba(var(--neon-rgb),.25); background:rgba(var(--neon-rgb),.045); border-radius:10px; padding:10px 7px; text-align:center; }
-  .pr-highlight-card .pr-name{font-size:8px;color:var(--chalk-dim);text-transform:uppercase;letter-spacing:.05em;}
-  .pr-highlight-card .pr-value{font:700 19px 'Oswald',sans-serif;color:var(--neon-strong);margin-top:3px;white-space:nowrap;}
-  .pr-tabs{display:flex;gap:5px;overflow-x:auto;padding:2px 0 8px;scrollbar-width:none;}
-  .pr-tabs::-webkit-scrollbar{display:none;}
-  .pr-tab{flex:0 0 auto;border:1px solid var(--line);background:var(--panel-3);color:var(--chalk-dim);border-radius:999px;padding:6px 10px;font:inherit;font-size:9px;text-transform:uppercase;letter-spacing:.04em;cursor:pointer;}
-  .pr-tab.active{background:rgba(var(--neon-rgb),.12);border-color:var(--neon);color:var(--neon-strong);box-shadow:0 0 12px rgba(var(--neon-rgb),.12);}
-  .pr-panel{display:none;}
-  .pr-panel.active{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px 10px;}
-  .pr-field{min-width:0;padding:7px 8px;border:1px solid rgba(255,255,255,.055);border-radius:9px;background:rgba(255,255,255,.018);}
-  .pr-field input{font-family:'JetBrains Mono',monospace;font-size:12px;padding:6px 7px;}
-  .profile-note{font-size:9px;color:var(--chalk-faint);line-height:1.45;margin-top:9px;}
-#savePrsBtn{display:none!important}
-.pr-field input[readonly]{cursor:default;opacity:.95}
+  .metric-unit{ color:var(--chalk-faint); font-size:8px; margin-top:3px; }
+  .profile-save-row{ display:flex; gap:6px; margin-top:8px; }
+  .profile-save-row button{ flex:1; padding:7px 9px; font-size:10px; }
+  .pr-highlight{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:5px; margin-bottom:8px; }
+  .pr-highlight-card{ border:1px solid rgba(var(--neon-rgb),.22); background:rgba(var(--neon-rgb),.035); border-radius:8px; padding:6px 5px; text-align:center; }
+  .pr-highlight-card .pr-name{font-size:7px;color:var(--chalk-dim);text-transform:uppercase;letter-spacing:.05em;}
+  .pr-highlight-card .pr-value{font:700 15px 'Oswald',sans-serif;color:var(--neon-strong);margin-top:2px;white-space:nowrap;}
+  .pr-tabs{display:flex;gap:5px;padding:0 0 7px;}
+  .pr-tab{flex:1;border:1px solid var(--neon);background:rgba(var(--neon-rgb),.09);color:var(--neon-strong);border-radius:999px;padding:5px 9px;font:inherit;font-size:9px;text-transform:uppercase;letter-spacing:.06em;cursor:default;text-align:center;}
+  .pr-panels{display:block;}
+  .pr-panel{display:block;}
+  .pr-accordion{ margin:0 0 6px; border:1px solid rgba(255,255,255,.07); border-radius:9px; overflow:hidden; background:rgba(255,255,255,.012); }
+  .pr-accordion summary{ list-style:none; display:flex; align-items:center; gap:8px; min-height:34px; padding:7px 9px; cursor:pointer; user-select:none; color:var(--chalk); font-family:'Oswald',sans-serif; font-size:12px; letter-spacing:.03em; }
+  .pr-accordion summary::-webkit-details-marker{display:none;}
+  .pr-accordion summary::before{ content:'›'; color:var(--neon); font-family:Inter,sans-serif; font-size:17px; line-height:1; transform:rotate(0deg); transition:transform .16s ease; }
+  .pr-accordion[open] summary::before{ transform:rotate(90deg); }
+  .pr-accordion summary .pr-section-count{ margin-left:auto; color:var(--chalk-faint); font:500 8px 'Inter',sans-serif; }
+  .pr-accordion summary .pr-section-type{ color:var(--neon); font:700 8px 'Inter',sans-serif; text-transform:uppercase; letter-spacing:.08em; margin-left:2px; }
+  .pr-accordion-body{ padding:0 7px 7px; }
+  .pr-panel.active{display:block;}
+  .pr-field{min-width:0;padding:6px 7px;border:1px solid rgba(255,255,255,.055);border-radius:8px;background:rgba(255,255,255,.018);}
+  .pr-field input{font-family:'JetBrains Mono',monospace;font-size:11px;padding:5px 6px;}
+  .pr-section-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;}
+  .pr-title{ color:var(--neon-strong); text-shadow:0 0 12px rgba(var(--neon-rgb),.28); font-size:18px!important; letter-spacing:.04em; margin-bottom:4px!important; }
+  .profile-note{font-size:8px;color:var(--chalk-faint);line-height:1.4;margin-top:7px;}
+  #savePrsBtn{display:none!important}
+  .pr-field input[readonly]{cursor:default;opacity:.95}
+  .profile-metrics-compact{padding-top:9px!important;padding-bottom:9px!important;}
+  .profile-metrics-compact h3{color:var(--neon-strong);font-size:13px;margin-bottom:5px;}
+  .profile-metrics-compact .profile-card-sub{margin-bottom:7px;}
+  .profile-metrics-compact .profile-save-row{margin-top:6px;}
+  .profile-metrics-compact .profile-note{display:none;}
   @media(max-width:680px){ .profile-grid{grid-template-columns:1fr;max-width:520px;} .profile-card.wide{grid-column:auto;} }
   @media(max-width:420px){ .profile-grid{margin-top:10px;} .profile-card{padding:15px 13px;} .pr-highlight-card .pr-value{font-size:17px;} .pr-panel.active{grid-template-columns:1fr 1fr;gap:6px;} }
 
@@ -1210,20 +1224,19 @@ input,select,textarea{background-color:rgba(8,10,10,.72)!important;backdrop-filt
           <div class="profile-email">Signed in as <span id="profileEmail"></span></div>
         </div>
 
-        <div class="profile-card">
+        <div class="profile-card profile-metrics-compact">
           <h3>Body Metrics</h3>
-          <div class="profile-card-sub">Used for workload intensity and calorie estimates.</div>
+          <div class="profile-card-sub">Weight + height for training estimates.</div>
           <div class="metrics-grid">
-            <div class="metric-field"><label for="bodyWeightInput">Current Body Weight</label><input id="bodyWeightInput" type="number" min="1" max="999" step="0.1" placeholder="150"><div class="metric-unit">lbs</div></div>
+            <div class="metric-field"><label for="bodyWeightInput">Weight</label><input id="bodyWeightInput" type="number" min="1" max="999" step="0.1" placeholder="150"><div class="metric-unit">lbs</div></div>
             <div class="metric-field"><label>Height</label><div class="height-grid"><input id="heightFtInput" type="number" min="3" max="8" step="1" placeholder="5" inputmode="numeric" aria-label="Height feet"><input id="heightInInput" type="number" min="0" max="11" step="1" placeholder="8" inputmode="numeric" aria-label="Height inches"></div><div class="metric-unit">ft&nbsp;&nbsp;&nbsp;&nbsp;in</div></div>
           </div>
           <div class="profile-save-row"><button type="button" class="btn-primary" id="saveMetricsBtn">Save Metrics</button></div>
-          <div class="profile-note">Keeping these current helps RepLog make better training-load and energy estimates as features expand.</div>
         </div>
 
         <div class="profile-card wide">
-          <h3>Personal Records <span style="color:var(--neon);">PRs</span></h3>
-          <div class="profile-card-sub">Automatically calculated from your recorded workouts. No manual PR entry is needed.</div>
+          <h3 class="pr-title">Personal Records</h3>
+          <div class="profile-card-sub">Automatically calculated from your recorded workouts.</div>
           <div class="pr-highlight">
             <div class="pr-highlight-card"><div class="pr-name">Bench</div><div class="pr-value" id="prBenchQuick">—</div></div>
             <div class="pr-highlight-card"><div class="pr-name">Squat</div><div class="pr-value" id="prSquatQuick">—</div></div>
@@ -1231,8 +1244,7 @@ input,select,textarea{background-color:rgba(8,10,10,.72)!important;backdrop-filt
           </div>
           <div class="pr-tabs" id="prTabs" role="tablist"></div>
           <div class="pr-panels" id="prPanels"></div>
-          <div class="profile-save-row"><button type="button" class="btn-primary" id="savePrsBtn">Save Personal Records</button></div>
-          <div class="profile-note">PRs are calculated from the highest weight you have actually recorded for each exercise.</div>
+          <div class="profile-note">Highest weight actually recorded for each exercise.</div>
         </div>
 
         <div class="profile-card wide">
@@ -3422,27 +3434,72 @@ const PR_FIELDS = [
 ];
 
 function profileMetadata(){ return (currentUser && currentUser.user_metadata) || {}; }
-const PR_GROUPS = [
-  ['Main', ['bench_press','back_squat','deadlift','overhead_press']],
-  ['Press', ['incline_bench','close_grip_bench','dumbbell_bench','dip','skull_crusher']],
-  ['Pull / Legs', ['barbell_row','pendlay_row','pull_up','front_squat','romanian_deadlift','leg_press','hack_squat','hip_thrust']],
-  ['Olympic / Other', ['power_clean','clean_and_jerk','snatch','barbell_curl','calf_raise']],
-  ['All Exercises', []]
-];
-function refreshAllExercisePRGroup(){const defs=collectAllExerciseNames().map(n=>[exerciseToPrKey(n),n]).filter(x=>x[0]);const g=PR_GROUPS.find(x=>x[0]==='All Exercises');if(g)g[1]=defs.map(x=>x[0]);defs.forEach(([k,n])=>{if(!PR_FIELDS.some(x=>x[0]===k))PR_FIELDS.push([k,n]);});}
+const PR_GROUPS = [['All Exercises', []]];
+function refreshAllExercisePRGroup(){
+  const defs=collectAllExerciseNames().map(n=>[exerciseToPrKey(n),n]).filter(x=>x[0]);
+  const unique=new Map();
+  defs.forEach(([k,n])=>{if(!unique.has(k))unique.set(k,n);});
+  const g=PR_GROUPS[0];
+  g[1]=Array.from(unique.keys());
+  unique.forEach((n,k)=>{if(!PR_FIELDS.some(x=>x[0]===k))PR_FIELDS.push([k,n]);});
+}
 function renderPrFields(){
   refreshAllExercisePRGroup();
   const tabs=document.getElementById('prTabs'), panels=document.getElementById('prPanels');
-  if(!tabs || !panels || tabs.children.length) return;
+  if(!tabs || !panels) return;
+  tabs.innerHTML=''; panels.innerHTML='';
+
+  const tab=document.createElement('button');
+  tab.type='button'; tab.className='pr-tab active'; tab.textContent='All Exercises';
+  tab.setAttribute('role','tab'); tab.setAttribute('aria-selected','true');
+  tabs.appendChild(tab);
+
+  const panel=document.createElement('div');
+  panel.className='pr-panel active'; panel.id='prPanel_0'; panel.setAttribute('role','tabpanel');
+
   const labelMap=Object.fromEntries(PR_FIELDS);
-  PR_GROUPS.forEach(([group, keys], i)=>{
-    const tab=document.createElement('button'); tab.type='button'; tab.className='pr-tab'+(i===0?' active':''); tab.textContent=group; tab.setAttribute('role','tab'); tab.dataset.group=group;
-    tab.addEventListener('click',()=>{ tabs.querySelectorAll('.pr-tab').forEach(x=>x.classList.remove('active')); panels.querySelectorAll('.pr-panel').forEach(x=>x.classList.remove('active')); tab.classList.add('active'); document.getElementById('prPanel_'+i).classList.add('active'); });
-    tabs.appendChild(tab);
-    const panel=document.createElement('div'); panel.className='pr-panel'+(i===0?' active':''); panel.id='prPanel_'+i; panel.setAttribute('role','tabpanel');
-    panel.innerHTML=keys.map(key=>`<div class="pr-field"><label for="pr_${key}">${labelMap[key]||key}</label><input id="pr_${key}" type="number" min="0" max="3000" step="0.5" placeholder="—" inputmode="decimal" readonly aria-readonly="true"><div class="metric-unit">lbs</div></div>`).join('');
-    panels.appendChild(panel);
-  });
+  const allNames=collectAllExerciseNames();
+  const keyForName=new Map();
+  allNames.forEach(n=>{const k=exerciseToPrKey(n); if(k && !keyForName.has(k)) keyForName.set(k,n);});
+
+  const makeAccordion=(type,label,items,open=false)=>{
+    if(!items.length) return null;
+    const details=document.createElement('details'); details.className='pr-accordion'; details.open=open;
+    const summary=document.createElement('summary');
+    summary.innerHTML=`<span class="pr-section-type">${type}</span><span>${label}</span><span class="pr-section-count">${items.length}</span>`;
+    details.appendChild(summary);
+    const body=document.createElement('div'); body.className='pr-accordion-body';
+    const grid=document.createElement('div'); grid.className='pr-section-grid';
+    items.forEach(key=>{
+      const name=labelMap[key] || keyForName.get(key) || key;
+      const field=document.createElement('div'); field.className='pr-field';
+      field.innerHTML=`<label for="pr_${key}">${name}</label><input id="pr_${key}" type="number" min="0" max="3000" step="0.5" placeholder="—" inputmode="decimal" readonly aria-readonly="true"><div class="metric-unit">lbs</div>`;
+      grid.appendChild(field);
+    });
+    body.appendChild(grid); details.appendChild(body); return details;
+  };
+
+  const appendLibrarySections=(type,lib)=>{
+    const used=new Set();
+    Object.entries(lib).forEach(([label,names])=>{
+      const keys=[]; names.forEach(n=>{const k=exerciseToPrKey(n); if(k && keyForName.has(k) && !used.has(k)){used.add(k);keys.push(k);}});
+      const sec=makeAccordion(type,label,keys,false); if(sec) panel.appendChild(sec);
+    });
+    return used;
+  };
+  const upperUsed=appendLibrarySections('Upper',UPPER_LIBRARY);
+  const lowerUsed=appendLibrarySections('Lower',LOWER_LIBRARY);
+
+  // The library already gives us exercise types; keep any custom/recorded exercises visible too.
+  const known=new Set([...upperUsed,...lowerUsed]);
+  const other=Array.from(keyForName.keys()).filter(k=>!known.has(k));
+  const otherSec=makeAccordion('Other','Recorded / Custom',other,false); if(otherSec) panel.appendChild(otherSec);
+
+  // If a user has no exercises yet, show a compact empty state.
+  if(!panel.children.length){
+    const empty=document.createElement('div'); empty.className='profile-card-sub'; empty.textContent='No exercises are available yet.'; panel.appendChild(empty);
+  }
+  panels.appendChild(panel);
 }
 function renderQuickPRs(prs){
   const q=[['prBenchQuick','bench_press'],['prSquatQuick','back_squat'],['prDeadliftQuick','deadlift']];
