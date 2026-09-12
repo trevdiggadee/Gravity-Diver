@@ -680,7 +680,7 @@
   .pr-wheel-fire{position:absolute;inset:-2%;border-radius:50%;pointer-events:none;overflow:hidden;}
   .pr-wheel-fire::before,.pr-wheel-fire::after{content:"";position:absolute;border-radius:50%;border:2px solid transparent;border-top-color:var(--neon);border-right-color:rgba(var(--neon-rgb),.3);filter:blur(1px);box-shadow:0 0 10px var(--neon),0 0 30px rgba(var(--neon-rgb),.35);animation:prFireOrbit 2.4s linear infinite;}
   .pr-wheel-fire::before{inset:5%;}.pr-wheel-fire::after{inset:9%;border-width:1px;border-top-color:var(--neon-strong);border-left-color:rgba(var(--neon-rgb),.35);animation-duration:3.7s;animation-direction:reverse;opacity:.75;}
-  .pr-wheel-core{width:137px;height:137px;border-radius:50%;border:2px solid rgba(var(--neon-rgb),.7);background:#090b0c;display:grid;place-items:center;text-align:center;color:var(--neon-strong);font:800 16px 'Oswald',sans-serif;letter-spacing:.08em;text-transform:uppercase;box-shadow:0 0 32px rgba(var(--neon-rgb),.35),inset 0 0 30px rgba(var(--neon-rgb),.1);overflow:hidden;z-index:4;position:relative;}
+  .pr-wheel-core{width:96px;height:96px;border-radius:50%;border:2px solid rgba(var(--neon-rgb),.7);background:#090b0c;display:grid;place-items:center;text-align:center;color:var(--neon-strong);font:800 16px 'Oswald',sans-serif;letter-spacing:.08em;text-transform:uppercase;box-shadow:0 0 32px rgba(var(--neon-rgb),.35),inset 0 0 30px rgba(var(--neon-rgb),.1);overflow:hidden;z-index:4;position:relative;}
   .pr-wheel-core::before{content:"";position:absolute;inset:-12px;border-radius:50%;background:radial-gradient(circle,rgba(var(--neon-rgb),.22),transparent 62%);filter:blur(9px);z-index:-1;animation:prCoreGlow 2.2s ease-in-out infinite alternate;}
   .pr-wheel-core img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;opacity:1;filter:drop-shadow(0 0 16px rgba(var(--neon-rgb),.72));z-index:0;}.pr-wheel-core::after{content:"";position:absolute;inset:-20px;border-radius:50%;background:radial-gradient(circle,rgba(var(--neon-rgb),.34) 0%,rgba(var(--neon-rgb),.16) 34%,transparent 70%);filter:blur(12px);z-index:-1;animation:prCenterPulse 1.9s ease-in-out infinite;pointer-events:none;}
 .pr-wheel-core .core-glow{position:absolute;inset:-12px;border-radius:50%;background:radial-gradient(circle,rgba(var(--neon-rgb),.32),transparent 66%);filter:blur(10px);animation:prCenterPulse 2.3s ease-in-out infinite alternate;z-index:-1;}
@@ -692,7 +692,7 @@
   .pr-wheel-item.active,.pr-wheel-item:hover{border-color:var(--neon);background:rgba(var(--neon-rgb),.13);box-shadow:0 0 34px rgba(var(--neon-rgb),.28),inset 0 0 26px rgba(var(--neon-rgb),.08);}
   .pr-wheel-item.active:nth-child(3){transform:translateX(-50%) scale(1.045)} .pr-wheel-item.active:nth-child(4){transform:translateY(-50%) scale(1.045)} .pr-wheel-item.active:nth-child(5){transform:translateX(-50%) scale(1.045)} .pr-wheel-item.active:nth-child(6){transform:translateY(-50%) scale(1.045)}
   .pr-wheel-icon{position:absolute;font-size:62px;line-height:1;color:var(--neon);opacity:.16;filter:drop-shadow(0 0 12px rgba(var(--neon-rgb),.5));z-index:0;}
-  .pr-wheel-label{position:relative;z-index:2;font:900 24px 'Oswald',sans-serif;color:#fff;letter-spacing:.055em;text-transform:uppercase;text-align:center;text-shadow:0 2px 10px #000,0 0 13px rgba(var(--neon-rgb),.3);white-space:nowrap;}
+  .pr-wheel-label{position:relative;z-index:2;display:flex;align-items:center;justify-content:center;width:100%;height:100%;font:900 24px 'Oswald',sans-serif;color:#fff;letter-spacing:.055em;text-transform:uppercase;text-align:center;text-shadow:0 2px 10px #000,0 0 13px rgba(var(--neon-rgb),.3);white-space:nowrap;}
   .pr-wheel-count{display:none!important;}
   .pr-wheel-detail{border-top:1px solid rgba(var(--neon-rgb),.13);padding-top:7px;animation:prPanelIn .28s ease both;}
   .pr-wheel-detail-head{display:flex;align-items:center;justify-content:space-between;margin:0 2px 6px;}
@@ -1123,13 +1123,13 @@ input,select,textarea{background-color:rgba(8,10,10,.72)!important;backdrop-filt
 .global-rest-timer.inside-exercise-hidden{display:none!important;}
 
   .pr-wheel-core{position:relative;overflow:visible;}
-  .pr-wheel-core img{position:relative;z-index:3;width:101%;height:101%;object-fit:contain;filter:drop-shadow(0 0 10px rgba(var(--neon-rgb),.45));}.pr-wheel-core .core-tint{position:absolute;inset:-1px;border-radius:50%;background:var(--neon);opacity:.34;mix-blend-mode:color;z-index:4;pointer-events:none;}.pr-wheel-core .core-tint::after{content:"";position:absolute;inset:0;border-radius:50%;background:var(--neon);opacity:.16;mix-blend-mode:screen;}
+  .pr-wheel-core img{position:relative;z-index:3;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 0 10px rgba(var(--neon-rgb),.55));}.pr-wheel-core .core-tint{position:absolute;inset:0;border-radius:50%;background:var(--neon);opacity:.48;mix-blend-mode:color;z-index:4;pointer-events:none;}.pr-wheel-core .core-tint::after{content:"";position:absolute;inset:0;border-radius:50%;background:var(--neon);opacity:.28;mix-blend-mode:screen;}
   .pr-wheel-core .core-text{display:none!important;}
   .pr-wheel-core .core-glow{position:absolute;inset:8%;border-radius:50%;background:radial-gradient(circle,rgba(var(--neon-rgb),.48) 0%,rgba(var(--neon-rgb),.20) 34%,transparent 70%);filter:blur(13px);animation:corePulse 1.9s ease-in-out infinite;z-index:1;}
   @keyframes corePulse{0%,100%{transform:scale(.82);opacity:.55;box-shadow:0 0 22px rgba(var(--neon-rgb),.2)}50%{transform:scale(1.12);opacity:1;box-shadow:0 0 55px rgba(var(--neon-rgb),.65)}}
   .pr-wheel-label{display:block!important;position:relative;z-index:3;font:900 24px 'Oswald',sans-serif;color:#fff;letter-spacing:.055em;text-transform:uppercase;text-align:center;line-height:1;pointer-events:none;text-shadow:0 1px 3px rgba(0,0,0,.75);}.pr-wheel-count{display:none!important;}
-  .pr-wheel-item .pr-wheel-icon{position:absolute;z-index:2;font-size:0;opacity:.24;width:56px;height:62px;display:block;pointer-events:none;}.pr-wheel-item .pr-wheel-icon::before{content:"";display:block;width:56px;height:62px;background:currentColor;clip-path:polygon(47% 0,58% 4%,64% 13%,63% 24%,57% 30%,70% 35%,82% 46%,100% 64%,93% 71%,77% 58%,68% 51%,73% 72%,82% 98%,69% 100%,58% 75%,51% 57%,45% 75%,34% 100%,21% 96%,31% 70%,36% 52%,25% 59%,9% 73%,0 64%,17% 45%,28% 35%,41% 30%,36% 23%,37% 13%,41% 5%);}
-  .pr-wheel-item .pr-wheel-icon:not(.runner-icon){font-size:64px;line-height:1;width:auto;height:auto;color:var(--neon);}.pr-wheel-item .runner-icon::before{display:block;} 
+  .pr-wheel-item .pr-wheel-icon{display:none!important;}.pr-wheel-item .pr-wheel-icon::before{content:"";display:block;width:56px;height:62px;background:currentColor;clip-path:polygon(47% 0,58% 4%,64% 13%,63% 24%,57% 30%,70% 35%,82% 46%,100% 64%,93% 71%,77% 58%,68% 51%,73% 72%,82% 98%,69% 100%,58% 75%,51% 57%,45% 75%,34% 100%,21% 96%,31% 70%,36% 52%,25% 59%,9% 73%,0 64%,17% 45%,28% 35%,41% 30%,36% 23%,37% 13%,41% 5%);}
+  
   .profile-avatar{cursor:pointer;flex-basis:62px;width:62px;height:62px;font-size:24px;}
   .profile-identity{justify-content:flex-start;gap:16px;min-height:92px;padding:6px 38px 6px 12px;}
   .profile-identity-text{flex:1;min-width:0;}
@@ -3517,10 +3517,10 @@ function renderPrFields(){
   const known=new Set([...upper,...lower,...cardio]);
   const custom=Array.from(keyForName.keys()).filter(k=>!known.has(k));
   const categories=[
-    {id:'upper',label:'Upper',icon:'↟',keys:upper},
-    {id:'lower',label:'Lower',icon:'↡',keys:lower},
-    {id:'custom',label:'Custom',icon:'✦',keys:custom},
-    {id:'cardio',label:'Cardio',icon:'RUN',keys:cardio}
+    {id:'upper',label:'Upper',icon:'',keys:upper},
+    {id:'lower',label:'Lower',icon:'',keys:lower},
+    {id:'custom',label:'Custom',icon:'',keys:custom},
+    {id:'cardio',label:'Cardio',icon:'',keys:cardio}
   ];
   const wheel=document.createElement('div'); wheel.className='pr-wheel-wrap';
   const fire=document.createElement('div'); fire.className='pr-wheel-fire'; wheel.appendChild(fire);
@@ -3547,7 +3547,7 @@ function renderPrFields(){
     });
     detail.appendChild(grid);
   }
-  categories.forEach(cat=>{const b=document.createElement('button');b.type='button';b.className='pr-wheel-item';b.setAttribute('aria-label',cat.label);b.innerHTML=`<span class="pr-wheel-icon ${cat.id==='cardio'?'runner-icon':''}" aria-hidden="true">${cat.id==='cardio'?'':cat.icon}</span><span class="pr-wheel-label">${cat.label}</span>`;b.addEventListener('click',()=>showCategory(cat,b));wheel.appendChild(b);});
+  categories.forEach(cat=>{const b=document.createElement('button');b.type='button';b.className='pr-wheel-item';b.setAttribute('aria-label',cat.label);b.innerHTML=`<span class="pr-wheel-label">${cat.label}</span>`;b.addEventListener('click',()=>showCategory(cat,b));wheel.appendChild(b);});
   const initial=categories.find(c=>c.keys.length)||categories[0];
   const initialButton=Array.from(wheel.querySelectorAll('.pr-wheel-item')).find(b=>b.querySelector('.pr-wheel-label')?.textContent===initial.label);
   if(initialButton) showCategory(initial,initialButton);
@@ -3657,47 +3657,53 @@ function readLocalRestSoundRaw(){
 }
 
 exportBackupBtn.addEventListener('click',()=>{
-  // Keep the share call inside the original tap gesture. Awaiting IndexedDB/local state
-  // before navigator.share() can cause iOS Safari to reject the file share.
+  // IMPORTANT: invoke Web Share synchronously from the original tap. Do not await
+  // IndexedDB/localStorage work before navigator.share() on iPhone Safari.
   exportBackupBtn.disabled=true;
   backupMsg.textContent='Creating backup…';
   try{
-    const backup={app:'RepLog',backupVersion:6,exportedAt:new Date().toISOString(),days:days,history:history,user:currentUser,theme:readLocalThemeRaw(),restSound:readLocalRestSoundRaw()};
+    const backup={app:'RepLog',backupVersion:7,exportedAt:new Date().toISOString(),days:days,history:history,user:currentUser,theme:readLocalThemeRaw(),restSound:readLocalRestSoundRaw()};
     const json=JSON.stringify(backup,null,2);
     const filename=`replog-backup-${new Date().toISOString().slice(0,10)}.json`;
-    const blob=new Blob([json],{type:'application/json'});
-    const file=new File([blob],filename,{type:'application/json'});
+    const file=new File([json],filename,{type:'application/json'});
 
-    if(navigator.share){
-      let canShareFiles=true;
-      try{ if(navigator.canShare) canShareFiles=navigator.canShare({files:[file]}); }catch(e){}
-      if(canShareFiles){
-        navigator.share({title:'RepLog Backup',text:'RepLog workout backup',files:[file]})
-          .then(()=>{backupMsg.style.color='var(--neon-strong)';backupMsg.textContent='Backup ready — choose Save to Files.';})
-          .catch(e=>{if(e&&e.name==='AbortError'){backupMsg.textContent='Export cancelled.';}else{showRepLogDownload(blob,filename);}})
+    if(typeof navigator.share==='function'){
+      let canShare=true;
+      try{canShare=!navigator.canShare || navigator.canShare({files:[file]});}catch(e){canShare=true;}
+      if(canShare){
+        navigator.share({title:'RepLog Backup',files:[file]})
+          .then(()=>{backupMsg.style.color='var(--neon-strong)';backupMsg.textContent='Backup opened — choose Save to Files.';})
+          .catch(e=>{
+            if(e&&e.name==='AbortError'){backupMsg.textContent='Export cancelled.';}
+            else{showRepLogDownload(blobFromJson(json),filename);}
+          })
           .finally(()=>{exportBackupBtn.disabled=false;});
         return;
       }
     }
-    showRepLogDownload(blob,filename);
+    showRepLogDownload(blobFromJson(json),filename);
   }catch(err){
     console.error('RepLog export failed',err);
     backupMsg.style.color='var(--danger)';
     backupMsg.textContent=err&&err.message||'Could not create backup.';
+    exportBackupBtn.disabled=false;
   }
-  exportBackupBtn.disabled=false;
 });
+
+function blobFromJson(json){return new Blob([json],{type:'application/json;charset=utf-8'});}
 
 function showRepLogDownload(blob,filename){
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
-  a.href=url;a.download=filename;a.rel='noopener';a.textContent='Save RepLog Backup';
-  a.style.cssText='position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:99999;padding:16px 22px;border-radius:14px;background:var(--neon);color:#000;font-weight:900;text-decoration:none;box-shadow:0 0 30px rgba(var(--neon-rgb),.55);';
+  a.href=url; a.download=filename; a.rel='noopener'; a.textContent='Save RepLog Backup to Files';
+  a.style.cssText='position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:99999;padding:18px 22px;border-radius:14px;background:var(--neon);color:#000;font-weight:900;text-decoration:none;box-shadow:0 0 30px rgba(var(--neon-rgb),.55);text-align:center;';
   document.body.appendChild(a);
   backupMsg.style.color='var(--neon-strong)';
-  backupMsg.textContent='Backup created — tap Save RepLog Backup.';
-  a.addEventListener('click',()=>setTimeout(()=>{try{URL.revokeObjectURL(url);a.remove();}catch(e){}},3000),{once:true});
+  backupMsg.textContent='Tap “Save RepLog Backup to Files”.';
+  // Keep the link alive until the user has had time to use it.
+  setTimeout(()=>{try{URL.revokeObjectURL(url);a.remove();}catch(e){}},60000);
 }
+
 importBackupInput.addEventListener('change',async()=>{
   const file=importBackupInput.files&&importBackupInput.files[0]; if(!file)return;
   backupMsg.textContent='Reading backup…';
