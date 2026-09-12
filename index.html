@@ -1058,9 +1058,17 @@
 .log-card,.summary-card,.profile-card,.exercise-card,.day-tab,.week-tab,.nav-block,.finish-bar,.bottom-dock,.session-active,.card,.panel,.box,.section-card,.settings-card{background-color:rgba(19,20,23,.20)!important}
 input,select,textarea{background-color:rgba(8,10,10,.18)!important}
 
-/* Final glass/dust pass: every major surface remains translucent so the Vibe dust field is visible beneath it. */
+/* Final glass/dust pass: about 25% transparency — dark glass stays solid enough to read while the Vibe dust remains visible. */
 .main-workout,.view,.view.active,.build-view,.log-view,.profile-view{position:relative;z-index:1;}
+.auth-card,.nav-block,.day-tab,.week-tab,.exercise-card,.profile-card,.log-card,.summary-card,.summary-block-complete,.finish-bar,.bottom-dock,.session-active,.card,.panel,.box,.section-card,.profile-section,.settings-card{background-color:rgba(19,20,23,.75)!important;backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px)}
+.ex-modal,.setup-modal,.modal,.rest-step,.rest-chip,.rest-sound-select,.rest-sound-row,.ex-prev-row{background-color:rgba(19,20,23,.75)!important;backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px)}
+.calc-modal{background:linear-gradient(160deg,rgba(var(--neon-rgb),.10),rgba(19,20,23,.75))!important;backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px)}
+.ex-timer-popup{background:rgba(10,12,12,.75)!important;backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px)}
+input,select,textarea{background-color:rgba(8,10,10,.72)!important;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
 .ex-modal-overlay,.calc-modal-overlay,.modal-overlay,.summary-modal-overlay{z-index:100;}
+
+/* The floating timer is only the outside-of-exercise timer. The full clock inside the exercise window is the only clock shown there. */
+.global-rest-timer.inside-exercise-hidden{display:none!important;}
 </style>
 </head>
 <body>
@@ -2108,15 +2116,20 @@ const globalRingComet = document.getElementById('globalRingComet');
 const globalRestHand = document.getElementById('globalRestHand');
 function updateGlobalRestTimer(){
   if(!globalRestTimer || !exRestInterval) return;
+  // While the exercise window is open, use its large analog clock only.
+  // The floating clock appears again immediately after leaving that window.
+  const exerciseWindowOpen = exModalOverlay && exModalOverlay.classList.contains('show');
+  globalRestTimer.classList.toggle('inside-exercise-hidden', !!exerciseWindowOpen);
   const remaining=Math.max(0,restRemaining), total=Math.max(1,restTotal);
   globalRestTime.textContent=formatMMSS(remaining);
   const deg=Math.min(1,(total-remaining)/total)*360;
   if(globalRingProgress) globalRingProgress.style.background=`conic-gradient(var(--neon) 0deg,var(--neon-strong) ${deg/2}deg,var(--neon) ${deg}deg,transparent ${deg}deg)`;
   if(globalRestHand) globalRestHand.style.transform=`translateX(-50%) rotate(${deg}deg)`;
   if(globalRingComet) globalRingComet.style.transform=`translateX(-50%) rotate(${deg}deg)`;
-  globalRestTimer.classList.add('show');
+  if(!exerciseWindowOpen) globalRestTimer.classList.add('show');
+  else globalRestTimer.classList.remove('show');
 }
-function hideGlobalRestTimer(){ if(globalRestTimer) globalRestTimer.classList.remove('show','done'); }
+function hideGlobalRestTimer(){ if(globalRestTimer) globalRestTimer.classList.remove('show','done','inside-exercise-hidden'); }
 
 function setTimerLabel(text){
   exTimerBtn.innerHTML = CLOCK_ICON_SVG + `<span class="tb-label">${text}</span>`;
@@ -3488,12 +3501,12 @@ savePrsBtn.addEventListener('click',async()=>{
   const canvas=document.getElementById('vibeParticleCanvas'); if(!canvas) return;
   const ctx=canvas.getContext('2d'); let particles=[]; let w=0,h=0,dpr=1;
   function cssVar(name,fallback){ return (getComputedStyle(document.documentElement).getPropertyValue(name)||fallback).trim(); }
-  function resize(){ dpr=Math.min(window.devicePixelRatio||1,2); w=innerWidth; h=innerHeight; canvas.width=w*dpr; canvas.height=h*dpr; canvas.style.width=w+'px'; canvas.style.height=h+'px'; ctx.setTransform(dpr,0,0,dpr,0,0); const count=Math.min(180,Math.max(85,Math.floor(w*h/9000))); particles=Array.from({length:count},()=>({x:Math.random()*w,y:Math.random()*h,r:.7+Math.random()*1.8,v:.12+Math.random()*.42,a:.28+Math.random()*.62,drift:(Math.random()-.5)*.18,tw:Math.random()*Math.PI*2})); }
+  function resize(){ dpr=Math.min(window.devicePixelRatio||1,2); w=innerWidth; h=innerHeight; canvas.width=w*dpr; canvas.height=h*dpr; canvas.style.width=w+'px'; canvas.style.height=h+'px'; ctx.setTransform(dpr,0,0,dpr,0,0); const count=Math.min(520,Math.max(260,Math.floor(w*h/3200))); particles=Array.from({length:count},()=>({x:Math.random()*w,y:Math.random()*h,r:.65+Math.random()*2.35,v:.018+Math.random()*.105,a:.20+Math.random()*.48,drift:(Math.random()-.5)*.055,tw:Math.random()*Math.PI*2})); }
   function draw(t){
     ctx.clearRect(0,0,w,h);
     const neon=cssVar('--neon','#b6ff00'); const strong=cssVar('--neon-strong','#d9ff66');
-    particles.forEach(p=>{ p.y-=p.v; p.x+=p.drift+Math.sin(t*.0005+p.tw)*.08; p.tw+=.008; if(p.y<-8){p.y=h+8;p.x=Math.random()*w;} if(p.x<-8)p.x=w+8;if(p.x>w+8)p.x=-8;
-      const pulse=.55+.45*Math.sin(t*.0015+p.tw); ctx.globalAlpha=p.a*pulse; ctx.fillStyle=(p.r>1.7?strong:neon); ctx.shadowBlur=7; ctx.shadowColor=neon; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
+    particles.forEach(p=>{ p.y-=p.v; p.x+=p.drift+Math.sin(t*.00018+p.tw)*.035; p.tw+=.0022; if(p.y<-8){p.y=h+8;p.x=Math.random()*w;} if(p.x<-8)p.x=w+8;if(p.x>w+8)p.x=-8;
+      const pulse=.72+.28*Math.sin(t*.00055+p.tw); ctx.globalAlpha=p.a*pulse; ctx.fillStyle=(p.r>1.9?strong:neon); ctx.shadowBlur=13; ctx.shadowColor=neon; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
     }); ctx.globalAlpha=1; ctx.shadowBlur=0; requestAnimationFrame(draw);
   }
   resize(); addEventListener('resize',resize,{passive:true}); requestAnimationFrame(draw);
