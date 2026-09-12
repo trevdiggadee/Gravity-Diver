@@ -1045,6 +1045,14 @@
     .columns{ grid-template-columns:minmax(0,1fr); gap:14px; }
     .bottom-dock{ padding-left:12px; padding-right:12px; }
   }
+
+/* REPLOG VIBE GLASS — particles remain visible through every major surface */
+.global-rest-timer{min-width:220px;justify-content:center;padding:10px 12px;background:rgba(8,10,10,.42);border:1px solid rgba(var(--neon-rgb),.72);box-shadow:0 0 24px rgba(var(--neon-rgb),.24),inset 0 0 18px rgba(var(--neon-rgb),.08);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.global-rest-timer .grt-label{color:var(--neon);font-weight:700}.global-rest-timer .grt-time{font-size:20px;min-width:68px}.global-rest-timer .grt-btn{width:34px;height:32px;border-radius:10px;background:rgba(var(--neon-rgb),.10)}
+.topbar{background:rgba(8,9,10,.55)!important}
+.auth-card,.nav-block,.day-tab,.week-tab,.exercise-card,.profile-card,.log-card,.summary-card,.summary-block-complete,.finish-bar,.bottom-dock,.session-active,.ex-modal,.calc-modal,.theme-modal,.setup-modal,.modal,.rest-step,.rest-chip,.rest-sound-select,.ex-prev-row,.card,.panel,.box,.section-card,.profile-section,.settings-card,input,select,textarea{background-color:rgba(19,20,23,.40)!important;backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px)}
+.ex-modal{background:rgba(19,20,23,.52)!important}.calc-modal{background:linear-gradient(160deg,rgba(var(--neon-rgb),.13),rgba(19,20,23,.52))!important}.ex-timer-popup{background:rgba(10,12,12,.38)!important}
+.theme-modal-overlay,.setup-modal-overlay,.modal-overlay,.ex-modal-overlay,.calc-modal-overlay,.summary-modal-overlay{background:rgba(3,4,4,.50)!important}
 </style>
 </head>
 <body>
@@ -1294,6 +1302,7 @@
         <button type="button" class="rest-chip" data-secs="60">60s</button>
         <button type="button" class="rest-chip" data-secs="90">90s</button>
         <button type="button" class="rest-chip" data-secs="120">2m</button>
+        <button type="button" class="rest-chip" data-secs="150">2:30</button>
         <button type="button" class="rest-chip" data-secs="180">3m</button>
       </div>
       <div class="ex-timer-popup" id="exTimerPopup">
@@ -1726,6 +1735,7 @@ function stopRestAlarm(){
   if(restAlarmStopTimer){ clearTimeout(restAlarmStopTimer); restAlarmStopTimer = null; }
   const audio = restAlarmAudio;
   restAlarmAudio = null;
+  if(audio && audio._selectedAlarm === true) return;
   if(audio){
     audio.loop = false;
     const silence = () => { try{ audio.pause(); audio.currentTime = 0; audio.muted = true; }catch(e){} };
@@ -1742,46 +1752,35 @@ function stopRestAlarm(){
 
 // Real alarm-sound files, sitting right next to index.html (same folder), so a
 // plain relative filename resolves correctly wherever RepLog is deployed.
-const ALARM_SOUND_FILES = {
-  alarm_clock:      'alarm_clock.mp3',
-  car:              'Car.mp3',
-  siren:            'Siren.mp3',
-  security_alarm:   'security-alarm.mp3',
-  biohazard:        'biohazard.mp3',
-  community:        'community.mp3',
-  scratch:          'scratch.mp3',
-  greece_eas:       'greece-eas.mp3',
-  japan_eas:        'japan-eas.mp3',
-  malaysia_eas:     'malaysia-eas.mp3',
-  saudi_arabia_eas: 'saudi-arabia-eas.mp3'
+const ALARM_SOUND_FILES = {}; // Sound profiles are generated locally so no missing MP3 can break the selected alarm.
+const REST_ALARM_DURATION = 5;
+const REST_ALARM_PATTERNS = {
+ alarm_clock:[[880,.28,0],[660,.28,.34],[880,.28,.70],[660,.28,1.04]],
+ car:[[523,.18,0],[659,.18,.20],[784,.30,.40],[523,.18,1.00],[659,.18,1.20],[784,.30,1.40]],
+ siren:[[620,.30,0,980],[980,.30,.34,620],[620,.30,.68,980],[980,.30,1.02,620]],
+ security_alarm:[[1200,.12,0],[1200,.12,.16],[1200,.12,.32],[760,.20,.52],[1200,.12,.80],[1200,.12,.96],[1200,.12,1.12]],
+ biohazard:[[740,.16,0],[740,.16,.20],[440,.28,.42],[740,.16,.82],[740,.16,1.02],[440,.28,1.24]],
+ community:[[392,.28,0],[523,.28,.30],[659,.45,.60],[523,.28,1.10]],
+ scratch:[[1500,.07,0],[900,.09,.10],[1700,.06,.22],[700,.11,.31],[1300,.07,.46],[600,.12,.57]],
+ greece_eas:[[853,.20,0],[960,.20,.23],[853,.20,.46],[960,.20,.69]],
+ japan_eas:[[700,.18,0],[900,.18,.20],[1100,.18,.40],[900,.18,.60],[700,.18,.80]],
+ malaysia_eas:[[600,.25,0],[800,.25,.28],[600,.25,.56],[800,.25,.84]],
+ saudi_arabia_eas:[[1000,.16,0],[800,.16,.18],[1000,.16,.36],[800,.16,.54],[1000,.16,.72]]
 };
-const REST_ALARM_DURATION = 5; // seconds the buzzer sounds off for when the timer ends
-
-function playSynthAlarm(){
-  const ctx=getRestAudioContext(); if(!ctx) return;
-  const start=ctx.currentTime+.01;
-  // Reliable iOS-safe synthesized alarm; no external audio file is required.
-  for(let i=0;i<8;i++){
-    const t=start+i*.42;
-    scheduleTone(i%2?740:1040,t,.22,'square',.24);
-    scheduleTone(i%2?520:820,t+.23,.13,'square',.18);
-  }
+function playSelectedAlarm(){
+ const ctx=getRestAudioContext(); if(!ctx || restSoundChoice==='silent') return;
+ const pat=REST_ALARM_PATTERNS[restSoundChoice]||REST_ALARM_PATTERNS.alarm_clock;
+ const emit=()=>{const t=ctx.currentTime+.02;pat.forEach(([f,d,o,e])=>scheduleTone(f,t+o,d,'square',.25,e||null));};
+ emit();
+ const id=setInterval(()=>{if(!restAlarmAudio||!restAlarmAudio._selectedAlarm){clearInterval(id);return}emit()},1700);
+ restAlarmTimeouts.push(id);
 }
 function playBuzzer(){
-  stopRestAlarm();
-  if(restSoundChoice === 'silent') return;
-  const file = ALARM_SOUND_FILES[restSoundChoice];
-  if(!file){ playSynthAlarm(); return; }
-  const audio = new Audio(file);
-  restAlarmAudio = audio;
-  audio.loop = true; audio.volume = .9; audio.playsInline = true;
-  audio._playPromise = audio.play();
-  if(audio._playPromise && typeof audio._playPromise.catch === 'function'){
-    audio._playPromise.catch(() => {
-      if(restAlarmAudio === audio){ restAlarmAudio=null; playSynthAlarm(); }
-    });
-  }
-  restAlarmStopTimer = setTimeout(() => { if(restAlarmAudio === audio) stopRestAlarm(); }, REST_ALARM_DURATION*1000);
+ stopRestAlarm(); if(restSoundChoice==='silent') return;
+ getRestAudioContext();
+ restAlarmAudio={_selectedAlarm:true};
+ playSelectedAlarm();
+ restAlarmStopTimer=setTimeout(()=>{if(restAlarmAudio&&restAlarmAudio._selectedAlarm)stopRestAlarm()},REST_ALARM_DURATION*1000);
 }
 
 function playBeep(){
@@ -2257,8 +2256,8 @@ function persistRestValue(){
   highlightRestPreset();
 }
 const restSoundSelect = document.getElementById('restSoundSelect');
-try{ restSoundSelect.value = localStorage.getItem('REPLOG_REST_SOUND') || 'digital_alarm'; }catch(e){}
-restSoundChoice = restSoundSelect.value || 'digital_alarm';
+try{ restSoundSelect.value = localStorage.getItem('REPLOG_REST_SOUND') || 'alarm_clock'; }catch(e){}
+restSoundChoice = restSoundSelect.value || 'alarm_clock';
 let restPreviewAudio = null;
 function stopRestPreview(){
   const audio = restPreviewAudio;
@@ -2276,15 +2275,11 @@ restSoundSelect.addEventListener('change', () => {
   try{ localStorage.setItem('REPLOG_REST_SOUND', restSoundChoice); }catch(e){}
   // Play a short preview clip so you can hear each option as you pick it
   stopRestPreview();
-  if(restSoundChoice !== 'silent' && ALARM_SOUND_FILES[restSoundChoice]){
-    const preview = new Audio(ALARM_SOUND_FILES[restSoundChoice]);
-    restPreviewAudio = preview;
-    preview.volume = 0.85;
-    preview._playPromise = preview.play();
-    if(preview._playPromise && typeof preview._playPromise.catch === 'function'){
-      preview._playPromise.catch(() => {});
-    }
-    setTimeout(() => { if(restPreviewAudio === preview) stopRestPreview(); }, 1500);
+  if(restSoundChoice !== 'silent'){
+    stopRestAlarm();
+    restAlarmAudio={_selectedAlarm:true};
+    playSelectedAlarm();
+    setTimeout(()=>{if(restAlarmAudio&&restAlarmAudio._selectedAlarm)stopRestAlarm()},1500);
   }
 });
 
@@ -2321,7 +2316,7 @@ function openExerciseModal(side, index){
 
   exModalSide = side; exModalIndex = index;
   exModal.classList.remove('all-done');
-  resetTimerVisual();
+  if(!exRestInterval){ resetTimerVisual(); } else { exTimerPopup.classList.remove('show'); updateGlobalRestTimer(); }
   exRestSeconds.value = slot.rest || '';
   highlightRestPreset();
 
@@ -2494,9 +2489,10 @@ exAddSetBtn.addEventListener('click', () => {
 });
 
 function closeExerciseModal(){
-  if(exRestInterval){ clearInterval(exRestInterval); exRestInterval = null; }
-  stopRestAlarm();
+  // Keep the rest countdown alive when leaving the exercise. The floating timer is the active display.
+  exTimerPopup.classList.remove('show');
   exModalOverlay.classList.remove('show');
+  if(exRestInterval) updateGlobalRestTimer(); else hideGlobalRestTimer();
   renderSlots();
 }
 exModalClose.addEventListener('click', closeExerciseModal);
