@@ -680,19 +680,20 @@
   .pr-wheel-fire{position:absolute;inset:-2%;border-radius:50%;pointer-events:none;overflow:hidden;}
   .pr-wheel-fire::before,.pr-wheel-fire::after{content:"";position:absolute;border-radius:50%;border:2px solid transparent;border-top-color:var(--neon);border-right-color:rgba(var(--neon-rgb),.3);filter:blur(1px);box-shadow:0 0 10px var(--neon),0 0 30px rgba(var(--neon-rgb),.35);animation:prFireOrbit 2.4s linear infinite;}
   .pr-wheel-fire::before{inset:5%;}.pr-wheel-fire::after{inset:9%;border-width:1px;border-top-color:var(--neon-strong);border-left-color:rgba(var(--neon-rgb),.35);animation-duration:3.7s;animation-direction:reverse;opacity:.75;}
-  .pr-wheel-core{width:105px;height:105px;border-radius:50%;border:2px solid rgba(var(--neon-rgb),.7);background:#090b0c;display:grid;place-items:center;text-align:center;color:var(--neon-strong);font:800 16px 'Oswald',sans-serif;letter-spacing:.08em;text-transform:uppercase;box-shadow:0 0 32px rgba(var(--neon-rgb),.35),inset 0 0 30px rgba(var(--neon-rgb),.1);overflow:hidden;z-index:4;position:relative;}
+  .pr-wheel-core{width:137px;height:137px;border-radius:50%;border:2px solid rgba(var(--neon-rgb),.7);background:#090b0c;display:grid;place-items:center;text-align:center;color:var(--neon-strong);font:800 16px 'Oswald',sans-serif;letter-spacing:.08em;text-transform:uppercase;box-shadow:0 0 32px rgba(var(--neon-rgb),.35),inset 0 0 30px rgba(var(--neon-rgb),.1);overflow:hidden;z-index:4;position:relative;}
   .pr-wheel-core::before{content:"";position:absolute;inset:-12px;border-radius:50%;background:radial-gradient(circle,rgba(var(--neon-rgb),.22),transparent 62%);filter:blur(9px);z-index:-1;animation:prCoreGlow 2.2s ease-in-out infinite alternate;}
-  .pr-wheel-core img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;opacity:.95;filter:drop-shadow(0 0 12px rgba(var(--neon-rgb),.6));z-index:0;}
-  .pr-wheel-core .core-text{position:relative;z-index:2;text-shadow:0 0 12px #000,0 0 14px rgba(var(--neon-rgb),.5);font-size:17px;}
-  .pr-wheel-core span{display:block;font:600 9px 'Inter',sans-serif;color:var(--chalk);letter-spacing:.08em;margin-top:2px;text-shadow:0 1px 8px #000;}
+  .pr-wheel-core img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;opacity:1;filter:drop-shadow(0 0 16px rgba(var(--neon-rgb),.72));z-index:0;}.pr-wheel-core::after{content:"";position:absolute;inset:-20px;border-radius:50%;background:radial-gradient(circle,rgba(var(--neon-rgb),.34) 0%,rgba(var(--neon-rgb),.16) 34%,transparent 70%);filter:blur(12px);z-index:-1;animation:prCenterPulse 1.9s ease-in-out infinite;pointer-events:none;}
+.pr-wheel-core .core-glow{position:absolute;inset:-12px;border-radius:50%;background:radial-gradient(circle,rgba(var(--neon-rgb),.32),transparent 66%);filter:blur(10px);animation:prCenterPulse 2.3s ease-in-out infinite alternate;z-index:-1;}
+  .pr-wheel-core .core-text{display:none;}
+  .pr-wheel-core span{display:none;}
   .pr-wheel-item{position:absolute;width:132px;height:132px;border-radius:50%;border:1px solid rgba(var(--neon-rgb),.42);background:rgba(10,12,13,.92);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:var(--chalk);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .32s cubic-bezier(.2,.8,.2,1),border-color .25s,box-shadow .3s,background .3s;box-shadow:0 8px 24px rgba(0,0,0,.3);z-index:3;overflow:hidden;}
   .pr-wheel-item:nth-child(3){top:-2px;left:50%;transform:translateX(-50%)} .pr-wheel-item:nth-child(4){right:-2px;top:50%;transform:translateY(-50%)} .pr-wheel-item:nth-child(5){bottom:-2px;left:50%;transform:translateX(-50%)} .pr-wheel-item:nth-child(6){left:-2px;top:50%;transform:translateY(-50%)}
   .pr-wheel-item::before{content:"";position:absolute;inset:-18%;border-radius:50%;background:radial-gradient(circle,rgba(var(--neon-rgb),.16),transparent 58%);filter:blur(8px);opacity:.55;animation:prNodePulse 2.8s ease-in-out infinite alternate;}
   .pr-wheel-item.active,.pr-wheel-item:hover{border-color:var(--neon);background:rgba(var(--neon-rgb),.13);box-shadow:0 0 34px rgba(var(--neon-rgb),.28),inset 0 0 26px rgba(var(--neon-rgb),.08);}
   .pr-wheel-item.active:nth-child(3){transform:translateX(-50%) scale(1.045)} .pr-wheel-item.active:nth-child(4){transform:translateY(-50%) scale(1.045)} .pr-wheel-item.active:nth-child(5){transform:translateX(-50%) scale(1.045)} .pr-wheel-item.active:nth-child(6){transform:translateY(-50%) scale(1.045)}
-  .pr-wheel-icon{position:absolute;font-size:58px;line-height:1;color:var(--neon);opacity:.13;filter:drop-shadow(0 0 12px rgba(var(--neon-rgb),.5));z-index:0;}
-  .pr-wheel-label{position:relative;z-index:2;font:900 23px 'Oswald',sans-serif;letter-spacing:.055em;text-transform:uppercase;text-align:center;text-shadow:0 2px 10px #000,0 0 13px rgba(var(--neon-rgb),.3);white-space:nowrap;}
-  .pr-wheel-count{position:absolute;bottom:26px;z-index:2;font:700 9px 'Inter',sans-serif;color:var(--chalk-faint);letter-spacing:.08em;}
+  .pr-wheel-icon{position:absolute;font-size:62px;line-height:1;color:var(--neon);opacity:.16;filter:drop-shadow(0 0 12px rgba(var(--neon-rgb),.5));z-index:0;}
+  .pr-wheel-label{position:relative;z-index:2;font:900 24px 'Oswald',sans-serif;color:#fff;letter-spacing:.055em;text-transform:uppercase;text-align:center;text-shadow:0 2px 10px #000,0 0 13px rgba(var(--neon-rgb),.3);white-space:nowrap;}
+  .pr-wheel-count{display:none!important;}
   .pr-wheel-detail{border-top:1px solid rgba(var(--neon-rgb),.13);padding-top:7px;animation:prPanelIn .28s ease both;}
   .pr-wheel-detail-head{display:flex;align-items:center;justify-content:space-between;margin:0 2px 6px;}
   .pr-wheel-detail-title{font:800 14px 'Oswald',sans-serif;color:var(--neon-strong);letter-spacing:.07em;text-transform:uppercase}.pr-wheel-detail-hint{font-size:8px;color:var(--chalk-faint);text-transform:uppercase;letter-spacing:.08em}
@@ -701,7 +702,7 @@
   .pr-accordion summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:6px;min-height:35px;padding:6px 8px;cursor:default;user-select:none;color:var(--chalk);font-family:'Inter',sans-serif;font-size:10px;font-weight:700;line-height:1.15;}
   .pr-accordion summary::-webkit-details-marker{display:none}.pr-accordion summary::before{display:none}.pr-accordion summary .pr-section-count,.pr-accordion summary .pr-section-type{display:none!important}.pr-accordion[open] summary{border-bottom:1px solid rgba(255,255,255,.05)}
   .pr-accordion-body{padding:0 6px 6px}.pr-field{min-width:0;padding:5px 6px;border:0;background:transparent;display:grid;grid-template-columns:1fr auto;align-items:center;gap:5px}.pr-field label{font-size:9px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pr-field input{font-family:'JetBrains Mono',monospace;font-size:12px!important;font-weight:800;padding:3px 4px!important;width:62px!important;text-align:right;border-color:rgba(var(--neon-rgb),.18)!important;background:rgba(var(--neon-rgb),.035)!important}.pr-field .metric-unit{display:none!important}
-  @keyframes prCoreGlow{from{transform:scale(.95);opacity:.55}to{transform:scale(1.06);opacity:1}} @keyframes prNodePulse{from{transform:scale(.9);opacity:.3}to{transform:scale(1.08);opacity:.8}}
+  @keyframes prCenterPulse{0%,100%{transform:scale(.92);opacity:.55}50%{transform:scale(1.12);opacity:1}} @keyframes prCoreGlow{from{transform:scale(.95);opacity:.55}to{transform:scale(1.06);opacity:1}} @keyframes prNodePulse{from{transform:scale(.9);opacity:.3}to{transform:scale(1.08);opacity:.8}}
   @keyframes prWheelSpin{to{transform:rotate(360deg)}} @keyframes prWheelFire{0%{transform:scale(.97);opacity:.65}100%{transform:scale(1.04);opacity:1}} @keyframes prFireOrbit{to{transform:rotate(360deg)}} @keyframes prPanelIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
   .pr-title{ color:var(--neon-strong); text-shadow:0 0 12px rgba(var(--neon-rgb),.28); font-size:18px!important; letter-spacing:.04em; margin-bottom:4px!important; }
   .profile-note{font-size:8px;color:var(--chalk-faint);line-height:1.4;margin-top:7px;}
@@ -3518,7 +3519,7 @@ function renderPrFields(){
     {id:'upper',label:'Upper',icon:'↟',keys:upper},
     {id:'lower',label:'Lower',icon:'↡',keys:lower},
     {id:'custom',label:'Custom',icon:'✦',keys:custom},
-    {id:'cardio',label:'Cardio',icon:'◌',keys:cardio}
+    {id:'cardio',label:'Cardio',icon:'🏃',keys:cardio}
   ];
   const wheel=document.createElement('div'); wheel.className='pr-wheel-wrap';
   const fire=document.createElement('div'); fire.className='pr-wheel-fire'; wheel.appendChild(fire);
@@ -3545,7 +3546,7 @@ function renderPrFields(){
     });
     detail.appendChild(grid);
   }
-  categories.forEach(cat=>{const b=document.createElement('button');b.type='button';b.className='pr-wheel-item';b.innerHTML=`<span class="pr-wheel-icon">${cat.icon}</span>`;b.addEventListener('click',()=>showCategory(cat,b));wheel.appendChild(b);});
+  categories.forEach(cat=>{const b=document.createElement('button');b.type='button';b.className='pr-wheel-item';b.setAttribute('aria-label',cat.label);b.innerHTML=`<span class="pr-wheel-icon" aria-hidden="true">${cat.icon}</span><span class="pr-wheel-label">${cat.label}</span>`;b.addEventListener('click',()=>showCategory(cat,b));wheel.appendChild(b);});
   const initial=categories.find(c=>c.keys.length)||categories[0];
   const initialButton=Array.from(wheel.querySelectorAll('.pr-wheel-item')).find(b=>b.querySelector('.pr-wheel-label')?.textContent===initial.label);
   if(initialButton) showCategory(initial,initialButton);
@@ -3658,18 +3659,34 @@ exportBackupBtn.addEventListener('click', async()=>{
   exportBackupBtn.disabled=true; backupMsg.textContent='Creating backup…';
   try{
     const state=await readLocalState();
-    const backup={app:'RepLog',backupVersion:4,exportedAt:new Date().toISOString(),days:(state&&state.days)||days,history:(state&&state.history)||history,user:(state&&state.user)||currentUser,theme:readLocalThemeRaw(),restSound:readLocalRestSoundRaw()};
+    const backup={app:'RepLog',backupVersion:5,exportedAt:new Date().toISOString(),days:(state&&state.days)||days,history:(state&&state.history)||history,user:(state&&state.user)||currentUser,theme:readLocalThemeRaw(),restSound:readLocalRestSoundRaw()};
     const json=JSON.stringify(backup,null,2);
     const filename=`replog-backup-${new Date().toISOString().slice(0,10)}.json`;
-    const blob=new Blob([json],{type:'application/json'});
+    const blob=new Blob([json],{type:'application/json;charset=utf-8'});
     const file=new File([blob],filename,{type:'application/json'});
-    if(navigator.share && (!navigator.canShare || navigator.canShare({files:[file]}))){
-      try{await navigator.share({title:'RepLog Backup',text:'RepLog backup — save this file to Files.',files:[file]}); backupMsg.style.color='var(--neon-strong)'; backupMsg.textContent='Backup shared — choose Save to Files.'; return;}
-      catch(e){if(e&&e.name==='AbortError'){backupMsg.textContent='Backup share cancelled.';return;}}
+    // iPhone/iPad: use the native Share sheet so the user can explicitly Save to Files.
+    if(navigator.share){
+      let shareOK=true;
+      try{ if(navigator.canShare && !navigator.canShare({files:[file]})) shareOK=false; }catch(e){}
+      if(shareOK){
+        try{
+          await navigator.share({title:'RepLog Backup',files:[file]});
+          backupMsg.style.color='var(--neon-strong)'; backupMsg.textContent='Backup exported — choose Save to Files in the share sheet.';
+          return;
+        }catch(e){
+          if(e&&e.name==='AbortError'){backupMsg.textContent='Export cancelled.';return;}
+        }
+      }
     }
-    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=filename; a.target='_blank'; a.rel='noopener'; a.style.display='none'; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},15000);
-    backupMsg.style.color='var(--neon-strong)'; backupMsg.textContent='Backup file created. Check Files/Downloads.';
-  }catch(err){console.error('RepLog export failed',err);backupMsg.style.color='var(--danger)';backupMsg.textContent=err.message||'Could not create backup.';}
+    // Browser fallback: create a real download link and activate it.
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a'); a.href=url; a.download=filename; a.rel='noopener'; a.textContent='Download RepLog Backup';
+    a.style.cssText='position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:99999;padding:16px 22px;border-radius:14px;background:var(--neon);color:#000;font-weight:900;text-decoration:none;box-shadow:0 0 30px rgba(var(--neon-rgb),.55);';
+    document.body.appendChild(a);
+    a.click();
+    backupMsg.style.color='var(--neon-strong)'; backupMsg.textContent='Backup created — tap Download RepLog Backup if it appears.';
+    setTimeout(()=>{try{URL.revokeObjectURL(url);a.remove();}catch(e){}},15000);
+  }catch(err){console.error('RepLog export failed',err);backupMsg.style.color='var(--danger)';backupMsg.textContent=err&&err.message||'Could not create backup.';}
   finally{exportBackupBtn.disabled=false;}
 });
 importBackupInput.addEventListener('change',async()=>{
