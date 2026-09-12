@@ -375,20 +375,18 @@
   .calc-open-btn:hover{color:var(--neon-strong);border-color:var(--neon);background:linear-gradient(145deg,rgba(var(--neon-rgb),0.27),rgba(0,0,0,0.38));box-shadow:inset 0 0 0 1px rgba(255,255,255,0.045),inset 0 0 15px rgba(var(--neon-rgb),0.14),0 0 18px rgba(var(--neon-rgb),0.48);transform:translateY(-1px) scale(1.035);}
   .calc-open-btn:active{transform:scale(.95);box-shadow:inset 0 0 10px rgba(var(--neon-rgb),0.18),0 0 10px rgba(var(--neon-rgb),0.30);}
 
-  /* ---- Floating rest timer: stays visible outside the exercise popup ---- */
-  .global-rest-timer{
-    position:fixed; right:14px; bottom:92px; z-index:125; display:none; align-items:center; gap:9px;
-    padding:8px 10px 8px 12px; border:1px solid var(--neon); border-radius:16px;
-    background:rgba(10,12,12,.72); backdrop-filter:blur(12px); box-shadow:0 0 24px rgba(var(--neon-rgb),.24), inset 0 0 16px rgba(var(--neon-rgb),.06);
-  }
-  .global-rest-timer.show{ display:flex; animation:popIn .2s ease; }
-  .global-rest-timer .grt-label{ font-size:9px; text-transform:uppercase; letter-spacing:.12em; color:var(--chalk-faint); }
-  .global-rest-timer .grt-time{ font:700 18px 'JetBrains Mono',monospace; color:var(--neon-strong); min-width:58px; text-align:center; text-shadow:0 0 12px rgba(var(--neon-rgb),.45); }
-  .global-rest-timer .grt-btn{ width:28px;height:28px;border-radius:9px;border:1px solid rgba(var(--neon-rgb),.32);background:rgba(var(--neon-rgb),.08);color:var(--neon);font:700 13px 'Inter',sans-serif;cursor:pointer; }
-  .global-rest-timer .grt-btn:active{ transform:scale(.92); background:rgba(var(--neon-rgb),.2); }
-  .global-rest-timer.done{ animation:timerDone .55s ease 2; }
-  @keyframes timerDone{ 50%{ box-shadow:0 0 38px rgba(var(--neon-rgb),.7),inset 0 0 20px rgba(var(--neon-rgb),.15); transform:scale(1.04); } }
-  @media(max-width:520px){ .global-rest-timer{ right:10px; bottom:84px; } }
+  /* ---- Floating rest timer: compact clock only outside the exercise popup ---- */
+   .global-rest-timer{position:fixed;right:16px;bottom:92px;z-index:125;display:none;width:72px;height:72px;padding:0;border:1px solid rgba(var(--neon-rgb),.9);border-radius:50%;background:rgba(8,10,10,.38);backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);box-shadow:0 0 24px rgba(var(--neon-rgb),.28),inset 0 0 14px rgba(var(--neon-rgb),.08)}
+   .global-rest-timer.show{display:block;animation:popIn .2s ease}
+   .global-clock{position:absolute;inset:4px;border-radius:50%;overflow:hidden}
+   .global-ring-progress{position:absolute;inset:0;border-radius:50%;background:conic-gradient(var(--neon) 0deg,transparent 0deg);opacity:.85}
+   .global-ring-progress:after{content:"";position:absolute;inset:5px;border-radius:50%;background:rgba(8,10,10,.68)}
+   .global-ring-comet{position:absolute;left:50%;top:1px;width:4px;height:12px;border-radius:4px;background:var(--neon-strong);box-shadow:0 0 10px var(--neon);transform-origin:50% 35px;transform:translateX(-50%) rotate(0deg)}
+   .global-hand{position:absolute;left:50%;top:50%;width:2px;height:25px;border-radius:2px;background:var(--neon-strong);transform-origin:50% 100%;transform:translateX(-50%) rotate(0deg);box-shadow:0 0 8px rgba(var(--neon-rgb),.75)}
+   .global-center-dot{position:absolute;left:50%;top:50%;width:7px;height:7px;border-radius:50%;background:var(--neon-strong);transform:translate(-50%,-50%);box-shadow:0 0 9px var(--neon)}
+   .global-time{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:2;font:700 13px 'JetBrains Mono',monospace;color:var(--neon-strong);text-shadow:0 0 10px rgba(var(--neon-rgb),.7)}
+   .global-rest-timer.done{animation:timerDone .55s ease 2}
+   @media(max-width:520px){.global-rest-timer{right:12px;bottom:84px;width:66px;height:66px}.global-ring-comet{transform-origin:50% 32px}.global-hand{height:22px}}
 
   .calc-modal-overlay{
     display:none; position:fixed; inset:0; z-index:200; background: rgba(3,4,4,.82); backdrop-filter: blur(6px);
@@ -1050,8 +1048,8 @@
 .global-rest-timer{min-width:220px;justify-content:center;padding:10px 12px;background:rgba(8,10,10,.42);border:1px solid rgba(var(--neon-rgb),.72);box-shadow:0 0 24px rgba(var(--neon-rgb),.24),inset 0 0 18px rgba(var(--neon-rgb),.08);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
 .global-rest-timer .grt-label{color:var(--neon);font-weight:700}.global-rest-timer .grt-time{font-size:20px;min-width:68px}.global-rest-timer .grt-btn{width:34px;height:32px;border-radius:10px;background:rgba(var(--neon-rgb),.10)}
 .topbar{background:rgba(8,9,10,.55)!important}
-.auth-card,.nav-block,.day-tab,.week-tab,.exercise-card,.profile-card,.log-card,.summary-card,.summary-block-complete,.finish-bar,.bottom-dock,.session-active,.ex-modal,.calc-modal,.theme-modal,.setup-modal,.modal,.rest-step,.rest-chip,.rest-sound-select,.ex-prev-row,.card,.panel,.box,.section-card,.profile-section,.settings-card,input,select,textarea{background-color:rgba(19,20,23,.40)!important;backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px)}
-.ex-modal{background:rgba(19,20,23,.52)!important}.calc-modal{background:linear-gradient(160deg,rgba(var(--neon-rgb),.13),rgba(19,20,23,.52))!important}.ex-timer-popup{background:rgba(10,12,12,.38)!important}
+.auth-card,.nav-block,.day-tab,.week-tab,.exercise-card,.profile-card,.log-card,.summary-card,.summary-block-complete,.finish-bar,.bottom-dock,.session-active,.ex-modal,.calc-modal,.theme-modal,.setup-modal,.modal,.rest-step,.rest-chip,.rest-sound-select,.ex-prev-row,.card,.panel,.box,.section-card,.profile-section,.settings-card,input,select,textarea{background-color:rgba(19,20,23,.24)!important;backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px)}
+.ex-modal{background:rgba(19,20,23,.32)!important}.calc-modal{background:linear-gradient(160deg,rgba(var(--neon-rgb),.13),rgba(19,20,23,.32))!important}.ex-timer-popup{background:rgba(10,12,12,.24)!important}
 .theme-modal-overlay,.setup-modal-overlay,.modal-overlay,.ex-modal-overlay,.calc-modal-overlay,.summary-modal-overlay{background:rgba(3,4,4,.50)!important}
 </style>
 </head>
@@ -1329,13 +1327,7 @@
 </div>
 
 <!-- FLOATING REST TIMER -->
-<div class="global-rest-timer" id="globalRestTimer" aria-live="polite">
-  <span class="grt-label">Rest</span>
-  <button type="button" class="grt-btn" id="globalRestMinus" aria-label="Subtract 15 seconds">−15</button>
-  <span class="grt-time mono" id="globalRestTime">00:00</span>
-  <button type="button" class="grt-btn" id="globalRestPlus" aria-label="Add 15 seconds">+15</button>
-  <button type="button" class="grt-btn" id="globalRestStop" aria-label="Stop rest timer">×</button>
-</div>
+<div class="global-rest-timer" id="globalRestTimer" aria-live="polite" title="Rest timer"><div class="global-clock" id="globalClock"><div class="global-ring-progress" id="globalRingProgress"></div><div class="global-ring-comet" id="globalRingComet"></div><div class="global-hand" id="globalRestHand"></div><div class="global-center-dot"></div><span class="global-time mono" id="globalRestTime">00:00</span></div></div>
 
 <!-- CALCULATOR POPUP -->
 <div class="calc-modal-overlay" id="calcModalOverlay">
@@ -1750,39 +1742,24 @@ function stopRestAlarm(){
   }
 }
 
-// Real alarm-sound files, sitting right next to index.html (same folder), so a
-// plain relative filename resolves correctly wherever RepLog is deployed.
-const ALARM_SOUND_FILES = {}; // Sound profiles are generated locally so no missing MP3 can break the selected alarm.
-const REST_ALARM_DURATION = 5;
-const REST_ALARM_PATTERNS = {
- alarm_clock:[[880,.28,0],[660,.28,.34],[880,.28,.70],[660,.28,1.04]],
- car:[[523,.18,0],[659,.18,.20],[784,.30,.40],[523,.18,1.00],[659,.18,1.20],[784,.30,1.40]],
- siren:[[620,.30,0,980],[980,.30,.34,620],[620,.30,.68,980],[980,.30,1.02,620]],
- security_alarm:[[1200,.12,0],[1200,.12,.16],[1200,.12,.32],[760,.20,.52],[1200,.12,.80],[1200,.12,.96],[1200,.12,1.12]],
- biohazard:[[740,.16,0],[740,.16,.20],[440,.28,.42],[740,.16,.82],[740,.16,1.02],[440,.28,1.24]],
- community:[[392,.28,0],[523,.28,.30],[659,.45,.60],[523,.28,1.10]],
- scratch:[[1500,.07,0],[900,.09,.10],[1700,.06,.22],[700,.11,.31],[1300,.07,.46],[600,.12,.57]],
- greece_eas:[[853,.20,0],[960,.20,.23],[853,.20,.46],[960,.20,.69]],
- japan_eas:[[700,.18,0],[900,.18,.20],[1100,.18,.40],[900,.18,.60],[700,.18,.80]],
- malaysia_eas:[[600,.25,0],[800,.25,.28],[600,.25,.56],[800,.25,.84]],
- saudi_arabia_eas:[[1000,.16,0],[800,.16,.18],[1000,.16,.36],[800,.16,.54],[1000,.16,.72]]
-};
-function playSelectedAlarm(){
- const ctx=getRestAudioContext(); if(!ctx || restSoundChoice==='silent') return;
- const pat=REST_ALARM_PATTERNS[restSoundChoice]||REST_ALARM_PATTERNS.alarm_clock;
- const emit=()=>{const t=ctx.currentTime+.02;pat.forEach(([f,d,o,e])=>scheduleTone(f,t+o,d,'square',.25,e||null));};
- emit();
- const id=setInterval(()=>{if(!restAlarmAudio||!restAlarmAudio._selectedAlarm){clearInterval(id);return}emit()},1700);
- restAlarmTimeouts.push(id);
+// The selected alarm is a real audio file stored beside index.html.
+// These filenames match the user's RepLog audio pack.
+const ALARM_SOUND_FILES={alarm_clock:'alarm_clock.mp3',car:'Car.mp3',siren:'Siren.mp3',security_alarm:'security-alarm.mp3',biohazard:'biohazard.mp3',community:'community.mp3',scratch:'scratch.mp3',greece_eas:'greece-eas.mp3',japan_eas:'japan-eas.mp3',malaysia_eas:'malaysia-eas.mp3',saudi_arabia_eas:'saudi-arabia-eas.mp3'};
+const REST_ALARM_DURATION=10;
+let restPrimedAudio=null;
+function primeSelectedAlarm(){
+  if(restSoundChoice==='silent') return;
+  const file=ALARM_SOUND_FILES[restSoundChoice]; if(!file) return;
+  try{ if(restPrimedAudio){restPrimedAudio.pause();restPrimedAudio.currentTime=0;} const a=new Audio(file); a.preload='auto'; a.playsInline=true; a.volume=.88; restPrimedAudio=a; const p=a.play(); if(p&&p.catch)p.catch(()=>{}); a.pause(); a.currentTime=0; }catch(e){}
 }
 function playBuzzer(){
- stopRestAlarm(); if(restSoundChoice==='silent') return;
- getRestAudioContext();
- restAlarmAudio={_selectedAlarm:true};
- playSelectedAlarm();
- restAlarmStopTimer=setTimeout(()=>{if(restAlarmAudio&&restAlarmAudio._selectedAlarm)stopRestAlarm()},REST_ALARM_DURATION*1000);
+  stopRestAlarm(); if(restSoundChoice==='silent') return;
+  const file=ALARM_SOUND_FILES[restSoundChoice]; if(!file) return;
+  const audio=(restPrimedAudio&&restPrimedAudio.src&&restPrimedAudio.src.endsWith('/'+file))?restPrimedAudio:new Audio(file);
+  restAlarmAudio=audio; audio.preload='auto'; audio.playsInline=true; audio.loop=true; audio.volume=.88; audio.muted=false;
+  try{audio.currentTime=0;const p=audio.play();audio._playPromise=p;if(p&&p.catch)p.catch(e=>console.warn('RepLog local alarm could not play:',e));}catch(e){}
+  restAlarmStopTimer=setTimeout(()=>{if(restAlarmAudio===audio)stopRestAlarm()},REST_ALARM_DURATION*1000);
 }
-
 function playBeep(){
   try{
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -2118,12 +2095,17 @@ let restRemaining = 0, restTotal = 0;
 
 const globalRestTimer = document.getElementById('globalRestTimer');
 const globalRestTime = document.getElementById('globalRestTime');
-const globalRestMinus = document.getElementById('globalRestMinus');
-const globalRestPlus = document.getElementById('globalRestPlus');
-const globalRestStop = document.getElementById('globalRestStop');
+const globalRingProgress = document.getElementById('globalRingProgress');
+const globalRingComet = document.getElementById('globalRingComet');
+const globalRestHand = document.getElementById('globalRestHand');
 function updateGlobalRestTimer(){
   if(!globalRestTimer || !exRestInterval) return;
-  globalRestTime.textContent = formatMMSS(restRemaining);
+  const remaining=Math.max(0,restRemaining), total=Math.max(1,restTotal);
+  globalRestTime.textContent=formatMMSS(remaining);
+  const deg=Math.min(1,(total-remaining)/total)*360;
+  if(globalRingProgress) globalRingProgress.style.background=`conic-gradient(var(--neon) 0deg,var(--neon-strong) ${deg/2}deg,var(--neon) ${deg}deg,transparent ${deg}deg)`;
+  if(globalRestHand) globalRestHand.style.transform=`translateX(-50%) rotate(${deg}deg)`;
+  if(globalRingComet) globalRingComet.style.transform=`translateX(-50%) rotate(${deg}deg)`;
   globalRestTimer.classList.add('show');
 }
 function hideGlobalRestTimer(){ if(globalRestTimer) globalRestTimer.classList.remove('show','done'); }
@@ -2213,8 +2195,9 @@ exTimerBtn.addEventListener('click', () => {
   d[exModalSide][exModalIndex].rest = exRestSeconds.value;
   saveDays();
 
-  restSoundChoice = document.getElementById('restSoundSelect')?.value || 'digital_alarm';
+  restSoundChoice = document.getElementById('restSoundSelect')?.value || 'alarm_clock';
   getRestAudioContext();
+  primeSelectedAlarm();
   clearRestAudioTimers();
   restCountdownPlayed = new Set();
   restTotal = seconds;
@@ -2243,9 +2226,6 @@ function nudgeRestTimer(deltaSeconds){
 }
 restNudgeDown.addEventListener('click', () => nudgeRestTimer(-15));
 restNudgeUp.addEventListener('click', () => nudgeRestTimer(15));
-globalRestMinus?.addEventListener('click', () => nudgeRestTimer(-15));
-globalRestPlus?.addEventListener('click', () => nudgeRestTimer(15));
-globalRestStop?.addEventListener('click', () => resetTimerVisual());
 
 function persistRestValue(){
   if(exModalSide != null && exModalIndex != null){
@@ -2273,13 +2253,11 @@ function stopRestPreview(){
 restSoundSelect.addEventListener('change', () => {
   restSoundChoice = restSoundSelect.value;
   try{ localStorage.setItem('REPLOG_REST_SOUND', restSoundChoice); }catch(e){}
-  // Play a short preview clip so you can hear each option as you pick it
   stopRestPreview();
   if(restSoundChoice !== 'silent'){
-    stopRestAlarm();
-    restAlarmAudio={_selectedAlarm:true};
-    playSelectedAlarm();
-    setTimeout(()=>{if(restAlarmAudio&&restAlarmAudio._selectedAlarm)stopRestAlarm()},1500);
+    const file=ALARM_SOUND_FILES[restSoundChoice];
+    if(file){try{const a=new Audio(file);a.preload='auto';a.playsInline=true;a.volume=.88;restPreviewAudio=a;const p=a.play();a._playPromise=p;if(p&&p.catch)p.catch(e=>console.warn('RepLog preview could not play:',e));}catch(e){}}
+    primeSelectedAlarm();
   }
 });
 
@@ -2440,35 +2418,24 @@ function persistExRows(){
 
 function exerciseToPrKey(name){
   const n=String(name||'').trim().toLowerCase().replace(/[–—]/g,'-');
-  const aliases={
-    'bench press':'bench_press','back squat':'back_squat','deadlift':'deadlift','overhead press':'overhead_press',
-    'barbell row':'barbell_row','front squat':'front_squat','romanian deadlift':'romanian_deadlift','incline bench press':'incline_bench',
-    'close-grip bench press':'close_grip_bench','close grip bench press':'close_grip_bench','leg press':'leg_press','hack squat':'hack_squat',
-    'barbell hip thrust':'hip_thrust','hip thrust':'hip_thrust','power clean':'power_clean','clean & jerk':'clean_and_jerk','clean and jerk':'clean_and_jerk',
-    'snatch':'snatch','dumbbell bench press':'dumbbell_bench','weighted pull-up':'pull_up','weighted pull up':'pull_up',
-    'weighted dip':'dip','barbell curl':'barbell_curl','skull crusher':'skull_crusher','calf raise':'calf_raise','pendlay row':'pendlay_row'
-  };
-  return aliases[n] || null;
+  const aliases={'bench press':'bench_press','barbell bench press':'bench_press','back squat':'back_squat','deadlift':'deadlift','conventional deadlift':'deadlift','overhead press':'overhead_press','overhead barbell press':'overhead_press','barbell row':'barbell_row','barbell bent-over row':'barbell_row','front squat':'front_squat','romanian deadlift':'romanian_deadlift','incline bench press':'incline_bench','incline barbell bench press':'incline_bench','close-grip bench press':'close_grip_bench','close grip bench press':'close_grip_bench','leg press':'leg_press','hack squat':'hack_squat','barbell hip thrust':'hip_thrust','hip thrust':'hip_thrust','power clean':'power_clean','clean & jerk':'clean_and_jerk','clean and jerk':'clean_and_jerk','snatch':'snatch','dumbbell bench press':'dumbbell_bench','weighted pull-up':'pull_up','weighted pull up':'pull_up','pull-up':'pull_up','weighted dip':'dip','barbell curl':'barbell_curl','skull crusher':'skull_crusher','skull crushers':'skull_crusher','calf raise':'calf_raise','pendlay row':'pendlay_row'};
+  if(aliases[n])return aliases[n]; const slug=n.replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'').slice(0,70); return slug?'exercise_'+slug:null;
 }
-async function autoSaveExercisePR(){
-  if(!currentUser || exModalSide==null || exModalIndex==null) return;
-  const slot=days[activeDay]?.[exModalSide]?.[exModalIndex];
-  const key=exerciseToPrKey(slot?.exercise); if(!key) return;
-  const maxWeight=exModalRowsData.reduce((m,r)=>Math.max(m,Number(r.weight)||0),0);
-  if(!(maxWeight>0)) return;
-  const meta=profileMetadata();
-  const prs=Object.assign({},meta.personal_records||{});
-  const old=Number(prs[key])||0;
-  if(maxWeight>old){
-    prs[key]=maxWeight;
-    await updateProfileMetadata({personal_records:prs}, `${slot.exercise} PR updated: ${maxWeight} lb`);
-  }
+function collectAllExerciseNames(){
+  const out=[],seen=new Set(); const add=n=>{n=String(n||'').trim();if(n&&!seen.has(n.toLowerCase())){seen.add(n.toLowerCase());out.push(n);}};
+  [UPPER_LIBRARY,LOWER_LIBRARY].forEach(lib=>Object.values(lib).flat().forEach(add)); (days||[]).forEach(d=>[...(d.upper||[]),...(d.lower||[])].forEach(s=>add(s.exercise))); return out.sort((a,b)=>a.localeCompare(b));
 }
+async function syncAllExercisePRsFromLogs(){
+  if(!currentUser)return; const meta=profileMetadata(),prs=Object.assign({},meta.personal_records||{}); let changed=false;
+  (days||[]).forEach(d=>(d.weeks||[]).forEach(w=>['upper','lower'].forEach(side=>(d[side]||[]).forEach((slot,i)=>{const key=exerciseToPrKey(slot.exercise);if(!key)return;const log=(w.logs&&w.logs[side]&&w.logs[side][i])||[];const max=log.reduce((m,r)=>Math.max(m,Number(r.weight)||0),0);if(max>0&&max>(Number(prs[key])||0)){prs[key]=max;changed=true;}}))));
+  if(changed){currentUser.user_metadata=Object.assign({},currentUser.user_metadata||{},{personal_records:prs});await writeLocalState({user:currentUser});}
+}
+async function autoSaveExercisePR(){await syncAllExercisePRsFromLogs();}
 
 const exFinishBtn = document.getElementById('exFinishBtn');
 exFinishBtn.addEventListener('click', () => {
   persistExRows();
-  autoSaveExercisePR().catch(()=>{});
+  autoSaveExercisePR().then(()=>renderProfile()).catch(()=>{});
   const anyLogged = exModalRowsData.some(r => r.reps !== "" && r.reps != null);
   if(anyLogged && !exModalCelebrated){
     exModalCelebrated = true;
@@ -3406,9 +3373,12 @@ const PR_GROUPS = [
   ['Main', ['bench_press','back_squat','deadlift','overhead_press']],
   ['Press', ['incline_bench','close_grip_bench','dumbbell_bench','dip','skull_crusher']],
   ['Pull / Legs', ['barbell_row','pendlay_row','pull_up','front_squat','romanian_deadlift','leg_press','hack_squat','hip_thrust']],
-  ['Olympic / Other', ['power_clean','clean_and_jerk','snatch','barbell_curl','calf_raise']]
+  ['Olympic / Other', ['power_clean','clean_and_jerk','snatch','barbell_curl','calf_raise']],
+  ['All Exercises', []]
 ];
+function refreshAllExercisePRGroup(){const defs=collectAllExerciseNames().map(n=>[exerciseToPrKey(n),n]).filter(x=>x[0]);const g=PR_GROUPS.find(x=>x[0]==='All Exercises');if(g)g[1]=defs.map(x=>x[0]);defs.forEach(([k,n])=>{if(!PR_FIELDS.some(x=>x[0]===k))PR_FIELDS.push([k,n]);});}
 function renderPrFields(){
+  refreshAllExercisePRGroup();
   const tabs=document.getElementById('prTabs'), panels=document.getElementById('prPanels');
   if(!tabs || !panels || tabs.children.length) return;
   const labelMap=Object.fromEntries(PR_FIELDS);
@@ -3613,3 +3583,10 @@ importBackupInput.addEventListener('change', async () => {
 </script>
 </body>
 </html>
+
+<style>
+/* RepLog dust visibility layer */
+.auth-card,.nav-block,.day-tab,.week-tab,.exercise-card,.profile-card,.log-card,.summary-card,.summary-block-complete,.finish-bar,.bottom-dock,.session-active,.ex-modal,.calc-modal,.theme-modal,.setup-modal,.modal,.rest-step,.rest-chip,.rest-sound-select,.ex-prev-row,.card,.panel,.box,.section-card,.profile-section,.settings-card,input,select,textarea{position:relative;overflow:hidden;}
+.auth-card:before,.nav-block:before,.day-tab:before,.week-tab:before,.exercise-card:before,.profile-card:before,.log-card:before,.summary-card:before,.finish-bar:before,.bottom-dock:before,.session-active:before,.ex-modal:before,.calc-modal:before,.theme-modal:before,.setup-modal:before,.modal:before,.rest-step:before,.rest-chip:before,.rest-sound-select:before,.ex-prev-row:before,.card:before,.panel:before,.box:before,.section-card:before,.profile-section:before,.settings-card:before,input:before,select:before,textarea:before{content:"";position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(circle,rgba(var(--neon-rgb),.22) 0 1px,transparent 1.7px),radial-gradient(circle,rgba(var(--neon-rgb),.14) 0 1px,transparent 1.8px);background-size:37px 43px,61px 67px;background-position:8px 11px,23px 31px;opacity:.22;mix-blend-mode:screen;}
+.auth-card>*,.nav-block>*,.day-tab>*,.week-tab>*,.exercise-card>*,.profile-card>*,.log-card>*,.summary-card>*,.finish-bar>*,.bottom-dock>*,.session-active>*,.ex-modal>*,.calc-modal>*,.theme-modal>*,.setup-modal>*,.modal>*,.card>*,.panel>*,.box>*,.section-card>*,.profile-section>*,.settings-card>*{position:relative;z-index:1;}
+</style>
