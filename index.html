@@ -686,13 +686,13 @@
 .pr-wheel-core .core-glow{position:absolute;inset:-12px;border-radius:50%;background:radial-gradient(circle,rgba(var(--neon-rgb),.32),transparent 66%);filter:blur(10px);animation:prCenterPulse 2.3s ease-in-out infinite alternate;z-index:-1;}
   .pr-wheel-core .core-text{display:none;}
   .pr-wheel-core span{display:none;}
-  .pr-wheel-item{position:absolute;width:132px;height:132px;border-radius:50%;border:1px solid rgba(var(--neon-rgb),.42);background:rgba(10,12,13,.92);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:var(--chalk);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .32s cubic-bezier(.2,.8,.2,1),border-color .25s,box-shadow .3s,background .3s;box-shadow:0 8px 24px rgba(0,0,0,.3);z-index:3;overflow:hidden;}
+  .pr-wheel-item{position:absolute;width:132px;height:132px;border-radius:50%;border:1px solid rgba(var(--neon-rgb),.28);padding:0;margin:0;box-sizing:border-box;background:rgba(10,12,13,.92);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:var(--chalk);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .32s cubic-bezier(.2,.8,.2,1),border-color .25s,box-shadow .3s,background .3s;box-shadow:0 8px 24px rgba(0,0,0,.3);z-index:3;overflow:hidden;}
   .pr-wheel-item:nth-child(3){top:-2px;left:50%;transform:translateX(-50%)} .pr-wheel-item:nth-child(4){right:-2px;top:50%;transform:translateY(-50%)} .pr-wheel-item:nth-child(5){bottom:-2px;left:50%;transform:translateX(-50%)} .pr-wheel-item:nth-child(6){left:-2px;top:50%;transform:translateY(-50%)}
   .pr-wheel-item::before{content:"";position:absolute;inset:-18%;border-radius:50%;background:radial-gradient(circle,rgba(var(--neon-rgb),.16),transparent 58%);filter:blur(8px);opacity:.55;animation:prNodePulse 2.8s ease-in-out infinite alternate;}
   .pr-wheel-item.active,.pr-wheel-item:hover{border-color:var(--neon);background:rgba(var(--neon-rgb),.13);box-shadow:0 0 34px rgba(var(--neon-rgb),.28),inset 0 0 26px rgba(var(--neon-rgb),.08);}
   .pr-wheel-item.active:nth-child(3){transform:translateX(-50%) scale(1.045)} .pr-wheel-item.active:nth-child(4){transform:translateY(-50%) scale(1.045)} .pr-wheel-item.active:nth-child(5){transform:translateX(-50%) scale(1.045)} .pr-wheel-item.active:nth-child(6){transform:translateY(-50%) scale(1.045)}
   .pr-wheel-icon{position:absolute;font-size:62px;line-height:1;color:var(--neon);opacity:.16;filter:drop-shadow(0 0 12px rgba(var(--neon-rgb),.5));z-index:0;}
-  .pr-wheel-label{position:relative;z-index:2;display:flex;align-items:center;justify-content:center;width:100%;height:100%;font:900 24px 'Oswald',sans-serif;color:#fff;letter-spacing:.055em;text-transform:uppercase;text-align:center;text-shadow:0 2px 10px #000,0 0 13px rgba(var(--neon-rgb),.3);white-space:nowrap;}
+  .pr-wheel-label{position:absolute;inset:0;z-index:2;display:flex;align-items:center;justify-content:center;width:auto;height:auto;margin:0;padding:0;font:900 24px/1 'Oswald',sans-serif;color:#fff;letter-spacing:.055em;text-transform:uppercase;text-align:center;text-shadow:0 2px 10px #000,0 0 13px rgba(var(--neon-rgb),.3);white-space:nowrap;}
   .pr-wheel-count{display:none!important;}
   .pr-wheel-detail{border-top:1px solid rgba(var(--neon-rgb),.13);padding-top:7px;animation:prPanelIn .28s ease both;}
   .pr-wheel-detail-head{display:flex;align-items:center;justify-content:space-between;margin:0 2px 6px;}
@@ -1127,7 +1127,7 @@ input,select,textarea{background-color:rgba(8,10,10,.72)!important;backdrop-filt
   .pr-wheel-core .core-text{display:none!important;}
   .pr-wheel-core .core-glow{position:absolute;inset:8%;border-radius:50%;background:radial-gradient(circle,rgba(var(--neon-rgb),.48) 0%,rgba(var(--neon-rgb),.20) 34%,transparent 70%);filter:blur(13px);animation:corePulse 1.9s ease-in-out infinite;z-index:1;}
   @keyframes corePulse{0%,100%{transform:scale(.82);opacity:.55;box-shadow:0 0 22px rgba(var(--neon-rgb),.2)}50%{transform:scale(1.12);opacity:1;box-shadow:0 0 55px rgba(var(--neon-rgb),.65)}}
-  .pr-wheel-label{display:block!important;position:relative;z-index:3;font:900 24px 'Oswald',sans-serif;color:#fff;letter-spacing:.055em;text-transform:uppercase;text-align:center;line-height:1;pointer-events:none;text-shadow:0 1px 3px rgba(0,0,0,.75);}.pr-wheel-count{display:none!important;}
+  .pr-wheel-label{display:flex!important;position:absolute;inset:0;z-index:3;align-items:center;justify-content:center;width:auto;height:auto;margin:0;padding:0;font:900 24px/1 'Oswald',sans-serif;color:#fff;letter-spacing:.055em;text-transform:uppercase;text-align:center;pointer-events:none;text-shadow:0 1px 3px rgba(0,0,0,.75);}.pr-wheel-count{display:none!important;}
   .pr-wheel-item .pr-wheel-icon{display:none!important;}.pr-wheel-item .pr-wheel-icon::before{content:"";display:block;width:56px;height:62px;background:currentColor;clip-path:polygon(47% 0,58% 4%,64% 13%,63% 24%,57% 30%,70% 35%,82% 46%,100% 64%,93% 71%,77% 58%,68% 51%,73% 72%,82% 98%,69% 100%,58% 75%,51% 57%,45% 75%,34% 100%,21% 96%,31% 70%,36% 52%,25% 59%,9% 73%,0 64%,17% 45%,28% 35%,41% 30%,36% 23%,37% 13%,41% 5%);}
   
   .profile-avatar{cursor:pointer;flex-basis:62px;width:62px;height:62px;font-size:24px;}
@@ -3699,8 +3699,10 @@ function showRepLogDownload(blob,filename){
   a.style.cssText='position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:99999;padding:18px 22px;border-radius:14px;background:var(--neon);color:#000;font-weight:900;text-decoration:none;box-shadow:0 0 30px rgba(var(--neon-rgb),.55);text-align:center;';
   document.body.appendChild(a);
   backupMsg.style.color='var(--neon-strong)';
-  backupMsg.textContent='Tap “Save RepLog Backup to Files”.';
-  // Keep the link alive until the user has had time to use it.
+  backupMsg.textContent='Backup ready — tap Save RepLog Backup to Files.';
+  // Trigger the browser's native download immediately, then leave a visible
+  // button on screen in case iOS requires a second tap.
+  try{ a.click(); }catch(e){ console.warn('RepLog fallback download click failed',e); }
   setTimeout(()=>{try{URL.revokeObjectURL(url);a.remove();}catch(e){}},60000);
 }
 
