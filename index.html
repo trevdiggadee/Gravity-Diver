@@ -673,35 +673,36 @@
   .pr-tabs{display:none!important;}
   .pr-panels{display:block;}
   .pr-panel{display:block;}
-  .pr-wheel-wrap{position:relative;margin:12px auto 16px;width:min(330px,88vw);height:min(330px,88vw);display:grid;place-items:center;isolation:isolate;}
-  .pr-wheel-wrap::before{content:"";position:absolute;inset:2%;border-radius:50%;background:conic-gradient(from -45deg,transparent 0 8%,rgba(var(--neon-rgb),.22) 12%,transparent 18% 33%,rgba(var(--neon-rgb),.22) 38%,transparent 44% 58%,rgba(var(--neon-rgb),.22) 63%,transparent 69% 83%,rgba(var(--neon-rgb),.22) 88%,transparent 94%);filter:blur(2px);animation:prWheelSpin 18s linear infinite;}
-  .pr-wheel-wrap::after{content:"";position:absolute;inset:7%;border-radius:50%;background:radial-gradient(circle,rgba(var(--neon-rgb),.13),transparent 55%);box-shadow:0 0 55px rgba(var(--neon-rgb),.13),inset 0 0 45px rgba(var(--neon-rgb),.06);filter:blur(5px);z-index:-1;animation:prWheelFire 4s ease-in-out infinite alternate;}
-  .pr-wheel-fire{position:absolute;inset:0;border-radius:50%;pointer-events:none;overflow:hidden;}
-  .pr-wheel-fire::before,.pr-wheel-fire::after{content:"";position:absolute;inset:8%;border-radius:50%;border:2px solid transparent;border-top-color:var(--neon);border-right-color:rgba(var(--neon-rgb),.28);filter:blur(1px);box-shadow:0 0 9px var(--neon),0 0 25px rgba(var(--neon-rgb),.35);animation:prFireOrbit 2.8s linear infinite;}
-  .pr-wheel-fire::after{inset:13%;border-width:1px;border-top-color:var(--neon-strong);border-left-color:rgba(var(--neon-rgb),.25);animation-duration:4.1s;animation-direction:reverse;opacity:.7;}
-  .pr-wheel-core{width:116px;height:116px;border-radius:50%;border:2px solid rgba(var(--neon-rgb),.62);background:radial-gradient(circle at 45% 38%,rgba(var(--neon-rgb),.13),rgba(8,10,11,.96) 62%);display:grid;place-items:center;text-align:center;color:var(--neon-strong);font:800 18px 'Oswald',sans-serif;letter-spacing:.1em;text-transform:uppercase;box-shadow:0 0 28px rgba(var(--neon-rgb),.28),inset 0 0 30px rgba(var(--neon-rgb),.08);transition:.35s ease;z-index:3;}
-  .pr-wheel-core span{font:600 10px 'Inter',sans-serif;color:var(--chalk-faint);letter-spacing:.09em;margin-top:1px;}
-  .pr-wheel-item{position:absolute;width:145px;height:145px;border-radius:50%;border:1px solid rgba(var(--neon-rgb),.34);background:rgba(13,15,17,.9);backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);color:var(--chalk);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;transition:transform .32s cubic-bezier(.2,.8,.2,1),border-color .25s,box-shadow .3s,background .3s;box-shadow:0 10px 28px rgba(0,0,0,.28);z-index:2;}
-  .pr-wheel-item:nth-child(3){top:-1px;left:50%;transform:translateX(-50%);}
-  .pr-wheel-item:nth-child(4){right:-1px;top:50%;transform:translateY(-50%);}
-  .pr-wheel-item:nth-child(5){bottom:-1px;left:50%;transform:translateX(-50%);}
-  .pr-wheel-item:nth-child(6){left:-1px;top:50%;transform:translateY(-50%);}
-  .pr-wheel-item:hover,.pr-wheel-item.active{border-color:var(--neon);background:rgba(var(--neon-rgb),.14);box-shadow:0 0 30px rgba(var(--neon-rgb),.24),inset 0 0 25px rgba(var(--neon-rgb),.07);}
-  .pr-wheel-item.active:nth-child(3){transform:translateX(-50%) scale(1.055);}.pr-wheel-item.active:nth-child(4){transform:translateY(-50%) scale(1.055);}.pr-wheel-item.active:nth-child(5){transform:translateX(-50%) scale(1.055);}.pr-wheel-item.active:nth-child(6){transform:translateY(-50%) scale(1.055);}
-  .pr-wheel-icon{width:38px;height:38px;border:1px solid rgba(var(--neon-rgb),.5);border-radius:50%;display:grid;place-items:center;color:var(--neon);font-size:19px;box-shadow:0 0 15px rgba(var(--neon-rgb),.16);}
-  .pr-wheel-label{font:800 17px 'Oswald',sans-serif;letter-spacing:.1em;text-transform:uppercase;text-shadow:0 0 10px rgba(var(--neon-rgb),.18);}.pr-wheel-count{font:600 9px 'Inter',sans-serif;color:var(--chalk-faint);letter-spacing:.06em;}
-  .pr-wheel-detail{border-top:1px solid rgba(var(--neon-rgb),.13);padding-top:10px;animation:prPanelIn .28s ease both;}
-  .pr-wheel-detail-head{display:flex;align-items:center;justify-content:space-between;margin:0 2px 8px;}
-  .pr-wheel-detail-title{font:800 15px 'Oswald',sans-serif;color:var(--neon-strong);letter-spacing:.07em;text-transform:uppercase;}.pr-wheel-detail-hint{font-size:8px;color:var(--chalk-faint);text-transform:uppercase;letter-spacing:.08em;}
-  .pr-section-grid{display:grid;grid-template-columns:1fr;gap:5px;}
-  .pr-accordion{margin:0 0 5px;border:1px solid rgba(255,255,255,.075);border-radius:11px;overflow:hidden;background:rgba(255,255,255,.018);}
-  .pr-accordion summary{list-style:none;display:flex;align-items:center;gap:9px;min-height:43px;padding:9px 11px;cursor:pointer;user-select:none;color:var(--chalk);font-family:'Oswald',sans-serif;font-size:15px;letter-spacing:.025em;}
-  .pr-accordion summary::-webkit-details-marker{display:none;}.pr-accordion summary::before{content:'›';color:var(--neon);font-family:Inter,sans-serif;font-size:21px;line-height:1;transition:transform .16s ease;}.pr-accordion[open] summary::before{transform:rotate(90deg);}.pr-accordion summary .pr-section-count{margin-left:auto;color:var(--chalk-faint);font:600 9px 'Inter',sans-serif;}.pr-accordion summary .pr-section-type{display:none!important;}.pr-accordion-body{padding:0 9px 9px;}
-  .pr-field{min-width:0;padding:8px;border:1px solid rgba(255,255,255,.055);border-radius:9px;background:rgba(255,255,255,.018);}.pr-field input{font-family:'JetBrains Mono',monospace;font-size:12px;padding:6px 7px;}
-  @keyframes prWheelSpin{to{transform:rotate(360deg)}}
-  @keyframes prWheelFire{0%{transform:scale(.96);opacity:.65}100%{transform:scale(1.04);opacity:1}}
-  @keyframes prFireOrbit{to{transform:rotate(360deg)}}
-  @keyframes prPanelIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+  /* ---- PR WHEEL + COMPACT RECORD CALENDAR ---- */
+  .pr-wheel-wrap{position:relative;margin:8px auto 10px;width:min(320px,86vw);height:min(320px,86vw);display:grid;place-items:center;isolation:isolate;}
+  .pr-wheel-wrap::before{content:"";position:absolute;inset:1%;border-radius:50%;background:conic-gradient(from -20deg,transparent 0 9%,rgba(var(--neon-rgb),.65) 12%,transparent 17% 30%,rgba(var(--neon-rgb),.55) 34%,transparent 40% 56%,rgba(var(--neon-rgb),.7) 60%,transparent 66% 82%,rgba(var(--neon-rgb),.55) 87%,transparent 93%);filter:blur(2px);animation:prWheelSpin 15s linear infinite;}
+  .pr-wheel-wrap::after{content:"";position:absolute;inset:5%;border-radius:50%;background:radial-gradient(circle,rgba(var(--neon-rgb),.12),transparent 57%);box-shadow:0 0 65px rgba(var(--neon-rgb),.2),inset 0 0 45px rgba(var(--neon-rgb),.07);filter:blur(5px);z-index:-1;animation:prWheelFire 3.2s ease-in-out infinite alternate;}
+  .pr-wheel-fire{position:absolute;inset:-2%;border-radius:50%;pointer-events:none;overflow:hidden;}
+  .pr-wheel-fire::before,.pr-wheel-fire::after{content:"";position:absolute;border-radius:50%;border:2px solid transparent;border-top-color:var(--neon);border-right-color:rgba(var(--neon-rgb),.3);filter:blur(1px);box-shadow:0 0 10px var(--neon),0 0 30px rgba(var(--neon-rgb),.35);animation:prFireOrbit 2.4s linear infinite;}
+  .pr-wheel-fire::before{inset:5%;}.pr-wheel-fire::after{inset:9%;border-width:1px;border-top-color:var(--neon-strong);border-left-color:rgba(var(--neon-rgb),.35);animation-duration:3.7s;animation-direction:reverse;opacity:.75;}
+  .pr-wheel-core{width:105px;height:105px;border-radius:50%;border:2px solid rgba(var(--neon-rgb),.7);background:#090b0c;display:grid;place-items:center;text-align:center;color:var(--neon-strong);font:800 16px 'Oswald',sans-serif;letter-spacing:.08em;text-transform:uppercase;box-shadow:0 0 32px rgba(var(--neon-rgb),.35),inset 0 0 30px rgba(var(--neon-rgb),.1);overflow:hidden;z-index:4;position:relative;}
+  .pr-wheel-core::before{content:"";position:absolute;inset:-12px;border-radius:50%;background:radial-gradient(circle,rgba(var(--neon-rgb),.22),transparent 62%);filter:blur(9px);z-index:-1;animation:prCoreGlow 2.2s ease-in-out infinite alternate;}
+  .pr-wheel-core img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;opacity:.95;filter:drop-shadow(0 0 12px rgba(var(--neon-rgb),.6));z-index:0;}
+  .pr-wheel-core .core-text{position:relative;z-index:2;text-shadow:0 0 12px #000,0 0 14px rgba(var(--neon-rgb),.5);font-size:17px;}
+  .pr-wheel-core span{display:block;font:600 9px 'Inter',sans-serif;color:var(--chalk);letter-spacing:.08em;margin-top:2px;text-shadow:0 1px 8px #000;}
+  .pr-wheel-item{position:absolute;width:132px;height:132px;border-radius:50%;border:1px solid rgba(var(--neon-rgb),.42);background:rgba(10,12,13,.92);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:var(--chalk);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .32s cubic-bezier(.2,.8,.2,1),border-color .25s,box-shadow .3s,background .3s;box-shadow:0 8px 24px rgba(0,0,0,.3);z-index:3;overflow:hidden;}
+  .pr-wheel-item:nth-child(3){top:-2px;left:50%;transform:translateX(-50%)} .pr-wheel-item:nth-child(4){right:-2px;top:50%;transform:translateY(-50%)} .pr-wheel-item:nth-child(5){bottom:-2px;left:50%;transform:translateX(-50%)} .pr-wheel-item:nth-child(6){left:-2px;top:50%;transform:translateY(-50%)}
+  .pr-wheel-item::before{content:"";position:absolute;inset:-18%;border-radius:50%;background:radial-gradient(circle,rgba(var(--neon-rgb),.16),transparent 58%);filter:blur(8px);opacity:.55;animation:prNodePulse 2.8s ease-in-out infinite alternate;}
+  .pr-wheel-item.active,.pr-wheel-item:hover{border-color:var(--neon);background:rgba(var(--neon-rgb),.13);box-shadow:0 0 34px rgba(var(--neon-rgb),.28),inset 0 0 26px rgba(var(--neon-rgb),.08);}
+  .pr-wheel-item.active:nth-child(3){transform:translateX(-50%) scale(1.045)} .pr-wheel-item.active:nth-child(4){transform:translateY(-50%) scale(1.045)} .pr-wheel-item.active:nth-child(5){transform:translateX(-50%) scale(1.045)} .pr-wheel-item.active:nth-child(6){transform:translateY(-50%) scale(1.045)}
+  .pr-wheel-icon{position:absolute;font-size:58px;line-height:1;color:var(--neon);opacity:.13;filter:drop-shadow(0 0 12px rgba(var(--neon-rgb),.5));z-index:0;}
+  .pr-wheel-label{position:relative;z-index:2;font:900 23px 'Oswald',sans-serif;letter-spacing:.055em;text-transform:uppercase;text-align:center;text-shadow:0 2px 10px #000,0 0 13px rgba(var(--neon-rgb),.3);white-space:nowrap;}
+  .pr-wheel-count{position:absolute;bottom:26px;z-index:2;font:700 9px 'Inter',sans-serif;color:var(--chalk-faint);letter-spacing:.08em;}
+  .pr-wheel-detail{border-top:1px solid rgba(var(--neon-rgb),.13);padding-top:7px;animation:prPanelIn .28s ease both;}
+  .pr-wheel-detail-head{display:flex;align-items:center;justify-content:space-between;margin:0 2px 6px;}
+  .pr-wheel-detail-title{font:800 14px 'Oswald',sans-serif;color:var(--neon-strong);letter-spacing:.07em;text-transform:uppercase}.pr-wheel-detail-hint{font-size:8px;color:var(--chalk-faint);text-transform:uppercase;letter-spacing:.08em}
+  .pr-section-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;max-height:245px;overflow:auto;padding-right:2px;}
+  .pr-accordion{margin:0;border:1px solid rgba(255,255,255,.065);border-radius:9px;overflow:hidden;background:rgba(255,255,255,.018);}
+  .pr-accordion summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:6px;min-height:35px;padding:6px 8px;cursor:default;user-select:none;color:var(--chalk);font-family:'Inter',sans-serif;font-size:10px;font-weight:700;line-height:1.15;}
+  .pr-accordion summary::-webkit-details-marker{display:none}.pr-accordion summary::before{display:none}.pr-accordion summary .pr-section-count,.pr-accordion summary .pr-section-type{display:none!important}.pr-accordion[open] summary{border-bottom:1px solid rgba(255,255,255,.05)}
+  .pr-accordion-body{padding:0 6px 6px}.pr-field{min-width:0;padding:5px 6px;border:0;background:transparent;display:grid;grid-template-columns:1fr auto;align-items:center;gap:5px}.pr-field label{font-size:9px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pr-field input{font-family:'JetBrains Mono',monospace;font-size:12px!important;font-weight:800;padding:3px 4px!important;width:62px!important;text-align:right;border-color:rgba(var(--neon-rgb),.18)!important;background:rgba(var(--neon-rgb),.035)!important}.pr-field .metric-unit{display:none!important}
+  @keyframes prCoreGlow{from{transform:scale(.95);opacity:.55}to{transform:scale(1.06);opacity:1}} @keyframes prNodePulse{from{transform:scale(.9);opacity:.3}to{transform:scale(1.08);opacity:.8}}
+  @keyframes prWheelSpin{to{transform:rotate(360deg)}} @keyframes prWheelFire{0%{transform:scale(.97);opacity:.65}100%{transform:scale(1.04);opacity:1}} @keyframes prFireOrbit{to{transform:rotate(360deg)}} @keyframes prPanelIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
   .pr-title{ color:var(--neon-strong); text-shadow:0 0 12px rgba(var(--neon-rgb),.28); font-size:18px!important; letter-spacing:.04em; margin-bottom:4px!important; }
   .profile-note{font-size:8px;color:var(--chalk-faint);line-height:1.4;margin-top:7px;}
   #savePrsBtn{display:none!important}
@@ -3509,24 +3510,24 @@ function renderPrFields(){
   ];
   const wheel=document.createElement('div'); wheel.className='pr-wheel-wrap';
   const fire=document.createElement('div'); fire.className='pr-wheel-fire'; wheel.appendChild(fire);
-  const core=document.createElement('div'); core.className='pr-wheel-core'; core.innerHTML='PR HUB<span>SELECT TYPE</span>'; wheel.appendChild(core);
+  const core=document.createElement('div'); core.className='pr-wheel-core'; core.innerHTML='<img src="center.png" alt=""><div class="core-text">PR HUB<span>SELECT TYPE</span></div>'; wheel.appendChild(core);
   const detail=document.createElement('div'); detail.className='pr-wheel-detail'; panels.appendChild(wheel); panels.appendChild(detail);
   function makePRField(key){
     const name=labelMap[key]||keyForName.get(key)||key;
     const field=document.createElement('div'); field.className='pr-field';
-    field.innerHTML=`<label for="pr_${key}">${name}</label><input id="pr_${key}" type="number" min="0" max="3000" step="0.5" placeholder="—" inputmode="decimal" readonly aria-readonly="true"><div class="metric-unit">lbs</div>`;
+    field.innerHTML=`<label for="pr_${key}">${name}</label><input id="pr_${key}" type="number" min="0" max="3000" step="0.5" placeholder="—" inputmode="decimal" readonly aria-readonly="true">`;
     return field;
   }
   function showCategory(cat,button){
     wheel.querySelectorAll('.pr-wheel-item').forEach(b=>b.classList.remove('active')); button.classList.add('active');
-    core.innerHTML=`${cat.label.toUpperCase()}<span>${cat.keys.length} EXERCISES</span>`;
+    core.querySelector('.core-text').innerHTML=`${cat.label.toUpperCase()}<span>${cat.keys.length} EXERCISES</span>`;
     detail.innerHTML='';
     const head=document.createElement('div'); head.className='pr-wheel-detail-head';
-    head.innerHTML=`<div class="pr-wheel-detail-title">${cat.label} Records</div><div class="pr-wheel-detail-hint">Tap exercise</div>`; detail.appendChild(head);
+    head.innerHTML=`<div class="pr-wheel-detail-title">${cat.label} Records</div><div class="pr-wheel-detail-hint">PR • LB</div>`; detail.appendChild(head);
     if(!cat.keys.length){const e=document.createElement('div');e.className='profile-card-sub';e.textContent=cat.id==='custom'?'No custom exercises recorded yet.':'No exercises available.';detail.appendChild(e);return;}
     const grid=document.createElement('div'); grid.className='pr-section-grid';
     cat.keys.forEach(key=>{
-      const d=document.createElement('details'); d.className='pr-accordion';
+      const d=document.createElement('details'); d.className='pr-accordion'; d.open=true;
       const sm=document.createElement('summary'); sm.innerHTML=`<span>${labelMap[key]||keyForName.get(key)||key}</span>`; d.appendChild(sm);
       const body=document.createElement('div'); body.className='pr-accordion-body'; body.appendChild(makePRField(key)); d.appendChild(body); grid.appendChild(d);
     });
@@ -3649,36 +3650,50 @@ function readLocalRestSoundRaw(){
 }
 
 exportBackupBtn.addEventListener('click', async () => {
-  exportBackupBtn.disabled = true;
-  backupMsg.textContent = 'Preparing backup…';
+  exportBackupBtn.disabled = true; backupMsg.textContent = 'Preparing backup…';
   try{
     const state = await readLocalState();
-    const backup={app:'RepLog',backupVersion:2,exportedAt:new Date().toISOString(),days:(state&&state.days)||days,history:(state&&state.history)||history,user:(state&&state.user)||currentUser,theme:readLocalThemeRaw(),restSound:readLocalRestSoundRaw()};
-    const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'});
-    const file=new File([blob],`replog-backup-${new Date().toISOString().slice(0,10)}.json`,{type:'application/json'});
-    if(navigator.share && (!navigator.canShare || navigator.canShare({files:[file]}))){
-      try{ await navigator.share({title:'RepLog Backup',text:'RepLog workout backup',files:[file]}); backupMsg.style.color='var(--neon-strong)'; backupMsg.textContent='Backup ready to share/save.'; return; }catch(e){ if(e && e.name==='AbortError'){backupMsg.textContent='Backup share cancelled.';return;} }
+    const backup={app:'RepLog',backupVersion:3,exportedAt:new Date().toISOString(),days:(state&&state.days)||days,history:(state&&state.history)||history,user:(state&&state.user)||currentUser,theme:readLocalThemeRaw(),restSound:readLocalRestSoundRaw()};
+    const json=JSON.stringify(backup,null,2);
+    const filename=`replog-backup-${new Date().toISOString().slice(0,10)}.json`;
+    const blob=new Blob([json],{type:'application/json'});
+    const file=new File([blob],filename,{type:'application/json'});
+    if(navigator.share){
+      try{
+        if(!navigator.canShare || navigator.canShare({files:[file]})){
+          await navigator.share({title:'RepLog Backup',text:'RepLog workout backup',files:[file]});
+          backupMsg.style.color='var(--neon-strong)'; backupMsg.textContent='Backup ready — choose Save to Files.'; return;
+        }
+      }catch(e){ if(e && e.name==='AbortError'){backupMsg.textContent='Backup share cancelled.';return;} }
     }
-    const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=file.name; a.style.display='none'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),5000);
-    backupMsg.style.color='var(--neon-strong)'; backupMsg.textContent='Backup downloaded!';
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a'); a.href=url; a.download=filename; a.rel='noopener'; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),10000);
+    backupMsg.style.color='var(--neon-strong)'; backupMsg.textContent='Backup file created.';
   }catch(err){ console.error('RepLog export failed',err); backupMsg.style.color='var(--danger)'; backupMsg.textContent=(err&&err.message)||'Could not create backup.'; }
   finally{ exportBackupBtn.disabled=false; }
 });
 
-importBackupBtn.addEventListener('click',()=>{ if(importBackupInput) importBackupInput.click(); });
+importBackupBtn.addEventListener('click',(e)=>{
+  e.preventDefault(); e.stopPropagation();
+  if(importBackupInput){ importBackupInput.value=''; importBackupInput.click(); }
+});
 importBackupInput.addEventListener('change',async()=>{
-  const file=importBackupInput.files&&importBackupInput.files[0]; importBackupInput.value=''; if(!file)return;
+  const file=importBackupInput.files&&importBackupInput.files[0];
+  if(!file)return;
   backupMsg.textContent='Reading backup…';
   try{
     const text=await file.text(); const parsed=JSON.parse(text);
-    if(!parsed || !isValidDaysShape(parsed.days)) throw new Error("That file doesn't look like a RepLog backup.");
+    if(!parsed || parsed.app!=='RepLog' || !isValidDaysShape(parsed.days)) throw new Error("That file doesn't look like a valid RepLog backup.");
     if(!confirm('This will replace your current program, history, profile, and Vibe color on this device. Continue?')){backupMsg.textContent='';return;}
     const restoredDays=normalizeDaysLength(parsed.days), restoredHistory=Array.isArray(parsed.history)?parsed.history:[], restoredUser=parsed.user||currentUser;
-    await writeLocalState({days:restoredDays,history:restoredHistory,user:restoredUser}); localStateLoaded=true; days=restoredDays; history=restoredHistory; currentUser=restoredUser;
+    await writeLocalState({days:restoredDays,history:restoredHistory,user:restoredUser});
+    localStateLoaded=true; days=restoredDays; history=restoredHistory; currentUser=restoredUser;
     if(parsed.theme&&parsed.theme.hex) applyTheme(parsed.theme,{silent:true});
     if(parsed.restSound){try{localStorage.setItem('REPLOG_REST_SOUND',parsed.restSound);}catch(e){} if(restSoundSelect)restSoundSelect.value=parsed.restSound;}
     activeDay=0; renderProfile(); renderAll(); backupMsg.style.color='var(--neon-strong)'; backupMsg.textContent='Backup restored!'; showToast('Backup restored successfully.',5000);
   }catch(err){console.error('RepLog import failed',err);backupMsg.style.color='var(--danger)';backupMsg.textContent=(err&&err.message)||'Could not restore that backup file.';}
+  finally{importBackupInput.value='';}
 });
 
 </script>
