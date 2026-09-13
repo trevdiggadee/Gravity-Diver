@@ -1158,6 +1158,39 @@ input,select,textarea{background-color:rgba(8,10,10,.72)!important;backdrop-filt
   .backup-import-label{display:flex;align-items:center;justify-content:center;cursor:pointer;}
   .profile-photo-btn{cursor:pointer;}
 </style>
+
+<style id="replog-positioning-fix">
+/* POSITIONING FIX: keep overlays out of document flow and the workout dock fixed to the viewport.
+   The global body-child rule earlier in this file was forcing these direct children to position:relative. */
+body > .topbar#appTopbar{
+  position:fixed !important;
+  top:0 !important; left:0 !important; right:0 !important;
+  z-index:300 !important;
+}
+body > .ex-modal-overlay#exModalOverlay,
+body > .calc-modal-overlay#calcModalOverlay,
+body > .summary-modal-overlay#summaryModalOverlay,
+body > .theme-modal-overlay#themeModalOverlay{
+  position:fixed !important;
+  inset:0 !important;
+  z-index:1000 !important;
+}
+body > .ex-modal-overlay#exModalOverlay{ z-index:1100 !important; }
+body > .calc-modal-overlay#calcModalOverlay{ z-index:1200 !important; }
+body > .bottom-dock#bottomDock{
+  position:fixed !important;
+  left:0 !important; right:0 !important; bottom:0 !important;
+  z-index:900 !important;
+  margin:0 !important;
+}
+/* Build content should begin immediately below the fixed header. */
+#appWrap{
+  padding-top:calc(var(--topbar-h, 0px) + 4px) !important;
+}
+@media (max-width:700px){
+  #appWrap{ padding-top:calc(var(--topbar-h, 0px) + 4px) !important; }
+}
+</style>
 </head>
 <body>
 <canvas id="vibeParticleCanvas" aria-hidden="true"></canvas>
