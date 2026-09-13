@@ -682,7 +682,7 @@
   .pr-wheel-fire::before{inset:5%;}.pr-wheel-fire::after{inset:9%;border-width:1px;border-top-color:var(--neon-strong);border-left-color:rgba(var(--neon-rgb),.35);animation-duration:3.7s;animation-direction:reverse;opacity:.75;}
   .pr-wheel-core{width:96px;height:96px;border-radius:50%;border:2px solid rgba(var(--neon-rgb),.7);background:#090b0c;display:grid;place-items:center;text-align:center;color:var(--neon-strong);font:800 16px 'Oswald',sans-serif;letter-spacing:.08em;text-transform:uppercase;box-shadow:0 0 32px rgba(var(--neon-rgb),.35),inset 0 0 30px rgba(var(--neon-rgb),.1);overflow:hidden;z-index:4;position:relative;}
   .pr-wheel-core::before{content:"";position:absolute;inset:-12px;border-radius:50%;background:radial-gradient(circle,rgba(var(--neon-rgb),.22),transparent 62%);filter:blur(9px);z-index:-1;animation:prCoreGlow 2.2s ease-in-out infinite alternate;}
-  .pr-wheel-core img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;opacity:1;filter:drop-shadow(0 0 16px rgba(var(--neon-rgb),.72));z-index:0;}.pr-wheel-core::after{content:"";position:absolute;inset:-20px;border-radius:50%;background:radial-gradient(circle,rgba(var(--neon-rgb),.34) 0%,rgba(var(--neon-rgb),.16) 34%,transparent 70%);filter:blur(12px);z-index:-1;animation:prCenterPulse 1.9s ease-in-out infinite;pointer-events:none;}
+  .pr-wheel-core::after{content:"";position:absolute;inset:-20px;border-radius:50%;background:radial-gradient(circle,rgba(var(--neon-rgb),.34) 0%,rgba(var(--neon-rgb),.16) 34%,transparent 70%);filter:blur(12px);z-index:-1;animation:prCenterPulse 1.9s ease-in-out infinite;pointer-events:none;}
 .pr-wheel-core .core-glow{position:absolute;inset:-12px;border-radius:50%;background:radial-gradient(circle,rgba(var(--neon-rgb),.32),transparent 66%);filter:blur(10px);animation:prCenterPulse 2.3s ease-in-out infinite alternate;z-index:-1;}
   .pr-wheel-core .core-text{display:none;}
   .pr-wheel-core span{display:none;}
@@ -1123,7 +1123,23 @@ input,select,textarea{background-color:rgba(8,10,10,.72)!important;backdrop-filt
 .global-rest-timer.inside-exercise-hidden{display:none!important;}
 
   .pr-wheel-core{position:relative;overflow:visible;}
-  .pr-wheel-core img{position:relative;z-index:3;width:100%;height:100%;object-fit:contain;filter:url(#replogLogoColor) drop-shadow(0 0 10px rgba(var(--neon-rgb),.55));}.pr-wheel-core .core-tint{display:none;}
+  .pr-wheel-core svg.core-anim{position:relative;z-index:3;width:78%;height:78%;overflow:visible;}
+  .core-ring{fill:none;stroke-width:1.6;transform-origin:50px 50px;}
+  .core-ring-outer{stroke:var(--neon);opacity:.6;stroke-dasharray:3.5 7;animation:coreRingSpin 9s linear infinite;filter:drop-shadow(0 0 4px rgba(var(--neon-rgb),.6));}
+  .core-ring-mid{stroke:var(--neon-strong);opacity:.75;stroke-dasharray:52 30;animation:coreRingSpinRev 6s linear infinite;filter:drop-shadow(0 0 5px rgba(var(--neon-strong-rgb),.6));}
+  .core-orbit{transform-origin:50px 50px;}
+  .core-orbit-a{animation:coreOrbit 3.2s linear infinite;}
+  .core-orbit-b{animation:coreOrbit 5.4s linear infinite reverse;}
+  .core-orbit-dot{fill:var(--neon-strong);filter:drop-shadow(0 0 6px rgba(var(--neon-strong-rgb),.85));}
+  .core-ping{fill:none;stroke:var(--neon);stroke-width:2;transform-origin:50px 50px;animation:corePing 2.4s ease-out infinite;}
+  .core-pulse{fill:var(--neon);transform-origin:50px 50px;filter:blur(1px) drop-shadow(0 0 10px rgba(var(--neon-rgb),.9));animation:coreOrbCharge 2.4s ease-in-out infinite;}
+  .core-spark{fill:#fff;transform-origin:50px 50px;filter:drop-shadow(0 0 8px rgba(var(--neon-strong-rgb),1));animation:coreSparkFlicker 1.7s ease-in-out infinite;}
+  @keyframes coreRingSpin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+  @keyframes coreRingSpinRev{from{transform:rotate(360deg)}to{transform:rotate(0deg)}}
+  @keyframes coreOrbit{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+  @keyframes corePing{0%{transform:scale(.55);opacity:.85;stroke-width:2.4}75%{transform:scale(1.9);opacity:0;stroke-width:.4}100%{transform:scale(1.9);opacity:0;stroke-width:.4}}
+  @keyframes coreOrbCharge{0%,100%{transform:scale(.86);opacity:.75}50%{transform:scale(1.18);opacity:1}}
+  @keyframes coreSparkFlicker{0%,100%{opacity:.55;transform:scale(.85)}45%{opacity:1;transform:scale(1.15)}55%{opacity:.7;transform:scale(1.02)}}
   .pr-wheel-core .core-text{display:none!important;}
   .pr-wheel-core .core-glow{position:absolute;inset:8%;border-radius:50%;background:radial-gradient(circle,rgba(var(--neon-rgb),.48) 0%,rgba(var(--neon-rgb),.20) 34%,transparent 70%);filter:blur(13px);animation:corePulse 1.9s ease-in-out infinite;z-index:1;}
   @keyframes corePulse{0%,100%{transform:scale(.82);opacity:.55;box-shadow:0 0 22px rgba(var(--neon-rgb),.2)}50%{transform:scale(1.12);opacity:1;box-shadow:0 0 55px rgba(var(--neon-rgb),.65)}}
@@ -3525,7 +3541,7 @@ function renderPrFields(){
   ];
   const wheel=document.createElement('div'); wheel.className='pr-wheel-wrap';
   const fire=document.createElement('div'); fire.className='pr-wheel-fire'; wheel.appendChild(fire);
-  const core=document.createElement('div'); core.className='pr-wheel-core'; core.innerHTML='<div class="core-glow"></div><img src="center.png" alt=""><div class="core-tint" aria-hidden="true"></div>'; wheel.appendChild(core);
+  const core=document.createElement('div'); core.className='pr-wheel-core'; core.innerHTML='<div class="core-glow"></div><svg class="core-anim" viewBox="0 0 100 100" aria-hidden="true"><circle class="core-ring core-ring-outer" cx="50" cy="50" r="43"/><circle class="core-ring core-ring-mid" cx="50" cy="50" r="33"/><g class="core-orbit core-orbit-a"><circle class="core-orbit-dot" cx="50" cy="9" r="3"/></g><g class="core-orbit core-orbit-b"><circle class="core-orbit-dot" cx="50" cy="13" r="2"/></g><circle class="core-ping" cx="50" cy="50" r="16"/><circle class="core-pulse" cx="50" cy="50" r="15"/><circle class="core-spark" cx="50" cy="50" r="5"/></svg>'; wheel.appendChild(core);
   const detail=document.createElement('div'); detail.className='pr-wheel-detail'; panels.appendChild(wheel); panels.appendChild(detail);
   function makePRField(key){
     const name=labelMap[key]||keyForName.get(key)||key;
