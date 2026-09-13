@@ -363,7 +363,7 @@
     background:linear-gradient(145deg,rgba(var(--neon-rgb),0.18),rgba(0,0,0,0.5));
     box-shadow:inset 0 0 0 1px rgba(255,255,255,0.035),inset 0 0 12px rgba(var(--neon-rgb),0.10),0 0 12px rgba(var(--neon-rgb),0.24);
     cursor:pointer;
-    transform:translateY(-25%);
+    transform:translate(-15%,-50%);
     transition:transform .15s ease,color .15s ease,border-color .15s ease,background .15s ease,box-shadow .15s ease;
     -webkit-tap-highlight-color:transparent;
   }
@@ -373,8 +373,8 @@
   .calc-open-btn .calc-screen{stroke:currentColor;fill:rgba(var(--neon-rgb),0.18);}
   .calc-open-btn .calc-keys{stroke:currentColor;}
   .calc-open-btn .calc-dot{fill:currentColor;stroke:none;}
-  .calc-open-btn:hover{color:var(--neon-strong);border-color:var(--neon);background:linear-gradient(145deg,rgba(var(--neon-rgb),0.27),rgba(0,0,0,0.38));box-shadow:inset 0 0 0 1px rgba(255,255,255,0.045),inset 0 0 15px rgba(var(--neon-rgb),0.14),0 0 18px rgba(var(--neon-rgb),0.48);transform:translateY(calc(-25% - 1px)) scale(1.035);}
-  .calc-open-btn:active{transform:translateY(-25%) scale(.95);box-shadow:inset 0 0 10px rgba(var(--neon-rgb),0.18),0 0 10px rgba(var(--neon-rgb),0.30);}
+  .calc-open-btn:hover{color:var(--neon-strong);border-color:var(--neon);background:linear-gradient(145deg,rgba(var(--neon-rgb),0.27),rgba(0,0,0,0.38));box-shadow:inset 0 0 0 1px rgba(255,255,255,0.045),inset 0 0 15px rgba(var(--neon-rgb),0.14),0 0 18px rgba(var(--neon-rgb),0.48);transform:translate(-15%,calc(-50% - 1px)) scale(1.035);}
+  .calc-open-btn:active{transform:translate(-15%,-50%) scale(.95);box-shadow:inset 0 0 10px rgba(var(--neon-rgb),0.18),0 0 10px rgba(var(--neon-rgb),0.30);}
 
   /* ---- Floating rest timer: compact clock only outside the exercise popup ---- */
    .global-rest-timer{position:fixed;right:16px;bottom:92px;z-index:125;display:none;width:72px;height:72px;padding:0;border:1px solid rgba(var(--neon-rgb),.9);border-radius:50%;background:rgba(8,10,10,.38);backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);box-shadow:0 0 24px rgba(var(--neon-rgb),.28),inset 0 0 14px rgba(var(--neon-rgb),.08)}
@@ -1022,8 +1022,9 @@
   }
   .bottom-utility-row{ display:flex; align-items:center; justify-content:space-between; min-height:24px; margin-bottom:7px; }
   .bottom-dock .logout-btn{ margin-left:auto; padding:5px 9px; font-size:11px; }
-  .bottom-dock .finish-actions{ display:grid; grid-template-columns:1fr 1fr 1.35fr; gap:8px; }
-  .bottom-dock .finish-actions button{ min-height:44px; }
+  .workout-actions-row{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
+  .workout-actions-row button{ min-height:44px; }
+  .ex-modal-workout-actions{ margin-top:14px; padding-top:14px; border-top:1px solid var(--line); }
   #bottomDock[style*="display: none"]{ display:none !important; }
 
   /* The old top Start control stays in the DOM for JS, but not on screen. */
@@ -1332,7 +1333,7 @@ input,select,textarea{background-color:rgba(8,10,10,.72)!important;backdrop-filt
     <span class="session-total">Total time <span class="clock-sm mono" id="finishClock">00:00:00</span></span>
     <button class="logout-btn" id="logoutBtn">Log out</button>
   </div>
-  <div class="finish-actions" id="bottomWorkoutActions">
+  <div class="finish-actions workout-actions-row" id="bottomWorkoutActions">
     <button class="btn-primary" id="startBtnBottom">Start</button>
     <button class="mode-btn" id="modeBtn"><span class="mode-dot" id="modeDot"></span>Vibe</button>
     <button class="btn-primary" id="finishBtn">Finish workout</button>
@@ -1417,6 +1418,11 @@ input,select,textarea{background-color:rgba(8,10,10,.72)!important;backdrop-filt
       <button type="button" class="timer-btn-wide" id="exTimerBtn"></button>
     </div>
     <button type="button" class="btn-primary" id="exFinishBtn">Finish Exercise</button>
+    <div class="finish-actions workout-actions-row ex-modal-workout-actions" id="exModalWorkoutActions">
+      <button type="button" class="btn-primary" id="startBtnExModal">Start</button>
+      <button type="button" class="mode-btn" id="modeBtnExModal"><span class="mode-dot"></span>Vibe</button>
+      <button type="button" class="btn-primary" id="finishBtnExModal">Finish workout</button>
+    </div>
   </div>
 </div>
 
@@ -2753,6 +2759,8 @@ function updateSessionUI(){
   const running = !!d.timerStart;
   startBtn.style.display = running ? 'none' : 'inline-flex';
   startBtnBottom.style.display = running ? 'none' : 'inline-flex';
+  const startBtnExModal = document.getElementById('startBtnExModal');
+  if(startBtnExModal) startBtnExModal.style.display = running ? 'none' : 'inline-flex';
   sessionActive.classList.toggle('show', running);
   const elapsed = currentElapsed(d);
   liveClock.textContent = formatHMS(elapsed);
@@ -2766,6 +2774,7 @@ function startWorkoutTimer(){
 }
 startBtn.addEventListener('click', startWorkoutTimer);
 startBtnBottom.addEventListener('click', startWorkoutTimer);
+document.getElementById('startBtnExModal').addEventListener('click', startWorkoutTimer);
 cancelSession.addEventListener('click', () => {
   const d = days[activeDay];
   d.timerStart = null;
@@ -2867,6 +2876,7 @@ modeBtn.addEventListener('click', () => {
   buildColorWheel();
   themeModalOverlay.classList.add('show');
 });
+document.getElementById('modeBtnExModal').addEventListener('click', () => modeBtn.click());
 themeModalClose.addEventListener('click', () => themeModalOverlay.classList.remove('show'));
 themeModalOverlay.addEventListener('click', (e) => {
   if(e.target === themeModalOverlay) themeModalOverlay.classList.remove('show');
@@ -2950,6 +2960,7 @@ summaryModalOverlay.addEventListener('click', (e) => {
 /* ---------------------------------------------------------
    FINISH WORKOUT / CLEAR DAY
 --------------------------------------------------------- */
+document.getElementById('finishBtnExModal').addEventListener('click', () => document.getElementById('finishBtn').click());
 document.getElementById('finishBtn').addEventListener('click', async () => {
   if(exModalOverlay.classList.contains('show')) closeExerciseModal();
 
