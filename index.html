@@ -349,31 +349,32 @@
   }
   .ex-modal.all-done{ border-color: var(--neon-strong); box-shadow: 0 0 80px rgba(var(--neon-rgb),0.45); }
   .ex-modal-close{
-    position:absolute; top:12px; right:14px; background:none; border:none; color: var(--chalk-faint);
-    font-size:22px; line-height:1; cursor:pointer; z-index:3;
+    position:absolute; top:6px; right:6px; background:none; border:none; color: var(--chalk-faint);
+    font-size:22px; line-height:1; cursor:pointer; z-index:5;
   }
   .ex-modal-close:hover{ color: var(--danger); }
   .calc-open-btn{
     position:absolute; top:8px; left:10px; z-index:3;
-    width:40px; height:40px; padding:0;
+    width:50px; height:50px; padding:0;
     display:flex; align-items:center; justify-content:center;
     border:1px solid rgba(var(--neon-rgb),0.75);
-    border-radius:12px;
+    border-radius:15px;
     color:var(--neon);
     background:linear-gradient(145deg,rgba(var(--neon-rgb),0.18),rgba(0,0,0,0.5));
     box-shadow:inset 0 0 0 1px rgba(255,255,255,0.035),inset 0 0 12px rgba(var(--neon-rgb),0.10),0 0 12px rgba(var(--neon-rgb),0.24);
     cursor:pointer;
+    transform:translateY(-25%);
     transition:transform .15s ease,color .15s ease,border-color .15s ease,background .15s ease,box-shadow .15s ease;
     -webkit-tap-highlight-color:transparent;
   }
-  .calc-open-btn::after{content:"";position:absolute;inset:2px;border-radius:10px;border:1px solid rgba(var(--neon-rgb),0.10);pointer-events:none;}
-  .calc-open-btn svg{width:24px;height:24px;overflow:visible;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 4px rgba(var(--neon-rgb),0.4));}
+  .calc-open-btn::after{content:"";position:absolute;inset:2px;border-radius:12.5px;border:1px solid rgba(var(--neon-rgb),0.10);pointer-events:none;}
+  .calc-open-btn svg{width:30px;height:30px;overflow:visible;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 4px rgba(var(--neon-rgb),0.4));}
   .calc-open-btn .calc-body{stroke:currentColor;fill:rgba(var(--neon-rgb),0.055);}
   .calc-open-btn .calc-screen{stroke:currentColor;fill:rgba(var(--neon-rgb),0.18);}
   .calc-open-btn .calc-keys{stroke:currentColor;}
   .calc-open-btn .calc-dot{fill:currentColor;stroke:none;}
-  .calc-open-btn:hover{color:var(--neon-strong);border-color:var(--neon);background:linear-gradient(145deg,rgba(var(--neon-rgb),0.27),rgba(0,0,0,0.38));box-shadow:inset 0 0 0 1px rgba(255,255,255,0.045),inset 0 0 15px rgba(var(--neon-rgb),0.14),0 0 18px rgba(var(--neon-rgb),0.48);transform:translateY(-1px) scale(1.035);}
-  .calc-open-btn:active{transform:scale(.95);box-shadow:inset 0 0 10px rgba(var(--neon-rgb),0.18),0 0 10px rgba(var(--neon-rgb),0.30);}
+  .calc-open-btn:hover{color:var(--neon-strong);border-color:var(--neon);background:linear-gradient(145deg,rgba(var(--neon-rgb),0.27),rgba(0,0,0,0.38));box-shadow:inset 0 0 0 1px rgba(255,255,255,0.045),inset 0 0 15px rgba(var(--neon-rgb),0.14),0 0 18px rgba(var(--neon-rgb),0.48);transform:translateY(calc(-25% - 1px)) scale(1.035);}
+  .calc-open-btn:active{transform:translateY(-25%) scale(.95);box-shadow:inset 0 0 10px rgba(var(--neon-rgb),0.18),0 0 10px rgba(var(--neon-rgb),0.30);}
 
   /* ---- Floating rest timer: compact clock only outside the exercise popup ---- */
    .global-rest-timer{position:fixed;right:16px;bottom:92px;z-index:125;display:none;width:72px;height:72px;padding:0;border:1px solid rgba(var(--neon-rgb),.9);border-radius:50%;background:rgba(8,10,10,.38);backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);box-shadow:0 0 24px rgba(var(--neon-rgb),.28),inset 0 0 14px rgba(var(--neon-rgb),.08)}
@@ -431,7 +432,7 @@
   .calc-insert-row button{ flex:1; }
   .calc-target-label{ text-align:center; font-size:11px; color: var(--chalk-faint); margin-top:10px; letter-spacing:.03em; }
   .ex-modal .eyebrow{ font-size:11px; letter-spacing:.14em; color: var(--chalk-faint); text-transform:uppercase; text-align:center; margin-bottom:6px; }
-  .ex-modal-title{ text-align:center; font-family:'Oswald',sans-serif; font-size:19px; color: var(--chalk); margin-bottom: 10px; }
+  .ex-modal-title{ text-align:center; font-family:'Oswald',sans-serif; font-size:38px; color: var(--chalk); margin-bottom: 10px; transform:translateY(-20%); }
 
   .ex-pr-badge{
     display:none; align-items:center; justify-content:center; gap:6px; align-self:center; margin-bottom:10px; width:max-content;
@@ -1350,8 +1351,8 @@ input,select,textarea{background-color:rgba(8,10,10,.72)!important;backdrop-filt
     <circle cx="16" cy="17" r="1" class="calc-dot"></circle>
   </svg>
 </button>
-    <div class="eyebrow">Logging Sets</div>
     <div class="ex-modal-title" id="exModalTitle">Exercise</div>
+    <div class="eyebrow">Logging Sets</div>
     <div class="ex-pr-badge" id="exPrBadge"></div>
     <div class="ex-prev-row" id="exPrevRow">
       <span class="ex-prev-label">Last week</span>
@@ -1425,7 +1426,6 @@ input,select,textarea{background-color:rgba(8,10,10,.72)!important;backdrop-filt
 <!-- CALCULATOR POPUP -->
 <div class="calc-modal-overlay" id="calcModalOverlay">
   <div class="calc-modal">
-    <button type="button" class="ex-modal-close" id="calcModalClose" title="Close">×</button>
     <div class="calc-heading">Calculator</div>
     <div class="calc-display">
       <div class="calc-prev" id="calcPrev">&nbsp;</div>
@@ -2607,7 +2607,6 @@ exModalClose.addEventListener('click', closeExerciseModal);
 --------------------------------------------------------- */
 const calcModalOverlay = document.getElementById('calcModalOverlay');
 const calcOpenBtn = document.getElementById('calcOpenBtn');
-const calcModalClose = document.getElementById('calcModalClose');
 const calcCurrent = document.getElementById('calcCurrent');
 const calcPrev = document.getElementById('calcPrev');
 const calcInsertBtn = document.getElementById('calcInsertBtn');
@@ -2723,7 +2722,6 @@ function closeCalcModal(){
   }
 }
 calcOpenBtn.addEventListener('click', openCalcModal);
-calcModalClose.addEventListener('click', closeCalcModal);
 calcModalOverlay.addEventListener('click', (e) => { if(e.target === calcModalOverlay) closeCalcModal(); });
 
 calcInsertBtn.addEventListener('click', () => {
