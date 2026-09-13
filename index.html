@@ -72,7 +72,7 @@
   .topbar{
     display:flex; flex-direction:column; align-items:center; gap:14px;
     padding: 24px 24px 20px; border-bottom: 1px solid var(--line);
-    position: sticky; top:0; z-index: 30; background: rgba(8,9,10,0.94); backdrop-filter: blur(8px);
+    position: fixed; top:0; left:0; right:0; z-index: 30; background: rgba(8,9,10,0.94); backdrop-filter: blur(8px);
   }
   .logo-img{ width:100%; max-width: 760px; height:auto; display:block; filter:url(#replogLogoColor) drop-shadow(0 0 16px rgba(var(--neon-rgb),0.3)); }
   .tagline{ color: #ffffff; font-size: 17px; font-weight:600; letter-spacing: 0.12em; text-transform: uppercase; text-align:center; margin-top: -4px; }
@@ -148,7 +148,7 @@
   .auth-note button:hover{ color: var(--chalk); }
   .auth-submit[disabled]{ opacity:0.6; cursor:not-allowed; }
 
-  .wrap{ max-width: 1180px; margin: 0 auto; padding: 26px 32px 154px; }
+  .wrap{ max-width: 1180px; margin: 0 auto; padding: calc(26px + var(--topbar-h,0px)) 32px 154px; }
   .view{ display:none; }
   .view.active{ display:block; animation: rise .35s ease; }
   @keyframes rise{ from{ opacity:0; transform: translateY(8px);} to{opacity:1; transform:none;} }
@@ -334,7 +334,7 @@
   /* ---- Unified Exercise popup (set check-off + rest timer) ---- */
   .ex-modal-overlay{
     position:fixed; inset:0; background:rgba(3,4,4,0.82); backdrop-filter: blur(5px);
-    display:none; align-items:center; justify-content:center; z-index:110; padding:20px;
+    display:none; align-items:flex-start; justify-content:center; z-index:110; padding:20px;
   }
   .ex-modal-overlay.show{ display:flex; animation: fadeIn .2s ease; }
   @keyframes fadeIn{ from{opacity:0;} to{opacity:1;} }
@@ -998,7 +998,7 @@
   /* ===== Balanced compact layout: preserve readability ===== */
   .topbar{ padding:10px 22px; }
   .topbar .logo{ max-width:240px; }
-  .wrap{ padding:18px 26px 128px; }
+  .wrap{ padding: calc(18px + var(--topbar-h,0px)) 26px 128px; }
   .day-rail{ margin-bottom:12px; }
   .week-rail{ margin-bottom:14px; }
   .day-header{ margin-bottom:14px; gap:10px; }
@@ -1093,7 +1093,7 @@
   @media (max-width:700px){
     .topbar{ padding:8px 14px; }
     .topbar .logo{ max-width:190px; }
-    .wrap{ padding:12px 14px 124px; }
+    .wrap{ padding: calc(12px + var(--topbar-h,0px)) 14px 124px; }
     .day-header{ grid-template-columns:minmax(0,1.35fr) minmax(0,1fr) minmax(0,1fr); gap:7px; }
     .day-header .field{ padding:9px 30px 8px 11px; min-height:56px; border-radius:12px; }
     .day-header .field label{ font-size:8px; margin-bottom:4px; }
@@ -2770,6 +2770,7 @@ function updateSessionUI(){
   const startBtnExModal = document.getElementById('startBtnExModal');
   if(startBtnExModal) startBtnExModal.style.display = running ? 'none' : 'inline-flex';
   sessionActive.classList.toggle('show', running);
+  syncTopbarHeight();
   const elapsed = currentElapsed(d);
   liveClock.textContent = formatHMS(elapsed);
   finishClock.textContent = formatHMS(elapsed);
@@ -3374,6 +3375,11 @@ function renderAll(){
 --------------------------------------------------------- */
 const splashView = document.getElementById('splashView');
 const appTopbar = document.getElementById('appTopbar');
+function syncTopbarHeight(){
+  if(!appTopbar) return;
+  document.documentElement.style.setProperty('--topbar-h', appTopbar.offsetHeight + 'px');
+}
+window.addEventListener('resize', syncTopbarHeight);
 const appWrap = document.getElementById('appWrap');
 const splashLogo = document.getElementById('splashLogo');
 const topbarLogo = document.getElementById('topbarLogo');
@@ -3449,6 +3455,8 @@ async function showApp(user){
   appTopbar.style.display='';
   appWrap.style.display='';
   if(bottomDock) bottomDock.style.display='';
+  syncTopbarHeight();
+  requestAnimationFrame(syncTopbarHeight);
   renderProfile();
   renderAll();
 }
