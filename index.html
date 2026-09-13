@@ -453,7 +453,7 @@
   .ex-prev-label{ color: var(--chalk-faint); font-size:10px; letter-spacing:.06em; text-transform:uppercase; flex-shrink:0; }
   .ex-prev-data{ color: var(--chalk); font-size:12px; text-align:right; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
-  .ex-set-rows{ display:flex; flex-direction:column; gap:6px; max-height: 34vh; overflow-y:auto; margin-bottom: 8px; padding-right:2px; }
+  .ex-set-rows{ display:flex; flex-direction:column; gap:6px; margin-bottom: 8px; padding-right:2px; }
   .ex-set-row{ display:grid; grid-template-columns: 30px 1fr 1fr 24px; gap:8px; align-items:center; padding:5px; border-radius:8px; border:1px solid transparent; transition: all .2s ease; }
   .ex-set-row.checked{ background: rgba(var(--neon-rgb),0.08); border-color: rgba(var(--neon-rgb),0.28); }
   .ex-set-row input{ padding: 9px 8px; font-size:13px; text-align:center; }
@@ -1024,7 +1024,10 @@
   .bottom-dock .logout-btn{ margin-left:auto; padding:5px 9px; font-size:11px; }
   .workout-actions-row{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; align-items:stretch; }
   .workout-actions-row button{ min-height:44px; height:100%; }
-  .ex-modal-workout-actions{ margin-top:14px; padding-top:14px; border-top:1px solid var(--line); }
+  .ex-modal-sticky-footer{
+    position: sticky; bottom: 0; margin-top: 14px; padding-top: 14px;
+    background: var(--panel); border-top: 1px solid var(--line); z-index: 2;
+  }
   .total-time-big{ display:flex; align-items:center; justify-content:center; gap:8px; margin-top:14px; }
   .total-time-big .label-big{ font-size:12px; letter-spacing:.05em; text-transform:uppercase; color:var(--chalk-dim); }
   .total-time-big .clock-big{ font-size:28px; color:var(--neon-strong); font-family:'JetBrains Mono',monospace; font-weight:700; text-shadow:0 0 12px rgba(var(--neon-rgb),.45); }
@@ -1421,14 +1424,16 @@ input,select,textarea{background-color:rgba(8,10,10,.72)!important;backdrop-filt
       <button type="button" class="timer-btn-wide" id="exTimerBtn"></button>
     </div>
     <button type="button" class="btn-primary" id="exFinishBtn">Finish Exercise</button>
-    <div class="total-time-big" id="exModalTotalTime">
-      <span class="label-big">Total time</span>
-      <span class="clock-big mono" id="exModalFinishClock">00:00:00</span>
-    </div>
-    <div class="finish-actions workout-actions-row ex-modal-workout-actions" id="exModalWorkoutActions">
-      <button type="button" class="btn-primary" id="startBtnExModal">Start</button>
-      <button type="button" class="mode-btn" id="modeBtnExModal"><span class="mode-dot"></span>Vibe</button>
-      <button type="button" class="btn-primary" id="finishBtnExModal">Finish workout</button>
+    <div class="ex-modal-sticky-footer">
+      <div class="total-time-big" id="exModalTotalTime">
+        <span class="label-big">Total time</span>
+        <span class="clock-big mono" id="exModalFinishClock">00:00:00</span>
+      </div>
+      <div class="finish-actions workout-actions-row" id="exModalWorkoutActions">
+        <button type="button" class="btn-primary" id="startBtnExModal">Start</button>
+        <button type="button" class="mode-btn" id="modeBtnExModal"><span class="mode-dot"></span>Vibe</button>
+        <button type="button" class="btn-primary" id="finishBtnExModal">Finish workout</button>
+      </div>
     </div>
   </div>
 </div>
