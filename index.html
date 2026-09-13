@@ -237,6 +237,11 @@
   .col-head .bar{ width:4px; height: 22px; border-radius: 4px; }
   .col-head.upper .bar{ background: var(--upper); box-shadow: 0 0 8px var(--upper); }
   .col-head.lower .bar{ background: var(--lower); box-shadow: 0 0 8px var(--lower); }
+  .col-head.cardio .bar{ background: var(--neon-strong); box-shadow: 0 0 8px var(--neon-strong); }
+  .slot.cardio.active,.slot-compact.cardio{ border-left-color: var(--neon-strong); }
+  .cardio-column{ grid-column:1 / -1; }
+  .cardio-column #cardioSlots{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0 12px; }
+  @media (max-width:700px){ .cardio-column #cardioSlots{grid-template-columns:minmax(0,1fr);} }
   .col-head h2{ font-size: 19px; margin:0; }
   .col-head .count{ margin-left:auto; font-size: 12px; color: var(--chalk-dim); }
 
@@ -1265,6 +1270,10 @@ input,select,textarea{background-color:rgba(8,10,10,.72)!important;backdrop-filt
         <div class="col-head lower"><div class="bar"></div><h2>Lower Body</h2><div class="count" id="lowerCount">0 / 5 logged</div></div>
         <div id="lowerSlots"></div>
       </div>
+      <div id="cardioColumn" class="cardio-column">
+        <div class="col-head cardio"><div class="bar"></div><h2>Cardio</h2><div class="count" id="cardioCount">0 / 5 logged</div></div>
+        <div id="cardioSlots"></div>
+      </div>
     </div>
 
   </div>
@@ -1593,7 +1602,8 @@ function emptyWeek(){
     date:"",
     logs: {
       upper: Array.from({length:SLOTS_PER_SIDE}, () => []),
-      lower: Array.from({length:SLOTS_PER_SIDE}, () => [])
+      lower: Array.from({length:SLOTS_PER_SIDE}, () => []),
+      cardio: Array.from({length:SLOTS_PER_SIDE}, () => [])
     }
   };
 }
@@ -1602,6 +1612,7 @@ function emptyDay(){
     title:"", type:"",
     upper: Array.from({length:SLOTS_PER_SIDE}, emptySlotDef),
     lower: Array.from({length:SLOTS_PER_SIDE}, emptySlotDef),
+    cardio: Array.from({length:SLOTS_PER_SIDE}, emptySlotDef),
     weeks: Array.from({length:WEEK_COUNT}, emptyWeek),
     currentWeek: 1,
     setupComplete: false,
@@ -1614,9 +1625,14 @@ function isValidDaysShape(parsed){
   return Array.isArray(parsed) && parsed.length && parsed[0].weeks && parsed[0].weeks[0] && parsed[0].weeks[0].logs;
 }
 function normalizeDaysLength(parsed){
-  if(parsed.length > DAY_COUNT) return parsed.slice(0, DAY_COUNT);
-  if(parsed.length < DAY_COUNT) return parsed.concat(Array.from({length: DAY_COUNT - parsed.length}, emptyDay));
-  return parsed;
+  const normalized = parsed.length > DAY_COUNT ? parsed.slice(0, DAY_COUNT) : parsed.length < DAY_COUNT ? parsed.concat(Array.from({length: DAY_COUNT - parsed.length}, emptyDay)) : parsed;
+  normalized.forEach(d=>{
+    if(!Array.isArray(d.cardio)) d.cardio=Array.from({length:SLOTS_PER_SIDE}, emptySlotDef);
+    d.cardio = d.cardio.slice(0,SLOTS_PER_SIDE).concat(Array.from({length:Math.max(0,SLOTS_PER_SIDE-d.cardio.length)}, emptySlotDef));
+    if(!Array.isArray(d.weeks)) d.weeks=Array.from({length:WEEK_COUNT}, emptyWeek);
+    d.weeks.forEach(w=>{ if(!w.logs) w.logs={}; if(!Array.isArray(w.logs.cardio)) w.logs.cardio=Array.from({length:SLOTS_PER_SIDE},()=>[]); });
+  });
+  return normalized;
 }
 
 /* ---- Local persistence (IndexedDB) ----
@@ -2059,7 +2075,7 @@ document.getElementById('setupBtn').addEventListener('click', () => {
     saveDays(); renderAll();
     showToast("Editing exercises — add or remove as needed.");
   } else {
-    const anyChosen = [...d.upper, ...d.lower].some(s => s.exercise);
+    const anyChosen = [...d.upper, ...d.lower, ...d.cardio].some(s => s.exercise);
     if(!anyChosen){ showToast("Choose at least one exercise before completing setup."); return; }
     d.setupComplete = true;
     saveDays(); renderAll();
@@ -2072,23 +2088,29 @@ document.getElementById('setupBtn').addEventListener('click', () => {
 --------------------------------------------------------- */
 const upperSlotsEl = document.getElementById('upperSlots');
 const lowerSlotsEl = document.getElementById('lowerSlots');
+const cardioSlotsEl = document.getElementById('cardioSlots');
 
 function renderSlots(){
   upperSlotsEl.innerHTML = "";
   lowerSlotsEl.innerHTML = "";
+  cardioSlotsEl.innerHTML = "";
   const d = days[activeDay];
 
   const upperEntries = d.upper.map((slot,i) => ({slot,i})).filter(o => !d.setupComplete || o.slot.exercise);
   const lowerEntries = d.lower.map((slot,i) => ({slot,i})).filter(o => !d.setupComplete || o.slot.exercise);
+  const cardioEntries = d.cardio.map((slot,i) => ({slot,i})).filter(o => !d.setupComplete || o.slot.exercise);
 
   upperEntries.forEach(o => upperSlotsEl.appendChild(d.setupComplete ? buildSlotCompactEl('upper', o.i, o.slot) : buildSlotEl('upper', o.i, o.slot)));
   lowerEntries.forEach(o => lowerSlotsEl.appendChild(d.setupComplete ? buildSlotCompactEl('lower', o.i, o.slot) : buildSlotEl('lower', o.i, o.slot)));
+  cardioEntries.forEach(o => cardioSlotsEl.appendChild(d.setupComplete ? buildSlotCompactEl('cardio', o.i, o.slot) : buildSlotEl('cardio', o.i, o.slot)));
 
   const hideUpper = d.setupComplete && upperEntries.length === 0;
   const hideLower = d.setupComplete && lowerEntries.length === 0;
+  const hideCardio = d.setupComplete && cardioEntries.length === 0;
   document.getElementById('upperColumn').style.display = hideUpper ? 'none' : '';
   document.getElementById('lowerColumn').style.display = hideLower ? 'none' : '';
-  document.getElementById('columnsWrap').classList.toggle('single', hideUpper || hideLower);
+  document.getElementById('cardioColumn').style.display = hideCardio ? 'none' : '';
+  document.getElementById('columnsWrap').classList.toggle('single', hideUpper || hideLower || hideCardio);
 
   updateCounts();
 }
@@ -2099,7 +2121,7 @@ function buildSlotEl(side, index, slot){
   wrap.dataset.side = side;
   wrap.dataset.index = index;
 
-  const optionsHtml = side === 'upper' ? UPPER_OPTIONS_HTML : LOWER_OPTIONS_HTML;
+  const optionsHtml = side === 'upper' ? UPPER_OPTIONS_HTML : side === 'lower' ? LOWER_OPTIONS_HTML : CARDIO_OPTIONS_HTML;
 
   wrap.innerHTML = `
     <div class="slot-top">
@@ -2182,6 +2204,8 @@ function updateCounts(){
   const lowerFilled = d.lower.filter(s => s.exercise).length;
   document.getElementById('upperCount').textContent = `${upperFilled} / 5 logged`;
   document.getElementById('lowerCount').textContent = `${lowerFilled} / 5 logged`;
+  const cardioFilled = d.cardio.filter(s => s.exercise).length;
+  document.getElementById('cardioCount').textContent = `${cardioFilled} / 5 logged`;
 }
 
 /* ---------------------------------------------------------
@@ -2568,7 +2592,7 @@ function calculateRecordedExercisePRs(){
     (entry.lower||[]).forEach(x=>addLog(x.exercise,x.log));
   });
   // Also include the currently active program so a newly recorded PR appears immediately.
-  (days||[]).forEach(d=>(d.weeks||[]).forEach(w=>['upper','lower'].forEach(side=>{
+  (days||[]).forEach(d=>(d.weeks||[]).forEach(w=>['upper','lower','cardio'].forEach(side=>{
     (d[side]||[]).forEach((slot,i)=>addLog(slot.exercise,w.logs && w.logs[side] && w.logs[side][i]));
   })));
   return prs;
@@ -2993,14 +3017,15 @@ document.getElementById('finishBtn').addEventListener('click', async () => {
 
   const upperSummary = buildSummary('upper');
   const lowerSummary = buildSummary('lower');
+  const cardioSummary = buildSummary('cardio');
 
-  if(upperSummary.length === 0 && lowerSummary.length === 0){
+  if(upperSummary.length === 0 && lowerSummary.length === 0 && cardioSummary.length === 0){
     showToast("Log at least one exercise before finishing.");
     return;
   }
 
   const totalSeconds = currentElapsed(d);
-  const totalVolume = [...upperSummary, ...lowerSummary].reduce((s,e) => s + e.volume, 0);
+  const totalVolume = [...upperSummary, ...lowerSummary, ...cardioSummary].reduce((s,e) => s + e.volume, 0);
   const calories = Math.max(0, Math.round((totalSeconds/60) * 6));
 
   const entry = {
@@ -3012,7 +3037,8 @@ document.getElementById('finishBtn').addEventListener('click', async () => {
     totalVolume,
     calories,
     upper: upperSummary.map(e => ({ exercise: e.exercise, sets: e.sets, log: e.log })),
-    lower: lowerSummary.map(e => ({ exercise: e.exercise, sets: e.sets, log: e.log }))
+    lower: lowerSummary.map(e => ({ exercise: e.exercise, sets: e.sets, log: e.log })),
+    cardio: cardioSummary.map(e => ({ exercise: e.exercise, sets: e.sets, log: e.log }))
   };
   const newId = await insertHistoryEntryToLocal(entry);
   history.unshift(Object.assign({}, entry, { id: newId || `local-${Date.now()}` }));
@@ -3028,7 +3054,7 @@ document.getElementById('finishBtn').addEventListener('click', async () => {
 
   openSummaryModal({
     title: entry.title, week: cw, duration: totalSeconds, calories, totalVolume,
-    upperSummary, lowerSummary, blockComplete, dayIndex: activeDay
+    upperSummary, lowerSummary, cardioSummary, blockComplete, dayIndex: activeDay
   });
 });
 
@@ -3049,7 +3075,7 @@ function renderLog(){
     const dt = entry.date ? new Date(entry.date + 'T00:00:00') : null;
     const dayNum = dt ? dt.getDate() : '—';
     const monthStr = dt ? dt.toLocaleString('en-US', { month:'short' }).toUpperCase() : '';
-    const totalEx = entry.upper.length + entry.lower.length;
+    const totalEx = entry.upper.length + entry.lower.length + (entry.cardio?.length || 0);
     const durationTxt = entry.duration ? formatHMS(entry.duration) : null;
     const volTxt = entry.totalVolume ? Math.round(entry.totalVolume) + ' lb' : null;
     const calTxt = entry.calories ? entry.calories + ' kcal' : null;
@@ -3777,4 +3803,19 @@ importBackupInput.addEventListener('change',async()=>{
 .auth-card,.nav-block,.day-tab,.week-tab,.exercise-card,.profile-card,.log-card,.summary-card,.summary-block-complete,.finish-bar,.bottom-dock,.session-active,.ex-modal,.calc-modal,.theme-modal,.setup-modal,.modal,.rest-step,.rest-chip,.rest-sound-select,.ex-prev-row,.card,.panel,.box,.section-card,.profile-section,.settings-card,input,select,textarea{position:relative;overflow:hidden;}
 .auth-card:before,.nav-block:before,.day-tab:before,.week-tab:before,.exercise-card:before,.profile-card:before,.log-card:before,.summary-card:before,.finish-bar:before,.bottom-dock:before,.session-active:before,.ex-modal:before,.calc-modal:before,.theme-modal:before,.setup-modal:before,.modal:before,.rest-step:before,.rest-chip:before,.rest-sound-select:before,.ex-prev-row:before,.card:before,.panel:before,.box:before,.section-card:before,.profile-section:before,.settings-card:before,input:before,select:before,textarea:before{content:"";position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(circle,rgba(var(--neon-rgb),.22) 0 1px,transparent 1.7px),radial-gradient(circle,rgba(var(--neon-rgb),.14) 0 1px,transparent 1.8px);background-size:37px 43px,61px 67px;background-position:8px 11px,23px 31px;opacity:.22;mix-blend-mode:screen;}
 .auth-card>*,.nav-block>*,.day-tab>*,.week-tab>*,.exercise-card>*,.profile-card>*,.log-card>*,.summary-card>*,.finish-bar>*,.bottom-dock>*,.session-active>*,.ex-modal>*,.calc-modal>*,.theme-modal>*,.setup-modal>*,.modal>*,.card>*,.panel>*,.box>*,.section-card>*,.profile-section>*,.settings-card>*{position:relative;z-index:1;}
+</style>
+
+<style>
+/* PR category redesign: one solid ring, four clickable labels */
+.pr-wheel-wrap::before{inset:1%;border-radius:50%;background:none;border:10px solid rgba(var(--neon-rgb),.72);box-shadow:0 0 18px rgba(var(--neon-rgb),.28),inset 0 0 18px rgba(var(--neon-rgb),.08);filter:none;animation:prSolidRingPulse 3s ease-in-out infinite;}
+.pr-wheel-wrap::after{inset:5%;background:radial-gradient(circle,rgba(var(--neon-rgb),.12),transparent 57%);}
+.pr-wheel-item{width:auto;height:auto;border:0!important;background:transparent!important;box-shadow:none!important;backdrop-filter:none;-webkit-backdrop-filter:none;overflow:visible;padding:10px 16px;}
+.pr-wheel-item::before{display:none;}
+.pr-wheel-item:nth-child(3){top:15%;left:50%;transform:translateX(-50%)}
+.pr-wheel-item:nth-child(4){right:8%;top:50%;transform:translateY(-50%)}
+.pr-wheel-item:nth-child(5){bottom:15%;left:50%;transform:translateX(-50%)}
+.pr-wheel-item:nth-child(6){left:8%;top:50%;transform:translateY(-50%)}
+.pr-wheel-item.active .pr-wheel-label{color:var(--neon-strong);text-shadow:0 0 14px rgba(var(--neon-rgb),.65),0 2px 3px #000;}
+.pr-wheel-label{position:relative;inset:auto;font-size:21px;}
+@keyframes prSolidRingPulse{0%,100%{box-shadow:0 0 18px rgba(var(--neon-rgb),.25),inset 0 0 18px rgba(var(--neon-rgb),.06)}50%{box-shadow:0 0 28px rgba(var(--neon-rgb),.42),inset 0 0 22px rgba(var(--neon-rgb),.1)}}
 </style>
