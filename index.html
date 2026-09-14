@@ -3622,7 +3622,7 @@ function renderPrFields(){
   const textGroup=document.createElementNS(svgNS,'g'); dialSvg.appendChild(textGroup);
   categories.forEach((cat,i)=>{
     const center=i*(360/dialN); const start=center-dialSweep/2, end=center+dialSweep/2;
-    const reversed=center>90&&center<270;
+    const reversed=center>90&&center<=270;
     const wedge=document.createElementNS(svgNS,'path');
     wedge.setAttribute('class','pr-dial-wedge'); wedge.setAttribute('d',dialWedgePath(wedgeR,start,end)); wedge.dataset.catId=cat.id;
     wedgeGroup.appendChild(wedge);
@@ -3865,8 +3865,9 @@ importBackupInput.addEventListener('change',async()=>{
 .pr-dial-wedge.active{opacity:.85;animation:prWedgeFire 1.7s ease-in-out infinite;}
 .pr-dial-seg{fill:none;stroke:var(--neon);stroke-width:11;stroke-linecap:round;opacity:.32;cursor:pointer;pointer-events:auto;transition:opacity .25s ease,stroke-width .25s ease,filter .25s ease;}
 .pr-dial-seg.active{opacity:1;stroke:var(--neon-strong);stroke-width:13;filter:drop-shadow(0 0 9px rgba(var(--neon-rgb),.85));}
-.pr-dial-text{font:800 12px 'Oswald',sans-serif;letter-spacing:.09em;fill:var(--neon-strong);text-transform:uppercase;pointer-events:none;filter:drop-shadow(0 0 4px rgba(var(--neon-rgb),.65));opacity:.7;transition:opacity .25s ease,filter .25s ease;}
-.pr-dial-text.active{opacity:1;filter:drop-shadow(0 0 7px rgba(var(--neon-rgb),.9));}
+.pr-dial-text{font:800 12px 'Oswald',sans-serif;letter-spacing:.09em;fill:var(--neon-strong);text-transform:uppercase;pointer-events:none;filter:drop-shadow(0 1px 2px rgba(0,0,0,.85)) drop-shadow(0 0 5px rgba(var(--neon-rgb),.6));opacity:.7;transition:opacity .25s ease,filter .25s ease;}
+.pr-dial-text.active{opacity:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,.9)) drop-shadow(0 0 8px rgba(var(--neon-rgb),.9));}
+.pr-wheel-item .pr-wheel-label{display:none!important;}
 @keyframes prWedgeFire{0%,100%{opacity:.65;}50%{opacity:.95;}}
 .pr-wheel-item{width:auto;height:auto;border:0!important;background:transparent!important;box-shadow:none!important;backdrop-filter:none;-webkit-backdrop-filter:none;overflow:visible;padding:10px 16px;z-index:3;}
 .pr-wheel-item::before{display:none;}
@@ -3874,5 +3875,4 @@ importBackupInput.addEventListener('change',async()=>{
 .pr-wheel-item:nth-child(5){right:8%;top:50%;transform:translateY(-50%)}
 .pr-wheel-item:nth-child(6){bottom:15%;left:50%;transform:translateX(-50%)}
 .pr-wheel-item:nth-child(7){left:8%;top:50%;transform:translateY(-50%)}
-.pr-wheel-item .pr-wheel-label{display:none;}
 </style>
