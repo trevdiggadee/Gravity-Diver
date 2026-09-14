@@ -3594,19 +3594,50 @@ function renderPrFields(){
   ];
   const wheel=document.createElement('div'); wheel.className='pr-wheel-wrap';
   const fire=document.createElement('div'); fire.className='pr-wheel-fire'; wheel.appendChild(fire);
-  const dialR=86, dialCirc=2*Math.PI*dialR, dialGap=14, dialSegLen=(dialCirc-dialGap*categories.length)/categories.length;
-  const dialSvg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  const svgNS='http://www.w3.org/2000/svg';
+  const dialCx=100, dialCy=100, ringR=84, wedgeR=78, gapDeg=6, dialN=categories.length, dialSweep=360/dialN-gapDeg;
+  function dialPolar(r,deg){ const rad=(deg-90)*Math.PI/180; return {x:dialCx+r*Math.cos(rad), y:dialCy+r*Math.sin(rad)}; }
+  function dialArcPath(r,startDeg,endDeg){
+    const s=dialPolar(r,startDeg), e=dialPolar(r,endDeg); const large=(endDeg-startDeg)<=180?0:1;
+    return `M ${s.x.toFixed(2)} ${s.y.toFixed(2)} A ${r} ${r} 0 ${large} 1 ${e.x.toFixed(2)} ${e.y.toFixed(2)}`;
+  }
+  function dialWedgePath(r,startDeg,endDeg){
+    const s=dialPolar(r,startDeg), e=dialPolar(r,endDeg); const large=(endDeg-startDeg)<=180?0:1;
+    return `M ${dialCx} ${dialCy} L ${s.x.toFixed(2)} ${s.y.toFixed(2)} A ${r} ${r} 0 ${large} 1 ${e.x.toFixed(2)} ${e.y.toFixed(2)} Z`;
+  }
+  const dialSvg=document.createElementNS(svgNS,'svg');
   dialSvg.setAttribute('class','pr-dial'); dialSvg.setAttribute('viewBox','0 0 200 200'); dialSvg.setAttribute('aria-hidden','true');
-  const dialTrack=document.createElementNS('http://www.w3.org/2000/svg','circle');
-  dialTrack.setAttribute('class','pr-dial-track'); dialTrack.setAttribute('cx','100'); dialTrack.setAttribute('cy','100'); dialTrack.setAttribute('r',dialR);
+  const dialDefs=document.createElementNS(svgNS,'defs');
+  dialDefs.innerHTML=`<radialGradient id="prWedgeFireGrad" cx="50%" cy="50%" r="70%">
+    <stop offset="0%" style="stop-color:var(--neon-strong);stop-opacity:0"/>
+    <stop offset="55%" style="stop-color:var(--neon);stop-opacity:.4"/>
+    <stop offset="100%" style="stop-color:var(--neon-strong);stop-opacity:.9"/>
+  </radialGradient>`;
+  dialSvg.appendChild(dialDefs);
+  const dialTrack=document.createElementNS(svgNS,'circle');
+  dialTrack.setAttribute('class','pr-dial-track'); dialTrack.setAttribute('cx',dialCx); dialTrack.setAttribute('cy',dialCy); dialTrack.setAttribute('r',ringR);
   dialSvg.appendChild(dialTrack);
+  const wedgeGroup=document.createElementNS(svgNS,'g'); dialSvg.appendChild(wedgeGroup);
+  const segGroup=document.createElementNS(svgNS,'g'); dialSvg.appendChild(segGroup);
+  const textGroup=document.createElementNS(svgNS,'g'); dialSvg.appendChild(textGroup);
   categories.forEach((cat,i)=>{
-    const seg=document.createElementNS('http://www.w3.org/2000/svg','circle');
-    seg.setAttribute('class','pr-dial-seg'); seg.setAttribute('cx','100'); seg.setAttribute('cy','100'); seg.setAttribute('r',dialR);
-    seg.setAttribute('stroke-dasharray',`${dialSegLen} ${dialCirc-dialSegLen}`);
-    seg.setAttribute('stroke-dashoffset',-(i*(dialSegLen+dialGap)));
-    seg.dataset.catId=cat.id;
-    dialSvg.appendChild(seg);
+    const center=i*(360/dialN); const start=center-dialSweep/2, end=center+dialSweep/2;
+    const reversed=center>90&&center<270;
+    const wedge=document.createElementNS(svgNS,'path');
+    wedge.setAttribute('class','pr-dial-wedge'); wedge.setAttribute('d',dialWedgePath(wedgeR,start,end)); wedge.dataset.catId=cat.id;
+    wedgeGroup.appendChild(wedge);
+    const seg=document.createElementNS(svgNS,'path'); const segId=`prDialArc${i}`;
+    seg.setAttribute('class','pr-dial-seg'); seg.setAttribute('id',segId);
+    seg.setAttribute('d', reversed?dialArcPath(ringR,end,start):dialArcPath(ringR,start,end));
+    seg.dataset.catId=cat.id; segGroup.appendChild(seg);
+    const text=document.createElementNS(svgNS,'text'); text.setAttribute('class','pr-dial-text'); text.dataset.catId=cat.id;
+    const textPath=document.createElementNS(svgNS,'textPath');
+    textPath.setAttributeNS('http://www.w3.org/1999/xlink','href','#'+segId); textPath.setAttribute('href','#'+segId);
+    textPath.setAttribute('startOffset','50%'); textPath.setAttribute('text-anchor','middle');
+    textPath.textContent=cat.label.toUpperCase();
+    text.appendChild(textPath); textGroup.appendChild(text);
+    const selectThis=()=>{ const btn=wheel.querySelector(`.pr-wheel-item[aria-label="${cat.label}"]`); if(btn) showCategory(cat,btn); };
+    wedge.addEventListener('click',selectThis); seg.addEventListener('click',selectThis);
   });
   wheel.appendChild(dialSvg);
   const core=document.createElement('div'); core.className='pr-wheel-core'; core.innerHTML='<div class="core-glow"></div><svg class="core-anim" viewBox="0 0 100 100" aria-hidden="true"><circle class="core-ring core-ring-outer" cx="50" cy="50" r="43"/><circle class="core-ring core-ring-mid" cx="50" cy="50" r="33"/><g class="core-orbit core-orbit-a"><circle class="core-orbit-dot" cx="50" cy="9" r="3"/></g><g class="core-orbit core-orbit-b"><circle class="core-orbit-dot" cx="50" cy="13" r="2"/></g><circle class="core-ping" cx="50" cy="50" r="16"/><circle class="core-pulse" cx="50" cy="50" r="15"/><circle class="core-spark" cx="50" cy="50" r="5"/></svg>'; wheel.appendChild(core);
@@ -3621,6 +3652,8 @@ function renderPrFields(){
   function showCategory(cat,button){
     wheel.querySelectorAll('.pr-wheel-item').forEach(b=>b.classList.remove('active')); button.classList.add('active');
     wheel.querySelectorAll('.pr-dial-seg').forEach(s=>s.classList.toggle('active', s.dataset.catId===cat.id));
+    wheel.querySelectorAll('.pr-dial-wedge').forEach(w=>w.classList.toggle('active', w.dataset.catId===cat.id));
+    wheel.querySelectorAll('.pr-dial-text').forEach(t=>t.classList.toggle('active', t.dataset.catId===cat.id));
     
     detail.innerHTML='';
     const head=document.createElement('div'); head.className='pr-wheel-detail-head';
@@ -3823,18 +3856,23 @@ importBackupInput.addEventListener('change',async()=>{
 
 <style>
 /* PR category redesign: segmented vibe-color ring synced to the active category,
-   original fire-spin ring kept underneath, core effects and exercise dropdown untouched */
+   curved per-section labels, and a fire-fill wedge behind each active section.
+   Original fire-spin ring kept underneath, core effects and exercise dropdown untouched */
 .pr-wheel-wrap::after{inset:5%;background:radial-gradient(circle,rgba(var(--neon-rgb),.12),transparent 57%);}
-.pr-dial{position:absolute;inset:0;width:100%;height:100%;z-index:2;transform:rotate(-90deg);pointer-events:none;}
+.pr-dial{position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none;}
 .pr-dial-track{fill:none;stroke:rgba(255,255,255,.06);stroke-width:11;}
-.pr-dial-seg{fill:none;stroke:var(--neon);stroke-width:11;stroke-linecap:round;opacity:.32;transition:opacity .25s ease,stroke-width .25s ease,filter .25s ease;}
+.pr-dial-wedge{fill:url(#prWedgeFireGrad);opacity:0;cursor:pointer;pointer-events:auto;transition:opacity .35s ease;}
+.pr-dial-wedge.active{opacity:.85;animation:prWedgeFire 1.7s ease-in-out infinite;}
+.pr-dial-seg{fill:none;stroke:var(--neon);stroke-width:11;stroke-linecap:round;opacity:.32;cursor:pointer;pointer-events:auto;transition:opacity .25s ease,stroke-width .25s ease,filter .25s ease;}
 .pr-dial-seg.active{opacity:1;stroke:var(--neon-strong);stroke-width:13;filter:drop-shadow(0 0 9px rgba(var(--neon-rgb),.85));}
+.pr-dial-text{font:800 12px 'Oswald',sans-serif;letter-spacing:.09em;fill:var(--neon-strong);text-transform:uppercase;pointer-events:none;filter:drop-shadow(0 0 4px rgba(var(--neon-rgb),.65));opacity:.7;transition:opacity .25s ease,filter .25s ease;}
+.pr-dial-text.active{opacity:1;filter:drop-shadow(0 0 7px rgba(var(--neon-rgb),.9));}
+@keyframes prWedgeFire{0%,100%{opacity:.65;}50%{opacity:.95;}}
 .pr-wheel-item{width:auto;height:auto;border:0!important;background:transparent!important;box-shadow:none!important;backdrop-filter:none;-webkit-backdrop-filter:none;overflow:visible;padding:10px 16px;z-index:3;}
 .pr-wheel-item::before{display:none;}
 .pr-wheel-item:nth-child(4){top:15%;left:50%;transform:translateX(-50%)}
 .pr-wheel-item:nth-child(5){right:8%;top:50%;transform:translateY(-50%)}
 .pr-wheel-item:nth-child(6){bottom:15%;left:50%;transform:translateX(-50%)}
 .pr-wheel-item:nth-child(7){left:8%;top:50%;transform:translateY(-50%)}
-.pr-wheel-item.active .pr-wheel-label{color:var(--neon-strong);text-shadow:0 0 14px rgba(var(--neon-rgb),.65),0 2px 3px #000;}
-.pr-wheel-label{position:relative;inset:auto;font-size:21px;}
+.pr-wheel-item .pr-wheel-label{display:none;}
 </style>
