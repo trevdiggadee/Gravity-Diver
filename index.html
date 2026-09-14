@@ -3594,6 +3594,21 @@ function renderPrFields(){
   ];
   const wheel=document.createElement('div'); wheel.className='pr-wheel-wrap';
   const fire=document.createElement('div'); fire.className='pr-wheel-fire'; wheel.appendChild(fire);
+  const dialR=86, dialCirc=2*Math.PI*dialR, dialGap=14, dialSegLen=(dialCirc-dialGap*categories.length)/categories.length;
+  const dialSvg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  dialSvg.setAttribute('class','pr-dial'); dialSvg.setAttribute('viewBox','0 0 200 200'); dialSvg.setAttribute('aria-hidden','true');
+  const dialTrack=document.createElementNS('http://www.w3.org/2000/svg','circle');
+  dialTrack.setAttribute('class','pr-dial-track'); dialTrack.setAttribute('cx','100'); dialTrack.setAttribute('cy','100'); dialTrack.setAttribute('r',dialR);
+  dialSvg.appendChild(dialTrack);
+  categories.forEach((cat,i)=>{
+    const seg=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    seg.setAttribute('class','pr-dial-seg'); seg.setAttribute('cx','100'); seg.setAttribute('cy','100'); seg.setAttribute('r',dialR);
+    seg.setAttribute('stroke-dasharray',`${dialSegLen} ${dialCirc-dialSegLen}`);
+    seg.setAttribute('stroke-dashoffset',-(i*(dialSegLen+dialGap)));
+    seg.dataset.catId=cat.id;
+    dialSvg.appendChild(seg);
+  });
+  wheel.appendChild(dialSvg);
   const core=document.createElement('div'); core.className='pr-wheel-core'; core.innerHTML='<div class="core-glow"></div><svg class="core-anim" viewBox="0 0 100 100" aria-hidden="true"><circle class="core-ring core-ring-outer" cx="50" cy="50" r="43"/><circle class="core-ring core-ring-mid" cx="50" cy="50" r="33"/><g class="core-orbit core-orbit-a"><circle class="core-orbit-dot" cx="50" cy="9" r="3"/></g><g class="core-orbit core-orbit-b"><circle class="core-orbit-dot" cx="50" cy="13" r="2"/></g><circle class="core-ping" cx="50" cy="50" r="16"/><circle class="core-pulse" cx="50" cy="50" r="15"/><circle class="core-spark" cx="50" cy="50" r="5"/></svg>'; wheel.appendChild(core);
   const detail=document.createElement('div'); detail.className='pr-wheel-detail'; panels.appendChild(wheel); panels.appendChild(detail);
   function makePRField(key){
@@ -3605,6 +3620,7 @@ function renderPrFields(){
   }
   function showCategory(cat,button){
     wheel.querySelectorAll('.pr-wheel-item').forEach(b=>b.classList.remove('active')); button.classList.add('active');
+    wheel.querySelectorAll('.pr-dial-seg').forEach(s=>s.classList.toggle('active', s.dataset.catId===cat.id));
     
     detail.innerHTML='';
     const head=document.createElement('div'); head.className='pr-wheel-detail-head';
@@ -3806,16 +3822,19 @@ importBackupInput.addEventListener('change',async()=>{
 </style>
 
 <style>
-/* PR category redesign: one solid ring, four clickable labels */
-.pr-wheel-wrap::before{inset:1%;border-radius:50%;background:none;border:10px solid rgba(var(--neon-rgb),.72);box-shadow:0 0 18px rgba(var(--neon-rgb),.28),inset 0 0 18px rgba(var(--neon-rgb),.08);filter:none;animation:prSolidRingPulse 3s ease-in-out infinite;}
+/* PR category redesign: segmented vibe-color ring synced to the active category,
+   original fire-spin ring kept underneath, core effects and exercise dropdown untouched */
 .pr-wheel-wrap::after{inset:5%;background:radial-gradient(circle,rgba(var(--neon-rgb),.12),transparent 57%);}
-.pr-wheel-item{width:auto;height:auto;border:0!important;background:transparent!important;box-shadow:none!important;backdrop-filter:none;-webkit-backdrop-filter:none;overflow:visible;padding:10px 16px;}
+.pr-dial{position:absolute;inset:0;width:100%;height:100%;z-index:2;transform:rotate(-90deg);pointer-events:none;}
+.pr-dial-track{fill:none;stroke:rgba(255,255,255,.06);stroke-width:11;}
+.pr-dial-seg{fill:none;stroke:var(--neon);stroke-width:11;stroke-linecap:round;opacity:.32;transition:opacity .25s ease,stroke-width .25s ease,filter .25s ease;}
+.pr-dial-seg.active{opacity:1;stroke:var(--neon-strong);stroke-width:13;filter:drop-shadow(0 0 9px rgba(var(--neon-rgb),.85));}
+.pr-wheel-item{width:auto;height:auto;border:0!important;background:transparent!important;box-shadow:none!important;backdrop-filter:none;-webkit-backdrop-filter:none;overflow:visible;padding:10px 16px;z-index:3;}
 .pr-wheel-item::before{display:none;}
-.pr-wheel-item:nth-child(3){top:15%;left:50%;transform:translateX(-50%)}
-.pr-wheel-item:nth-child(4){right:8%;top:50%;transform:translateY(-50%)}
-.pr-wheel-item:nth-child(5){bottom:15%;left:50%;transform:translateX(-50%)}
-.pr-wheel-item:nth-child(6){left:8%;top:50%;transform:translateY(-50%)}
+.pr-wheel-item:nth-child(4){top:15%;left:50%;transform:translateX(-50%)}
+.pr-wheel-item:nth-child(5){right:8%;top:50%;transform:translateY(-50%)}
+.pr-wheel-item:nth-child(6){bottom:15%;left:50%;transform:translateX(-50%)}
+.pr-wheel-item:nth-child(7){left:8%;top:50%;transform:translateY(-50%)}
 .pr-wheel-item.active .pr-wheel-label{color:var(--neon-strong);text-shadow:0 0 14px rgba(var(--neon-rgb),.65),0 2px 3px #000;}
 .pr-wheel-label{position:relative;inset:auto;font-size:21px;}
-@keyframes prSolidRingPulse{0%,100%{box-shadow:0 0 18px rgba(var(--neon-rgb),.25),inset 0 0 18px rgba(var(--neon-rgb),.06)}50%{box-shadow:0 0 28px rgba(var(--neon-rgb),.42),inset 0 0 22px rgba(var(--neon-rgb),.1)}}
 </style>
