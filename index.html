@@ -48,7 +48,7 @@
     body{ touch-action:pan-y; }
   /* ---- Vibe particle field ---- */
   #vibeParticleCanvas{ position:fixed; inset:0; width:100%; height:100%; z-index:0; pointer-events:none; opacity:.92; mix-blend-mode:screen; }
-  body > *:not(#vibeParticleCanvas):not(#appTopbar):not(.finish-bar):not(.ex-modal-overlay):not(.calc-modal-overlay):not(.summary-modal-overlay):not(.theme-modal-overlay):not(.global-rest-timer):not(.toast){ position:relative; z-index:1; }
+  body > *:not(#vibeParticleCanvas):not(#appTopbar):not(.finish-bar):not(.ex-modal-overlay):not(.calc-modal-overlay):not(.summary-modal-overlay):not(.theme-modal-overlay):not(.global-rest-timer):not(.ex-timer-popup):not(.toast){ position:relative; z-index:1; }
   .topbar{ background:rgba(8,9,10,.72); }
   .auth-card,.nav-block,.day-tab,.week-tab,.exercise-card,.profile-card,.log-card,.summary-card,.summary-block-complete,.finish-bar,.bottom-dock,.session-active,.ex-modal,.calc-modal,.theme-modal-overlay,.theme-modal,.setup-modal,.modal,.rest-step,.rest-chip,.rest-sound-select,.ex-prev-row{ backdrop-filter:blur(8px); }
   .auth-card,.nav-block,.day-tab,.week-tab,.exercise-card,.profile-card,.log-card,.summary-card,.finish-bar,.bottom-dock,.session-active{ background-color:rgba(19,20,23,.62); }
@@ -348,11 +348,19 @@
     position:relative; overflow:hidden;
     background: var(--panel); border:1px solid var(--upper); border-radius: 22px; padding: 20px 22px 18px;
     width:100%; max-width: 400px; max-height: 94vh; overflow-y:auto;
-    box-shadow: 0 0 55px rgba(var(--neon-rgb),0.22); animation: popIn .22s ease;
-    transition: border-color .3s ease, box-shadow .3s ease;
+    animation: popIn .22s ease, exModalGlow 2.6s ease-in-out infinite;
+    transition: border-color .3s ease;
     display:flex; flex-direction:column;
   }
-  .ex-modal.all-done{ border-color: var(--neon-strong); box-shadow: 0 0 80px rgba(var(--neon-rgb),0.45); }
+  @keyframes exModalGlow{
+    0%,100%{ box-shadow: 0 0 40px rgba(var(--neon-rgb),0.22), 0 0 90px rgba(var(--neon-rgb),0.08); }
+    50%{ box-shadow: 0 0 75px rgba(var(--neon-rgb),0.5), 0 0 150px rgba(var(--neon-rgb),0.25); }
+  }
+  .ex-modal.all-done{ border-color: var(--neon-strong); animation: popIn .22s ease, exModalGlowDone 1.4s ease-in-out infinite; }
+  @keyframes exModalGlowDone{
+    0%,100%{ box-shadow: 0 0 55px rgba(var(--neon-rgb),0.4), 0 0 110px rgba(var(--neon-rgb),0.18); }
+    50%{ box-shadow: 0 0 95px rgba(var(--neon-rgb),0.7), 0 0 180px rgba(var(--neon-rgb),0.35); }
+  }
   .ex-modal-close{
     position:absolute; top:6px; right:6px; background:none; border:none; color: var(--chalk-faint);
     font-size:22px; line-height:1; cursor:pointer; z-index:5;
@@ -456,7 +464,7 @@
   }
   .ex-prev-row.empty .ex-prev-data{ color: var(--chalk-faint); }
   .ex-prev-label{ color: var(--chalk-faint); font-size:10px; letter-spacing:.06em; text-transform:uppercase; flex-shrink:0; }
-  .ex-prev-data{ color: var(--chalk); font-size:12px; text-align:right; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .ex-prev-data{ color: var(--chalk); font-size:15px; text-align:right; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
   .ex-bw-toggle{
     display:flex; align-items:center; justify-content:center; gap:7px; margin:0 auto 12px; width:max-content;
@@ -487,7 +495,12 @@
   #exAddSetBtn{ width:100%; margin-bottom: 12px; padding: 8px 18px; }
 
   .ex-rest-zone{ border-top:1px solid var(--line); padding-top:12px; text-align:center; }
-  .ex-timer-popup{ display:none; position:relative; }
+  .ex-timer-popup{
+    display:none; position:fixed; inset:0; margin:auto; width:max-content; max-width:88vw; height:max-content;
+    z-index:130; padding:22px 28px 18px; border-radius:20px; text-align:center;
+    border:1px solid rgba(var(--neon-rgb),.5);
+    box-shadow:0 0 40px rgba(var(--neon-rgb),.35), 0 20px 60px rgba(0,0,0,.6);
+  }
   .ex-timer-popup.show{ display:block; animation: popIn .18s ease; }
   #exFinishBtn{ width:100%; margin-top:12px; }
   .ex-rest-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
@@ -720,6 +733,16 @@
   .pr-accordion-body{padding:0 6px 6px}.pr-field{min-width:0;padding:5px 6px;border:0;background:transparent;display:grid;grid-template-columns:1fr auto;align-items:center;gap:5px}.pr-field label{font-size:9px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pr-field input{font-family:'JetBrains Mono',monospace;font-size:12px!important;font-weight:800;padding:3px 4px!important;width:62px!important;text-align:right;border-color:rgba(var(--neon-rgb),.18)!important;background:rgba(var(--neon-rgb),.035)!important}.pr-field .metric-unit{display:none!important}
   @keyframes prPanelIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
   .pr-title{ color:var(--neon-strong); text-shadow:0 0 12px rgba(var(--neon-rgb),.28); font-size:18px!important; letter-spacing:.04em; margin-bottom:4px!important; }
+  .weekly-awards{ display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px; margin-top:10px; }
+  .award-card{
+    position:relative; text-align:center; padding:16px 10px 14px; border-radius:14px;
+    border:1px solid rgba(var(--neon-rgb),.35); background:rgba(var(--neon-rgb),.06);
+    box-shadow:0 0 18px rgba(var(--neon-rgb),.14), inset 0 0 14px rgba(var(--neon-rgb),.05);
+  }
+  .award-icon{ font-size:26px; margin-bottom:6px; filter:drop-shadow(0 0 8px rgba(var(--neon-rgb),.5)); }
+  .award-title{ font:800 11px 'Oswald',sans-serif; letter-spacing:.06em; text-transform:uppercase; color:var(--chalk-dim); margin-bottom:4px; }
+  .award-value{ font:800 18px 'Oswald',sans-serif; color:var(--neon-strong); text-shadow:0 0 10px rgba(var(--neon-rgb),.4); margin-bottom:2px; }
+  .award-sub{ font-size:11px; color:var(--chalk-faint); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .profile-note{font-size:8px;color:var(--chalk-faint);line-height:1.4;margin-top:7px;}
   #savePrsBtn{display:none!important}
   .pr-field input[readonly]{cursor:default;opacity:.95}
@@ -1338,6 +1361,12 @@ input,select,textarea{background-color:rgba(8,10,10,.72)!important;backdrop-filt
         </div>
 
         <div class="profile-card wide">
+          <h3 class="pr-title">Weekly Awards</h3>
+          <div class="profile-card-sub">Highlights from this week's logged sets, per day's current week.</div>
+          <div class="weekly-awards" id="weeklyAwards"></div>
+        </div>
+
+        <div class="profile-card wide">
           <h3>Backup &amp; Restore</h3>
           <div class="profile-card-sub">RepLog stores everything on this device only. Export a backup file regularly so a cleared browser, a new device, or a new browser never costs you your program or history.</div>
           <input id="importBackupInput" type="file" accept="application/json,.json" hidden>
@@ -1427,23 +1456,6 @@ input,select,textarea{background-color:rgba(8,10,10,.72)!important;backdrop-filt
         <button type="button" class="rest-chip" data-secs="150">2:30</button>
         <button type="button" class="rest-chip" data-secs="180">3m</button>
       </div>
-      <div class="ex-timer-popup" id="exTimerPopup">
-        <div class="timer-stage">
-          
-          <div class="analog-clock" id="analogClock">
-            <div class="tick-ring">
-              <span></span><span></span><span></span><span></span><span></span><span></span>
-              <span></span><span></span><span></span><span></span><span></span><span></span>
-            </div>
-            <div class="ring-progress" id="ringProgress"></div>
-            <div class="ring-comet" id="ringComet"></div>
-            <div class="hand" id="restHand"></div>
-            <div class="center-dot"></div>
-          </div>
-          
-        </div>
-        <div class="digital-readout mono" id="restDigital">00:00</div>
-      </div>
       <button type="button" class="timer-btn-wide" id="exTimerBtn"></button>
     </div>
     <button type="button" class="btn-primary" id="exFinishBtn">Finish Exercise</button>
@@ -1459,6 +1471,23 @@ input,select,textarea{background-color:rgba(8,10,10,.72)!important;backdrop-filt
       </div>
     </div>
   </div>
+</div>
+
+<!-- FLOATING REST TIMER (large popup) — intentionally separate from the exercise log window -->
+<div class="ex-timer-popup" id="exTimerPopup">
+  <div class="timer-stage">
+    <div class="analog-clock" id="analogClock">
+      <div class="tick-ring">
+        <span></span><span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span><span></span>
+      </div>
+      <div class="ring-progress" id="ringProgress"></div>
+      <div class="ring-comet" id="ringComet"></div>
+      <div class="hand" id="restHand"></div>
+      <div class="center-dot"></div>
+    </div>
+  </div>
+  <div class="digital-readout mono" id="restDigital">00:00</div>
 </div>
 
 <!-- FLOATING REST TIMER -->
@@ -3677,9 +3706,65 @@ function renderPrFields(){
   const initialButton=Array.from(wheel.querySelectorAll('.pr-tab')).find(b=>b.querySelector('.pr-tab-name')?.textContent===initial.label);
   if(initialButton) showCategory(initial,initialButton);
 }
+function computeWeeklyAwards(){
+  let heaviest=null, mostVolume=null, mostReps=null, daysWithLogs=0;
+  const totalDays=(days||[]).length;
+  (days||[]).forEach(d=>{
+    const cw=d.currentWeek;
+    const week=d.weeks && d.weeks[cw-1];
+    if(!week || !week.logs) return;
+    let dayHasLog=false;
+    ['upper','lower','cardio'].forEach(side=>{
+      (d[side]||[]).forEach((slot,i)=>{
+        const log=week.logs[side] && week.logs[side][i];
+        if(!Array.isArray(log) || !log.length) return;
+        const name=slot && slot.exercise;
+        if(!name) return;
+        let exVolume=0, exReps=0, exMaxWeight=0;
+        log.forEach(r=>{
+          if(!r) return;
+          const reps=parseFloat(r.reps)||0;
+          const isBw=String(r.weight).toUpperCase()==='BW';
+          const weight=isBw ? 0 : (parseFloat(r.weight)||0);
+          if(reps>0 || weight>0) dayHasLog=true;
+          exReps+=reps; exVolume+=reps*weight;
+          if(weight>exMaxWeight) exMaxWeight=weight;
+        });
+        if(exMaxWeight>0 && (!heaviest || exMaxWeight>heaviest.weight)) heaviest={exercise:name, weight:exMaxWeight};
+        if(exVolume>0 && (!mostVolume || exVolume>mostVolume.volume)) mostVolume={exercise:name, volume:exVolume};
+        if(exReps>0 && (!mostReps || exReps>mostReps.reps)) mostReps={exercise:name, reps:exReps};
+      });
+    });
+    if(dayHasLog) daysWithLogs++;
+  });
+  return {heaviest, mostVolume, mostReps, daysWithLogs, totalDays};
+}
+function renderWeeklyAwards(){
+  const el=document.getElementById('weeklyAwards');
+  if(!el) return;
+  const a=computeWeeklyAwards();
+  const cards=[];
+  if(a.heaviest) cards.push({icon:'🏋️', title:'Heaviest Lift', value:`${Math.round(a.heaviest.weight*10)/10} lb`, sub:a.heaviest.exercise});
+  if(a.mostVolume) cards.push({icon:'💪', title:'Most Volume', value:`${Math.round(a.mostVolume.volume).toLocaleString()} lb`, sub:a.mostVolume.exercise});
+  if(a.mostReps) cards.push({icon:'🔥', title:'Most Reps', value:`${a.mostReps.reps} reps`, sub:a.mostReps.exercise});
+  if(a.totalDays>0) cards.push({icon:'✅', title:'Consistency', value:`${a.daysWithLogs}/${a.totalDays} days`, sub:'Logged this week'});
+  if(!cards.length){
+    el.innerHTML='<div class="profile-card-sub">Log some sets this week to start earning awards.</div>';
+    return;
+  }
+  el.innerHTML=cards.map(c=>`
+    <div class="award-card">
+      <div class="award-icon">${c.icon}</div>
+      <div class="award-title">${c.title}</div>
+      <div class="award-value">${c.value}</div>
+      <div class="award-sub">${c.sub}</div>
+    </div>
+  `).join('');
+}
 function renderProfile(){
   if(!currentUser) return;
   renderPrFields();
+  renderWeeklyAwards();
   const meta=profileMetadata();
   const username=meta.username || '';
   usernameInput.value=username;
