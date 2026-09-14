@@ -458,10 +458,25 @@
   .ex-prev-label{ color: var(--chalk-faint); font-size:10px; letter-spacing:.06em; text-transform:uppercase; flex-shrink:0; }
   .ex-prev-data{ color: var(--chalk); font-size:12px; text-align:right; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
+  .ex-bw-toggle{
+    display:flex; align-items:center; justify-content:center; gap:7px; margin:0 auto 12px; width:max-content;
+    background: var(--panel-3); border:1px solid var(--line); color: var(--chalk-dim);
+    font-family:'Oswald',sans-serif; font-size:12px; font-weight:700; letter-spacing:.05em; text-transform:uppercase;
+    padding:7px 16px; border-radius:100px; cursor:pointer; transition: all .2s ease;
+  }
+  .ex-bw-toggle .bw-dot{ width:7px; height:7px; border-radius:50%; background: var(--chalk-faint); transition: all .2s ease; }
+  .ex-bw-toggle:hover{ border-color: rgba(var(--neon-rgb),0.4); color: var(--chalk); }
+  .ex-bw-toggle.active{
+    background: rgba(var(--neon-rgb),0.15); border-color: var(--neon); color: var(--neon-strong);
+    text-shadow:0 0 10px rgba(var(--neon-rgb),0.5); box-shadow:0 0 18px rgba(var(--neon-rgb),0.3);
+  }
+  .ex-bw-toggle.active .bw-dot{ background: var(--neon-strong); box-shadow:0 0 8px rgba(var(--neon-rgb),0.8); }
+
   .ex-set-rows{ display:flex; flex-direction:column; gap:6px; margin-bottom: 8px; padding-right:2px; }
   .ex-set-row{ display:grid; grid-template-columns: 30px 1fr 1fr 24px; gap:8px; align-items:center; padding:5px; border-radius:8px; border:1px solid transparent; transition: all .2s ease; }
   .ex-set-row.checked{ background: rgba(var(--neon-rgb),0.08); border-color: rgba(var(--neon-rgb),0.28); }
   .ex-set-row input{ padding: 9px 8px; font-size:13px; text-align:center; }
+  .ex-set-row .ex-weight:disabled{ background: rgba(var(--neon-rgb),0.1); border-color: rgba(var(--neon-rgb),0.32); color: var(--neon-strong); font-weight:800; opacity:1; -webkit-text-fill-color: var(--neon-strong); }
   .ex-check{ background: var(--panel-3); cursor:pointer; padding:0; font-family:inherit;
     width:26px; height:26px; border-radius:50%; border:2px solid var(--line); flex-shrink:0;
     display:flex; align-items:center; justify-content:center; font-size:11px; color: var(--chalk-dim); transition: all .2s ease;
@@ -1370,6 +1385,10 @@ input,select,textarea{background-color:rgba(8,10,10,.72)!important;backdrop-filt
       <span class="ex-prev-data mono" id="exPrevData">—</span>
     </div>
 
+    <button type="button" class="ex-bw-toggle" id="exBwToggle" aria-pressed="false" title="Toggle body weight mode for all sets">
+      <span class="bw-dot"></span>Body Weight
+    </button>
+
     <div class="ex-set-rows" id="exSetRows"></div>
     <button type="button" class="btn-ghost" id="exAddSetBtn">+ Add extra set</button>
 
@@ -2211,6 +2230,7 @@ const exModal = document.getElementById('exModal');
 const exModalTitle = document.getElementById('exModalTitle');
 const exSetRowsEl = document.getElementById('exSetRows');
 const exAddSetBtn = document.getElementById('exAddSetBtn');
+const exBwToggle = document.getElementById('exBwToggle');
 const exModalClose = document.getElementById('exModalClose');
 const exRestSeconds = document.getElementById('exRestSeconds');
 const restStepDown = document.getElementById('restStepDown');
@@ -2457,9 +2477,18 @@ function openExerciseModal(side, index){
   renderExPrevRow(cw, exModalPrevLog);
 
   exModalTitle.textContent = slot.exercise || 'Exercise';
+  if(exBwToggle){
+    const isBw = !!slot.bodyweight;
+    exBwToggle.classList.toggle('active', isBw);
+    exBwToggle.setAttribute('aria-pressed', isBw ? 'true' : 'false');
+  }
   renderExRows();
   updatePRBadge();
   exModalOverlay.classList.add('show');
+}
+function currentExSlot(){
+  const d = days[activeDay];
+  return d && exModalSide != null && exModalIndex != null ? d[exModalSide][exModalIndex] : null;
 }
 
 function renderExPrevRow(cw, prevLog){
@@ -2519,14 +2548,17 @@ function updatePRBadge(){
 
 function renderExRows(){
   exSetRowsEl.innerHTML = "";
+  const slot = currentExSlot();
+  const isBw = !!(slot && slot.bodyweight);
   exModalRowsData.forEach((row, i) => {
     const logged = !!row.logged;
+    if(isBw) row.weight = 'BW';
     const rowEl = document.createElement('div');
     rowEl.className = 'ex-set-row' + (logged ? ' checked' : '');
     rowEl.innerHTML = `
       <button type="button" class="ex-check ${logged ? 'checked' : ''}" title="${logged ? 'Logged — tap to undo' : 'Tap to log this set'}">${logged ? '✓' : (i+1)}</button>
       <input type="number" min="0" inputmode="numeric" pattern="[0-9]*" class="ex-reps" placeholder="Reps" value="${row.reps}">
-      <input type="number" min="0" step="0.5" inputmode="decimal" class="ex-weight" placeholder="Weight (lb)" value="${row.weight}">
+      <input type="${isBw ? 'text' : 'number'}" min="0" step="0.5" inputmode="decimal" class="ex-weight" placeholder="Weight (lb)" value="${isBw ? 'BW' : row.weight}" ${isBw ? 'disabled' : ''}>
       <button type="button" class="ex-row-remove" title="Remove set">×</button>
     `;
     const repsInput = rowEl.querySelector('.ex-reps');
@@ -2574,10 +2606,18 @@ function collectAllExerciseNames(){
   const out=[],seen=new Set(); const add=n=>{n=String(n||'').trim();if(n&&!seen.has(n.toLowerCase())){seen.add(n.toLowerCase());out.push(n);}};
   [UPPER_LIBRARY,LOWER_LIBRARY].forEach(lib=>Object.values(lib).flat().forEach(add)); (days||[]).forEach(d=>[...(d.upper||[]),...(d.lower||[])].forEach(s=>add(s.exercise))); return out.sort((a,b)=>a.localeCompare(b));
 }
+let prRepsKeys = new Set();
 function calculateRecordedExercisePRs(){
   const prs={};
+  const repsKeys=new Set();
   const addLog=(exercise,log)=>{
     const key=exerciseToPrKey(exercise); if(!key || !Array.isArray(log)) return;
+    const bwReps=log.reduce((m,r)=>(r && String(r.weight).toUpperCase()==='BW') ? Math.max(m,Number(r.reps)||0) : m, 0);
+    if(bwReps>0){
+      prs[key]=Math.max(repsKeys.has(key)?(prs[key]||0):0, bwReps);
+      repsKeys.add(key);
+      return;
+    }
     const max=log.reduce((m,r)=>Math.max(m,Number(r && r.weight)||0),0);
     if(max>0) prs[key]=Math.max(prs[key]||0,max);
   };
@@ -2590,6 +2630,7 @@ function calculateRecordedExercisePRs(){
   (days||[]).forEach(d=>(d.weeks||[]).forEach(w=>['upper','lower','cardio'].forEach(side=>{
     (d[side]||[]).forEach((slot,i)=>addLog(slot.exercise,w.logs && w.logs[side] && w.logs[side][i]));
   })));
+  prRepsKeys = repsKeys;
   return prs;
 }
 async function syncAllExercisePRsFromLogs(){
@@ -2624,10 +2665,29 @@ exFinishBtn.addEventListener('click', () => {
 });
 
 exAddSetBtn.addEventListener('click', () => {
-  exModalRowsData.push({ reps: "", weight: "" });
+  const slot = currentExSlot();
+  exModalRowsData.push({ reps: "", weight: (slot && slot.bodyweight) ? 'BW' : "" });
   persistExRows();
   renderExRows();
 });
+
+if(exBwToggle){
+  exBwToggle.addEventListener('click', () => {
+    const slot = currentExSlot();
+    if(!slot) return;
+    slot.bodyweight = !slot.bodyweight;
+    exBwToggle.classList.toggle('active', slot.bodyweight);
+    exBwToggle.setAttribute('aria-pressed', slot.bodyweight ? 'true' : 'false');
+    if(slot.bodyweight){
+      exModalRowsData.forEach(row => { row.weight = 'BW'; });
+    } else {
+      exModalRowsData.forEach(row => { if(row.weight === 'BW') row.weight = ''; });
+    }
+    saveDays();
+    persistExRows();
+    renderExRows();
+  });
+}
 
 function closeExerciseModal(){
   // Keep the rest countdown alive when leaving the exercise. The floating timer is the active display.
@@ -3591,8 +3651,9 @@ function renderPrFields(){
   const detail=document.createElement('div'); detail.className='pr-wheel-detail'; panels.appendChild(wheel); panels.appendChild(detail);
   function makePRField(key){
     const name=labelMap[key]||keyForName.get(key)||key;
+    const isReps=prRepsKeys.has(key);
     const field=document.createElement('div'); field.className='pr-field';
-    field.innerHTML=`<label for="pr_${key}">${name}</label><input id="pr_${key}" type="number" min="0" max="3000" step="0.5" placeholder="—" inputmode="decimal" readonly aria-readonly="true">`;
+    field.innerHTML=`<label for="pr_${key}">${name}${isReps?' (reps)':''}</label><input id="pr_${key}" type="number" min="0" max="${isReps?'500':'3000'}" step="${isReps?'1':'0.5'}" placeholder="—" inputmode="decimal" readonly aria-readonly="true">`;
     const input=field.querySelector('input'); input.value=prs[key] || '';
     return field;
   }
@@ -3601,7 +3662,7 @@ function renderPrFields(){
     
     detail.innerHTML='';
     const head=document.createElement('div'); head.className='pr-wheel-detail-head';
-    head.innerHTML=`<div class="pr-wheel-detail-title">${cat.label} Records</div><div class="pr-wheel-detail-hint">PR • LB</div>`; detail.appendChild(head);
+    head.innerHTML=`<div class="pr-wheel-detail-title">${cat.label} Records</div><div class="pr-wheel-detail-hint">PR</div>`; detail.appendChild(head);
     if(!cat.keys.length){const e=document.createElement('div');e.className='profile-card-sub';e.textContent=cat.id==='custom'?'No custom exercises recorded yet.':'No exercises available.';detail.appendChild(e);return;}
     const grid=document.createElement('div'); grid.className='pr-section-grid';
     cat.keys.forEach(key=>{
