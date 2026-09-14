@@ -680,26 +680,21 @@
   .pr-panels{display:block;}
   .pr-panel{display:block;}
   /* ---- PR WHEEL + COMPACT RECORD CALENDAR ---- */
-  .pr-wheel-wrap{position:relative;margin:4px auto 5px;width:min(160px,43vw);height:min(160px,43vw);display:grid;place-items:center;isolation:isolate;}
-  .pr-wheel-wrap::before{content:"";position:absolute;inset:1%;border-radius:50%;background:conic-gradient(from -20deg,transparent 0 9%,rgba(var(--neon-rgb),.65) 12%,transparent 17% 30%,rgba(var(--neon-rgb),.55) 34%,transparent 40% 56%,rgba(var(--neon-rgb),.7) 60%,transparent 66% 82%,rgba(var(--neon-rgb),.55) 87%,transparent 93%);filter:blur(2px);animation:prWheelSpin 15s linear infinite;}
-  .pr-wheel-wrap::after{content:"";position:absolute;inset:5%;border-radius:50%;background:radial-gradient(circle,rgba(var(--neon-rgb),.12),transparent 57%);box-shadow:0 0 65px rgba(var(--neon-rgb),.2),inset 0 0 45px rgba(var(--neon-rgb),.07);filter:blur(5px);z-index:-1;animation:prWheelFire 3.2s ease-in-out infinite alternate;}
-  .pr-wheel-fire{position:absolute;inset:-2%;border-radius:50%;pointer-events:none;overflow:hidden;}
-  .pr-wheel-fire::before,.pr-wheel-fire::after{content:"";position:absolute;border-radius:50%;border:2px solid transparent;border-top-color:var(--neon);border-right-color:rgba(var(--neon-rgb),.3);filter:blur(1px);box-shadow:0 0 10px var(--neon),0 0 30px rgba(var(--neon-rgb),.35);animation:prFireOrbit 2.4s linear infinite;}
-  .pr-wheel-fire::before{inset:5%;}.pr-wheel-fire::after{inset:9%;border-width:1px;border-top-color:var(--neon-strong);border-left-color:rgba(var(--neon-rgb),.35);animation-duration:3.7s;animation-direction:reverse;opacity:.75;}
-  .pr-wheel-core{width:48px;height:48px;border-radius:50%;border:1px solid rgba(var(--neon-rgb),.7);background:#090b0c;display:grid;place-items:center;text-align:center;color:var(--neon-strong);font:800 8px 'Oswald',sans-serif;letter-spacing:.08em;text-transform:uppercase;box-shadow:0 0 16px rgba(var(--neon-rgb),.35),inset 0 0 15px rgba(var(--neon-rgb),.1);overflow:hidden;z-index:4;position:relative;}
-  .pr-wheel-core::before{content:"";position:absolute;inset:-12px;border-radius:50%;background:radial-gradient(circle,rgba(var(--neon-rgb),.22),transparent 62%);filter:blur(9px);z-index:-1;animation:prCoreGlow 2.2s ease-in-out infinite alternate;}
-  .pr-wheel-core::after{content:"";position:absolute;inset:-20px;border-radius:50%;background:radial-gradient(circle,rgba(var(--neon-rgb),.34) 0%,rgba(var(--neon-rgb),.16) 34%,transparent 70%);filter:blur(12px);z-index:-1;animation:prCenterPulse 1.9s ease-in-out infinite;pointer-events:none;}
-.pr-wheel-core .core-glow{position:absolute;inset:-12px;border-radius:50%;background:radial-gradient(circle,rgba(var(--neon-rgb),.32),transparent 66%);filter:blur(10px);animation:prCenterPulse 2.3s ease-in-out infinite alternate;z-index:-1;}
-  .pr-wheel-core .core-text{display:none;}
-  .pr-wheel-core span{display:none;}
-  .pr-wheel-item{position:absolute;width:132px;height:132px;border-radius:50%;border:1px solid rgba(var(--neon-rgb),.28);padding:0;margin:0;box-sizing:border-box;background:rgba(10,12,13,.92);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:var(--chalk);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .32s cubic-bezier(.2,.8,.2,1),border-color .25s,box-shadow .3s,background .3s;box-shadow:0 8px 24px rgba(0,0,0,.3);z-index:3;overflow:hidden;}
-  .pr-wheel-item:nth-child(3){top:-2px;left:50%;transform:translateX(-50%)} .pr-wheel-item:nth-child(4){right:-2px;top:50%;transform:translateY(-50%)} .pr-wheel-item:nth-child(5){bottom:-2px;left:50%;transform:translateX(-50%)} .pr-wheel-item:nth-child(6){left:-2px;top:50%;transform:translateY(-50%)}
-  .pr-wheel-item::before{content:"";position:absolute;inset:-18%;border-radius:50%;background:radial-gradient(circle,rgba(var(--neon-rgb),.16),transparent 58%);filter:blur(8px);opacity:.55;animation:prNodePulse 2.8s ease-in-out infinite alternate;}
-  .pr-wheel-item.active,.pr-wheel-item:hover{border-color:var(--neon);background:rgba(var(--neon-rgb),.13);box-shadow:0 0 34px rgba(var(--neon-rgb),.28),inset 0 0 26px rgba(var(--neon-rgb),.08);}
-  .pr-wheel-item.active:nth-child(3){transform:translateX(-50%) scale(1.045)} .pr-wheel-item.active:nth-child(4){transform:translateY(-50%) scale(1.045)} .pr-wheel-item.active:nth-child(5){transform:translateX(-50%) scale(1.045)} .pr-wheel-item.active:nth-child(6){transform:translateY(-50%) scale(1.045)}
-  .pr-wheel-icon{position:absolute;font-size:62px;line-height:1;color:var(--neon);opacity:.16;filter:drop-shadow(0 0 12px rgba(var(--neon-rgb),.5));z-index:0;}
-  .pr-wheel-label{position:absolute;inset:0;z-index:2;display:flex;align-items:center;justify-content:center;width:auto;height:auto;margin:0;padding:0;font:900 24px/1 'Oswald',sans-serif;color:var(--neon-strong);letter-spacing:.055em;text-transform:uppercase;text-align:center;text-shadow:0 2px 10px #000,0 0 13px rgba(var(--neon-rgb),.3);white-space:nowrap;}
-  .pr-wheel-count{display:none!important;}
+  .pr-tab-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:6px 0 16px;}
+  .pr-tab{position:relative;overflow:hidden;isolation:isolate;padding:18px 10px;border-radius:14px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.03);color:rgba(255,255,255,.5);font:800 13px 'Oswald',sans-serif;letter-spacing:.08em;text-transform:uppercase;text-align:center;cursor:pointer;transition:color .3s ease,border-color .3s ease,background .3s ease,box-shadow .3s ease,transform .25s ease;}
+  .pr-tab-name{position:relative;z-index:2;}
+  .pr-tab::before{content:"";position:absolute;inset:-40% -10%;z-index:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.07) 48%,transparent 65%);transform:translateX(-120%);animation:prTabShimmer 5s ease-in-out infinite;pointer-events:none;}
+  .pr-tab::after{content:"";position:absolute;inset:0;z-index:0;border-radius:inherit;background:radial-gradient(circle at 30% 20%,rgba(255,255,255,.06),transparent 60%);opacity:.5;animation:prTabBreathe 4s ease-in-out infinite alternate;pointer-events:none;}
+  .pr-tab:hover{border-color:rgba(255,255,255,.3);color:rgba(255,255,255,.82);}
+  .pr-tab.active{color:var(--neon-strong);border-color:var(--neon);background:rgba(var(--neon-rgb),.13);box-shadow:0 0 26px rgba(var(--neon-rgb),.35),inset 0 0 20px rgba(var(--neon-rgb),.1);transform:translateY(-2px);}
+  .pr-tab.active::before{background:linear-gradient(115deg,transparent 30%,rgba(var(--neon-rgb),.4) 48%,transparent 65%);animation-duration:2.1s;}
+  .pr-tab.active::after{background:radial-gradient(circle at 50% 50%,rgba(var(--neon-rgb),.4),transparent 65%);opacity:1;animation:prTabPulse 1.6s ease-in-out infinite;}
+  .pr-tab-burst{position:absolute;inset:0;z-index:1;border-radius:inherit;pointer-events:none;border:2px solid var(--neon);opacity:0;}
+  .pr-tab.burst .pr-tab-burst{animation:prTabBurst .6s ease-out;}
+  @keyframes prTabShimmer{0%{transform:translateX(-120%);}45%,100%{transform:translateX(120%);}}
+  @keyframes prTabBreathe{from{opacity:.3;}to{opacity:.7;}}
+  @keyframes prTabPulse{0%,100%{opacity:.5;transform:scale(.94);}50%{opacity:1;transform:scale(1.08);}}
+  @keyframes prTabBurst{0%{opacity:.9;transform:scale(1);}100%{opacity:0;transform:scale(1.35);}}
   .pr-wheel-detail{border-top:1px solid rgba(var(--neon-rgb),.13);padding-top:7px;animation:prPanelIn .28s ease both;}
   .pr-wheel-detail-head{display:flex;align-items:center;justify-content:space-between;margin:0 2px 6px;}
   .pr-wheel-detail-title{font:800 14px 'Oswald',sans-serif;color:var(--neon-strong);letter-spacing:.07em;text-transform:uppercase}.pr-wheel-detail-hint{font-size:8px;color:var(--chalk-faint);text-transform:uppercase;letter-spacing:.08em}
@@ -708,8 +703,7 @@
   .pr-accordion summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:6px;min-height:35px;padding:6px 8px;cursor:default;user-select:none;color:var(--chalk);font-family:'Inter',sans-serif;font-size:10px;font-weight:700;line-height:1.15;}
   .pr-accordion summary::-webkit-details-marker{display:none}.pr-accordion summary::before{display:none}.pr-accordion summary .pr-section-count,.pr-accordion summary .pr-section-type{display:none!important}.pr-accordion[open] summary{border-bottom:1px solid rgba(255,255,255,.05)}
   .pr-accordion-body{padding:0 6px 6px}.pr-field{min-width:0;padding:5px 6px;border:0;background:transparent;display:grid;grid-template-columns:1fr auto;align-items:center;gap:5px}.pr-field label{font-size:9px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pr-field input{font-family:'JetBrains Mono',monospace;font-size:12px!important;font-weight:800;padding:3px 4px!important;width:62px!important;text-align:right;border-color:rgba(var(--neon-rgb),.18)!important;background:rgba(var(--neon-rgb),.035)!important}.pr-field .metric-unit{display:none!important}
-  @keyframes prCenterPulse{0%,100%{transform:scale(.92);opacity:.55}50%{transform:scale(1.12);opacity:1}} @keyframes prCoreGlow{from{transform:scale(.95);opacity:.55}to{transform:scale(1.06);opacity:1}} @keyframes prNodePulse{from{transform:scale(.9);opacity:.3}to{transform:scale(1.08);opacity:.8}}
-  @keyframes prWheelSpin{to{transform:rotate(360deg)}} @keyframes prWheelFire{0%{transform:scale(.97);opacity:.65}100%{transform:scale(1.04);opacity:1}} @keyframes prFireOrbit{to{transform:rotate(360deg)}} @keyframes prPanelIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes prPanelIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
   .pr-title{ color:var(--neon-strong); text-shadow:0 0 12px rgba(var(--neon-rgb),.28); font-size:18px!important; letter-spacing:.04em; margin-bottom:4px!important; }
   .profile-note{font-size:8px;color:var(--chalk-faint);line-height:1.4;margin-top:7px;}
   #savePrsBtn{display:none!important}
@@ -3593,60 +3587,7 @@ function renderPrFields(){
     {id:'custom',label:'Custom',icon:'',keys:custom},
     {id:'cardio',label:'Cardio',icon:'',keys:cardio}
   ];
-  const wheel=document.createElement('div'); wheel.className='pr-wheel-wrap';
-  const fire=document.createElement('div'); fire.className='pr-wheel-fire'; wheel.appendChild(fire);
-  const svgNS='http://www.w3.org/2000/svg';
-  const dialCx=100, dialCy=100, ringR=84, wedgeR=78, textR=97, gapDeg=6, dialN=categories.length, dialSweep=360/dialN-gapDeg;
-  function dialPolar(r,deg){ const rad=(deg-90)*Math.PI/180; return {x:dialCx+r*Math.cos(rad), y:dialCy+r*Math.sin(rad)}; }
-  function dialArcPath(r,startDeg,endDeg,sweep=1){
-    const s=dialPolar(r,startDeg), e=dialPolar(r,endDeg); const large=(endDeg-startDeg)<=180?0:1;
-    return `M ${s.x.toFixed(2)} ${s.y.toFixed(2)} A ${r} ${r} 0 ${large} ${sweep} ${e.x.toFixed(2)} ${e.y.toFixed(2)}`;
-  }
-  function dialWedgePath(r,startDeg,endDeg){
-    const s=dialPolar(r,startDeg), e=dialPolar(r,endDeg); const large=(endDeg-startDeg)<=180?0:1;
-    return `M ${dialCx} ${dialCy} L ${s.x.toFixed(2)} ${s.y.toFixed(2)} A ${r} ${r} 0 ${large} 1 ${e.x.toFixed(2)} ${e.y.toFixed(2)} Z`;
-  }
-  const dialSvg=document.createElementNS(svgNS,'svg');
-  dialSvg.setAttribute('class','pr-dial'); dialSvg.setAttribute('viewBox','-12 -12 224 224'); dialSvg.setAttribute('aria-hidden','true');
-  const dialDefs=document.createElementNS(svgNS,'defs');
-  dialDefs.innerHTML=`<radialGradient id="prWedgeFireGrad" cx="50%" cy="50%" r="70%">
-    <stop offset="0%" style="stop-color:var(--neon-strong);stop-opacity:0"/>
-    <stop offset="55%" style="stop-color:var(--neon);stop-opacity:.4"/>
-    <stop offset="100%" style="stop-color:var(--neon-strong);stop-opacity:.9"/>
-  </radialGradient>`;
-  dialSvg.appendChild(dialDefs);
-  const dialTrack=document.createElementNS(svgNS,'circle');
-  dialTrack.setAttribute('class','pr-dial-track'); dialTrack.setAttribute('cx',dialCx); dialTrack.setAttribute('cy',dialCy); dialTrack.setAttribute('r',ringR);
-  dialSvg.appendChild(dialTrack);
-  const wedgeGroup=document.createElementNS(svgNS,'g'); dialSvg.appendChild(wedgeGroup);
-  const segGroup=document.createElementNS(svgNS,'g'); dialSvg.appendChild(segGroup);
-  const textGroup=document.createElementNS(svgNS,'g'); dialSvg.appendChild(textGroup);
-  const textPathGroup=document.createElementNS(svgNS,'g'); textPathGroup.setAttribute('class','pr-dial-textpaths'); dialSvg.appendChild(textPathGroup);
-  categories.forEach((cat,i)=>{
-    const center=i*(360/dialN); const start=center-dialSweep/2, end=center+dialSweep/2;
-    const reversed=center>90&&center<270;
-    const wedge=document.createElementNS(svgNS,'path');
-    wedge.setAttribute('class','pr-dial-wedge'); wedge.setAttribute('d',dialWedgePath(wedgeR,start,end)); wedge.dataset.catId=cat.id;
-    wedgeGroup.appendChild(wedge);
-    const seg=document.createElementNS(svgNS,'path'); const segId=`prDialArc${i}`;
-    seg.setAttribute('class','pr-dial-seg'); seg.setAttribute('id',segId);
-    seg.setAttribute('d', reversed?dialArcPath(ringR,end,start,0):dialArcPath(ringR,start,end,1));
-    seg.dataset.catId=cat.id; segGroup.appendChild(seg);
-    const textArc=document.createElementNS(svgNS,'path'); const textArcId=`prDialTextArc${i}`;
-    textArc.setAttribute('class','pr-dial-textpath'); textArc.setAttribute('id',textArcId); textArc.setAttribute('fill','none');
-    textArc.setAttribute('d', reversed?dialArcPath(textR,end,start,0):dialArcPath(textR,start,end,1));
-    textPathGroup.appendChild(textArc);
-    const text=document.createElementNS(svgNS,'text'); text.setAttribute('class','pr-dial-text'); text.dataset.catId=cat.id;
-    const textPath=document.createElementNS(svgNS,'textPath');
-    textPath.setAttributeNS('http://www.w3.org/1999/xlink','href','#'+textArcId); textPath.setAttribute('href','#'+textArcId);
-    textPath.setAttribute('startOffset','50%'); textPath.setAttribute('text-anchor','middle');
-    textPath.textContent=cat.label.toUpperCase();
-    text.appendChild(textPath); textGroup.appendChild(text);
-    const selectThis=()=>{ const btn=wheel.querySelector(`.pr-wheel-item[aria-label="${cat.label}"]`); if(btn) showCategory(cat,btn); };
-    wedge.addEventListener('click',selectThis); seg.addEventListener('click',selectThis);
-  });
-  wheel.appendChild(dialSvg);
-  const core=document.createElement('div'); core.className='pr-wheel-core'; core.innerHTML='<div class="core-glow"></div><svg class="core-anim" viewBox="0 0 100 100" aria-hidden="true"><circle class="core-ring core-ring-outer" cx="50" cy="50" r="43"/><circle class="core-ring core-ring-mid" cx="50" cy="50" r="33"/><g class="core-orbit core-orbit-a"><circle class="core-orbit-dot" cx="50" cy="9" r="3"/></g><g class="core-orbit core-orbit-b"><circle class="core-orbit-dot" cx="50" cy="13" r="2"/></g><circle class="core-ping" cx="50" cy="50" r="16"/><circle class="core-pulse" cx="50" cy="50" r="15"/><circle class="core-spark" cx="50" cy="50" r="5"/></svg>'; wheel.appendChild(core);
+  const wheel=document.createElement('div'); wheel.className='pr-tab-grid';
   const detail=document.createElement('div'); detail.className='pr-wheel-detail'; panels.appendChild(wheel); panels.appendChild(detail);
   function makePRField(key){
     const name=labelMap[key]||keyForName.get(key)||key;
@@ -3656,10 +3597,7 @@ function renderPrFields(){
     return field;
   }
   function showCategory(cat,button){
-    wheel.querySelectorAll('.pr-wheel-item').forEach(b=>b.classList.remove('active')); button.classList.add('active');
-    wheel.querySelectorAll('.pr-dial-seg').forEach(s=>s.classList.toggle('active', s.dataset.catId===cat.id));
-    wheel.querySelectorAll('.pr-dial-wedge').forEach(w=>w.classList.toggle('active', w.dataset.catId===cat.id));
-    wheel.querySelectorAll('.pr-dial-text').forEach(t=>t.classList.toggle('active', t.dataset.catId===cat.id));
+    wheel.querySelectorAll('.pr-tab').forEach(b=>b.classList.remove('active')); button.classList.add('active');
     
     detail.innerHTML='';
     const head=document.createElement('div'); head.className='pr-wheel-detail-head';
@@ -3673,9 +3611,9 @@ function renderPrFields(){
     });
     detail.appendChild(grid);
   }
-  categories.forEach(cat=>{const b=document.createElement('button');b.type='button';b.className='pr-wheel-item';b.setAttribute('aria-label',cat.label);b.innerHTML=`<span class="pr-wheel-label">${cat.label}</span>`;b.addEventListener('click',()=>showCategory(cat,b));wheel.appendChild(b);});
+  categories.forEach(cat=>{const b=document.createElement('button');b.type='button';b.className='pr-tab';b.setAttribute('aria-label',cat.label);b.innerHTML=`<span class="pr-tab-burst"></span><span class="pr-tab-name">${cat.label}</span>`;b.addEventListener('click',()=>{showCategory(cat,b);b.classList.remove('burst');void b.offsetWidth;b.classList.add('burst');});wheel.appendChild(b);});
   const initial=categories.find(c=>c.keys.length)||categories[0];
-  const initialButton=Array.from(wheel.querySelectorAll('.pr-wheel-item')).find(b=>b.querySelector('.pr-wheel-label')?.textContent===initial.label);
+  const initialButton=Array.from(wheel.querySelectorAll('.pr-tab')).find(b=>b.querySelector('.pr-tab-name')?.textContent===initial.label);
   if(initialButton) showCategory(initial,initialButton);
 }
 function renderProfile(){
